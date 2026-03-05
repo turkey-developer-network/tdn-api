@@ -6,7 +6,13 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default defineConfig([
     {
-        ignores: ["dist/**", "node_modules/**", "coverage/**", "prisma/**"],
+        ignores: [
+            "dist/**",
+            "node_modules/**",
+            "coverage/**",
+            "prisma/**",
+            "prisma.config.ts",
+        ],
     },
 
     js.configs.recommended,
@@ -42,7 +48,7 @@ export default defineConfig([
             "@typescript-eslint/require-await": "error",
 
             "@typescript-eslint/consistent-type-imports": [
-                "error",
+                "warn",
                 {
                     prefer: "type-imports",
                     fixStyle: "separate-type-imports",

@@ -1,20 +1,26 @@
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify from "fastify";
 
 // Plugins
-import envPlugin from "@plugins/env.plugin";
-
-// Routes
-import healthRoutes from "@routes/health.route";
+import envPlugin from "src/http/plugins/env.plugin";
 
 // Hooks
-import responseWrapperHook from "@hooks/response-wrapper.hook";
+import responseWrapperHook from "src/http/hooks/response-wrapper.hook";
 
 // Custom Plugins
-import errorHandlerPlugin from "@plugins/custom/error-handler.plugin";
+import errorHandlerPlugin from "src/http/plugins/custom/error-handler.plugin";
+import prismaPlugin from "src/http/plugins/custom/prisma.plugin";
+
+//Decorators
+import userServiceDecorator from "src/http/decorators/auth-service.decorator";
+
+// Routes
+import healthRoutes from "src/http/routes/health.route";
+import authRoutes from "src/http/routes/auth.route";
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const server: FastifyInstance = Fastify({
+const server = Fastify({
     allowErrorHandlerOverride: true,
     logger: isDevelopment
         ? {
@@ -27,7 +33,7 @@ const server: FastifyInstance = Fastify({
               },
           }
         : true,
-});
+}).withTypeProvider<TypeBoxTypeProvider>();
 
 /**
  * Registers core Fastify ecosystem plugins.
@@ -43,6 +49,7 @@ function registerPlugins(): void {
  */
 function registerCustomPlugins(): void {
     server.register(errorHandlerPlugin);
+    server.register(prismaPlugin);
 }
 
 /**
@@ -59,8 +66,16 @@ function registerHooks(): void {
  */
 function registerRoutes(): void {
     server.register(healthRoutes, { prefix: "/api/v1" });
+    server.register(authRoutes, { prefix: "/api/v1/auth" });
 }
 
+/**
+ * Registers Fastify decorators (e.g. service layer facades).
+ * Must run after required plugins (like Prisma) so decorators can use fastify.prisma, config, etc.
+ */
+function registerDecorators(): void {
+    server.register(userServiceDecorator);
+}
 /**
  * Initializes and starts the Fastify server.
  * Orchestrates plugin registration, hook setup, and route mounting
@@ -71,12 +86,11 @@ async function startServer(): Promise<void> {
     try {
         registerPlugins();
         await server.after();
-
         registerCustomPlugins();
+        registerDecorators();
         registerHooks();
         registerRoutes();
 
-        // Wait for all plugins to be loaded and decorated
         await server.after();
 
         await server.listen({ port: server.config.PORT, host: "0.0.0.0" });

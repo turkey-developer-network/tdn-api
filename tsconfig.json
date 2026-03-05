@@ -12,13 +12,13 @@
         /* Path Aliases */
         "baseUrl": ".",
         "paths": {
-            "@plugins/*": ["src/plugins/*"],
-            "@custom/*": ["src/plugins/custom/*"],
-            "@services/*": ["src/services/*"],
-            "@hooks/*": ["src/hooks/*"],
-            "@decorators/*": ["src/decorators/*"],
-            "@routes/*": ["src/routes/*"],
-            "@typings/*": ["src/types/*"]
+            "@plugins/*": ["src/http/plugins/*"],
+            "@custom/*": ["src/http/plugins/custom/*"],
+            "@hooks/*": ["src/http/hooks/*"],
+            "@decorators/*": ["src/http/decorators/*"],
+            "@routes/*": ["src/http/routes/*"],
+            "@typings/*": ["src/types/*"],
+            "@generated/*": ["src/generated/*"]
         }
     },
     "include": ["src/**/*"],
