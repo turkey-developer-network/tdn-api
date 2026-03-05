@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "commonjs",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+
+        /* Path Aliases */
+        "baseUrl": ".",
+        "paths": {
+            "@plugins/*": ["src/plugins/*"],
+            "@custom/*": ["src/plugins/custom/*"],
+            "@services/*": ["src/services/*"],
+            "@hooks/*": ["src/hooks/*"],
+            "@decorators/*": ["src/decorators/*"],
+            "@routes/*": ["src/routes/*"],
+            "@typings/*": ["src/types/*"]
+        }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+}
