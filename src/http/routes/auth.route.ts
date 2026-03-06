@@ -1,5 +1,5 @@
 import type { FastifyPluginCallbackTypebox } from "@fastify/type-provider-typebox";
-import { RegisterBodySchema } from "@typings/schemas/auth.types";
+import { RegisterBodySchema } from "@typings/schemas/auth.schema";
 
 const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
     fastify.post(

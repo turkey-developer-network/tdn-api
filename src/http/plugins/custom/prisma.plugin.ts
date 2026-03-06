@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import fastifyPlugin from "fastify-plugin";
-import { createDatabaseClient } from "src/infrastructure/database/database.client";
+import { createDatabaseClient } from "@infrastructure/database/database.client";
+
 async function prismaPlugin(fastify: FastifyInstance): Promise<void> {
     const client = createDatabaseClient(fastify.config.DATABASE_URL);
 

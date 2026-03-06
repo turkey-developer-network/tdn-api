@@ -17,8 +17,10 @@
             "@hooks/*": ["src/http/hooks/*"],
             "@decorators/*": ["src/http/decorators/*"],
             "@routes/*": ["src/http/routes/*"],
-            "@typings/*": ["src/types/*"],
-            "@generated/*": ["src/generated/*"]
+            "@typings/*": ["src/http/types/*"],
+            "@generated/*": ["src/generated/*"],
+            "@infrastructure/*": ["src/infrastructure/*"],
+            "@core/*": ["src/core/*"]
         }
     },
     "include": ["src/**/*"],

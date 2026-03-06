@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 // Plugins
 import envPlugin from "src/http/plugins/env.plugin";
@@ -16,7 +17,6 @@ import userServiceDecorator from "src/http/decorators/auth-service.decorator";
 // Routes
 import healthRoutes from "src/http/routes/health.route";
 import authRoutes from "src/http/routes/auth.route";
-import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 

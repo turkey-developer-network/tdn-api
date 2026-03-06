@@ -1,5 +1,5 @@
 import type { Prisma, User as PrismaUser } from "@generated/prisma/client";
-import { User } from "src/core/entities/user.entity";
+import { User } from "@core/entities/user.entity";
 
 export default class UserPrismaMapper {
     /**
