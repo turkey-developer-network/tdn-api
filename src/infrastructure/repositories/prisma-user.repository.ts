@@ -2,6 +2,8 @@ import type { PrismaClient } from "@generated/prisma/client";
 import type { User } from "@core/entities/user.entity";
 import type { IUserRepository } from "@core/repositories/user.repository";
 import UserPrismaMapper from "../mappers/user-prisma.mapper";
+import { UserAlreadyExistsError } from "@core/errors";
+import { PrismaClientKnownRequestError } from "@generated/prisma/internal/prismaNamespace";
 
 export class PrismaUserRepository implements IUserRepository {
     constructor(private readonly prisma: PrismaClient) {}
@@ -11,10 +13,18 @@ export class PrismaUserRepository implements IUserRepository {
         username: string;
         passwordHash: string | null;
     }): Promise<User> {
-        const user = await this.prisma.user.create({
-            data: UserPrismaMapper.toPrismaCreateUser(data),
-        });
+        try {
+            const user = await this.prisma.user.create({
+                data: UserPrismaMapper.toPrismaCreateUser(data),
+            });
 
-        return UserPrismaMapper.toDomainUser(user);
+            return UserPrismaMapper.toDomainUser(user);
+        } catch (error: unknown) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                if (error.code === "P2002") throw new UserAlreadyExistsError();
+            }
+
+            throw error;
+        }
     }
 }

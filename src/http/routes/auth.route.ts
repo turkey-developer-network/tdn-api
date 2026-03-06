@@ -1,19 +1,22 @@
 import type { FastifyPluginCallbackTypebox } from "@fastify/type-provider-typebox";
-import { RegisterBodySchema } from "@typings/schemas/auth.schema";
+import {
+    RegisterBodySchema,
+    RegisterResponseSchema,
+} from "@typings/schemas/auth.schema";
 
 const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
     fastify.post(
         "/register",
-        { schema: { body: RegisterBodySchema } },
-        async (req) => {
-            const { id, username, createdAt } =
-                await fastify.authService.register(req.body);
-
-            return {
-                id,
-                username,
-                createdAt: createdAt.toISOString(),
-            };
+        {
+            schema: {
+                body: RegisterBodySchema,
+                response: { 201: RegisterResponseSchema },
+            },
+        },
+        async (request, reply) => {
+            const response = await fastify.authService.register(request.body);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            reply.status(201).send(response as any);
         },
     );
 

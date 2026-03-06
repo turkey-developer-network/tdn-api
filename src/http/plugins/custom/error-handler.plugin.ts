@@ -1,3 +1,4 @@
+import { CustomError } from "@core/errors";
 import type {
     FastifyError,
     FastifyInstance,
@@ -37,6 +38,28 @@ function errorHandlerPlugin(
      */
     fastify.setErrorHandler(
         (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+            if (error instanceof CustomError) {
+                const errorResponse = {
+                    type: "about:blank",
+                    title: error.name,
+                    status: error.statusCode,
+                    detail: error.message,
+                    instance: request.url,
+                };
+                return void reply.status(error.statusCode).send(errorResponse);
+            }
+
+            if (error.validation) {
+                const errorResponse = {
+                    type: "about:blank",
+                    title: "Validation Error",
+                    status: 400,
+                    detail: "Invalid data format provided.",
+                    instance: request.url,
+                    validation: error.validation,
+                };
+                return void reply.status(400).send(errorResponse);
+            }
             const statusCode = error.statusCode || 500;
 
             // Log internal server errors (500+) for debugging
@@ -49,7 +72,10 @@ function errorHandlerPlugin(
                 type: "about:blank",
                 title: error.name || "Internal Server Error",
                 status: statusCode,
-                detail: error.message || "An unexpected error occurred.",
+                detail:
+                    statusCode >= 500
+                        ? "An unexpected error occurred."
+                        : error.message,
                 instance: request.url,
             };
 

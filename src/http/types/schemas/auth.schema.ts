@@ -1,4 +1,4 @@
-import { type Static, Type } from "@sinclair/typebox";
+import { type Static, type TSchema, Type } from "@sinclair/typebox";
 
 export const RegisterBodySchema = Type.Object({
     email: Type.String({ format: "email" }),
@@ -7,3 +7,25 @@ export const RegisterBodySchema = Type.Object({
 });
 
 export type RegisterBody = Static<typeof RegisterBodySchema>;
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const createResponseSchema = <T extends TSchema>(schema: T) => {
+    return Type.Object({
+        data: schema,
+        meta: Type.Object({
+            timestamp: Type.String({ format: "date-time" }),
+        }),
+    });
+};
+
+export const RegisterResponseDataSchema = Type.Object({
+    id: Type.String({ format: "uuid" }),
+    username: Type.String(),
+    createdAt: Type.String({ format: "date-time" }),
+});
+
+export type RegisterResponseData = Static<typeof RegisterResponseDataSchema>;
+
+export const RegisterResponseSchema = createResponseSchema(
+    RegisterResponseDataSchema,
+);
