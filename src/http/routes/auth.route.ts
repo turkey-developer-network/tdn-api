@@ -3,7 +3,7 @@ import {
     RegisterBodySchema,
     RegisterResponseSchema,
     LoginBodySchema,
-    LoginResponseSchema, // Updated: Using the wrapped schema
+    LoginResponseSchema,
     type RegisterResponse,
     type LoginResponse,
 } from "@typings/schemas/auth.schema";
