@@ -1,5 +1,8 @@
-import type { UserPayload } from "@core/interfaces/user-payload.interface";
-import type { TokenPort, TokenResult } from "@core/ports/token.port";
+import type {
+    TokenPort,
+    TokenResult,
+    UserPayload,
+} from "@core/ports/token.port";
 import type { FastifyInstance } from "fastify";
 
 export class JwtService implements TokenPort {

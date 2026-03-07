@@ -1,4 +1,7 @@
-import type { UserPayload } from "../interfaces/user-payload.interface";
+export interface UserPayload {
+    id: string;
+    username: string;
+}
 
 export interface TokenResult {
     accessToken: string;

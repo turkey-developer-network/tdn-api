@@ -1,7 +1,6 @@
 import { InvalidCredentialsError } from "@core/errors/invalid-credentials.error";
-import type { UserPayload } from "@core/interfaces/user-payload.interface";
 import type { PasswordPort } from "@core/ports/password.port";
-import type { TokenPort } from "@core/ports/token.port";
+import type { TokenPort, UserPayload } from "@core/ports/token.port";
 import type { IUserRepository } from "@core/repositories/user.repository";
 
 interface LoginInput {
