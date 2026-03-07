@@ -3,10 +3,10 @@ import {
     RegisterBodySchema,
     RegisterResponseSchema,
     LoginBodySchema,
-    LoginResponseDataSchema,
-    type LoginBody,
+    LoginResponseSchema, // Updated: Using the wrapped schema
+    type RegisterResponse,
+    type LoginResponse,
 } from "@typings/schemas/auth.schema";
-import type { FastifyReply, FastifyRequest } from "fastify";
 
 const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
     fastify.post(
@@ -19,8 +19,8 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
         },
         async (request, reply) => {
             const response = await fastify.authService.register(request.body);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            reply.status(201).send(response as any);
+            reply.status(201);
+            return response as unknown as RegisterResponse;
         },
     );
 
@@ -30,14 +30,14 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             schema: {
                 body: LoginBodySchema,
                 response: {
-                    201: LoginResponseDataSchema,
+                    200: LoginResponseSchema,
                 },
             },
         },
         async (request, reply) => {
             const response = await fastify.authService.login(request.body);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            reply.status(201).send(response as any);
+            reply.status(200);
+            return response as unknown as LoginResponse;
         },
     );
 

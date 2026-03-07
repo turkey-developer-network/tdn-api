@@ -1,5 +1,9 @@
-import { type Static, type TSchema, Type } from "@sinclair/typebox";
+import { type Static, Type } from "@sinclair/typebox";
+import { createResponseSchema } from "./create-response-schema";
 
+/**
+ * Expected HTTP request body schema for user registration.
+ */
 export const RegisterBodySchema = Type.Object({
     email: Type.String({ format: "email" }),
     username: Type.String({ minLength: 3, maxLength: 32 }),
@@ -8,16 +12,10 @@ export const RegisterBodySchema = Type.Object({
 
 export type RegisterBody = Static<typeof RegisterBodySchema>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const createResponseSchema = <T extends TSchema>(schema: T) => {
-    return Type.Object({
-        data: schema,
-        meta: Type.Object({
-            timestamp: Type.String({ format: "date-time" }),
-        }),
-    });
-};
-
+/**
+ * Internal DTO schema for a successful registration response.
+ * Note: This payload will be wrapped by the global response formatter.
+ */
 export const RegisterResponseDataSchema = Type.Object({
     id: Type.String({ format: "uuid" }),
     username: Type.String(),
@@ -26,10 +24,19 @@ export const RegisterResponseDataSchema = Type.Object({
 
 export type RegisterResponseData = Static<typeof RegisterResponseDataSchema>;
 
+/**
+ * Standard wrapped HTTP response schema for registration sent to the client.
+ */
 export const RegisterResponseSchema = createResponseSchema(
     RegisterResponseDataSchema,
 );
 
+export type RegisterResponse = Static<typeof RegisterResponseSchema>;
+
+/**
+ * Expected HTTP request body schema for user login.
+ * The identifier can be either an email address or a username.
+ */
 export const LoginBodySchema = Type.Object({
     identifier: Type.String(),
     password: Type.String(),
@@ -37,16 +44,26 @@ export const LoginBodySchema = Type.Object({
 
 export type LoginBody = Static<typeof LoginBodySchema>;
 
-export const LoginResponseSchema = Type.Object({
+/**
+ * Internal DTO schema for a successful login response.
+ * Contains the access token, expiration timestamp, and basic user profile.
+ */
+export const LoginResponseDataSchema = Type.Object({
     accessToken: Type.String(),
     expiresAt: Type.Number(),
     user: Type.Object({
-        id: Type.String({ format: "uuid " }),
+        id: Type.String({ format: "uuid" }),
         username: Type.String(),
     }),
 });
 
-export type LoginResponse = Static<typeof LoginResponseSchema>;
+export type LoginResponseData = Static<typeof LoginResponseDataSchema>;
 
-export const LoginResponseDataSchema =
-    createResponseSchema(LoginResponseSchema);
+/**
+ * Standard wrapped HTTP response schema for login sent to the client.
+ */
+export const LoginResponseSchema = createResponseSchema(
+    LoginResponseDataSchema,
+);
+
+export type LoginResponse = Static<typeof LoginResponseSchema>;
