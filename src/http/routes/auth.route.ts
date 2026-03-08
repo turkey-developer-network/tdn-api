@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "@core/errors/unauthorized.error";
 import type { FastifyPluginCallbackTypebox } from "@fastify/type-provider-typebox";
 import {
     RegisterBodySchema,
@@ -73,6 +74,49 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
 
             reply.status(200);
             return responseData as unknown as LoginResponse;
+        },
+    );
+
+    fastify.post(
+        "/refresh",
+        {
+            schema: {
+                response: { 200: LoginResponseSchema },
+            },
+        },
+        async (request, reply) => {
+            const rawCookie = request.cookies.refreshToken;
+
+            if (!rawCookie) {
+                throw new UnauthorizedError("Authentication session not found");
+            }
+
+            const unsignedCookie = request.unsignCookie(rawCookie);
+
+            if (!unsignedCookie.valid || !unsignedCookie.value) {
+                throw new UnauthorizedError("Invalid session signature");
+            }
+
+            const response = await fastify.authService.refresh({
+                token: unsignedCookie.value,
+                deviceIp: request.ip,
+                userAgent: request.headers["user-agent"] || "Unknown Device",
+            });
+
+            reply.setCookie("refreshToken", response.refreshToken, {
+                path: "/",
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                expires: response.refreshTokenExpiresAt,
+                signed: true,
+            });
+
+            return {
+                accessToken: response.accessToken,
+                expiresAt: response.expiresAt,
+                user: response.user,
+            } as unknown as LoginResponse;
         },
     );
 

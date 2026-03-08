@@ -8,4 +8,6 @@ export interface IRefreshTokenRepository {
         userAgent: string;
         expiresAt: Date;
     }): Promise<RefreshToken>;
+    findByToken(token: string): Promise<RefreshToken | null>;
+    update(refreshToken: RefreshToken): Promise<void>;
 }

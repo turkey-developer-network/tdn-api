@@ -8,6 +8,7 @@ import { RegisterUseCase } from "@core/use-cases/register.usecase";
 import { LoginUseCase } from "@core/use-cases/login.usecase";
 import { JwtService } from "@infrastructure/services/jwt.service";
 import { PrismaRefreshTokenRepository } from "@infrastructure/repositories/prisma-refresh-token.repository";
+import { RefreshUseCase } from "@core/use-cases/refresh.usecase";
 function authServiceDecorator(fastify: FastifyInstance): void {
     const userRepo = new PrismaUserRepository(fastify.prisma);
     const passwordService = new PasswordService();
@@ -21,20 +22,24 @@ function authServiceDecorator(fastify: FastifyInstance): void {
         fastify.config.ACCESS_TOKEN_EXPIRES_IN,
         fastify.config.REFRESH_TOKEN_EXPIRES_IN,
     );
-    const refreshTokenRepository = new PrismaRefreshTokenRepository(
-        fastify.prisma,
-    );
+    const refreshTokenRepo = new PrismaRefreshTokenRepository(fastify.prisma);
 
     const loginUseCase = new LoginUseCase(
         userRepo,
         passwordService,
         jwtService,
-        refreshTokenRepository,
+        refreshTokenRepo,
+    );
+
+    const refreshUseCase = new RefreshUseCase(
+        refreshTokenRepo,
+        userRepo,
+        jwtService,
     );
 
     fastify.decorate(
         "authService",
-        new AuthService(registerUseCase, loginUseCase),
+        new AuthService(registerUseCase, loginUseCase, refreshUseCase),
     );
 }
 
