@@ -11,4 +11,5 @@ export interface IRefreshTokenRepository {
     findByToken(token: string): Promise<RefreshToken | null>;
     update(refreshToken: RefreshToken): Promise<void>;
     deleteInvalidBefore(date: Date): Promise<number>;
+    revokeAllByUserId(userId: string): Promise<void>;
 }

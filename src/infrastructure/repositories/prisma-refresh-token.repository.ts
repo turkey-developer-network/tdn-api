@@ -1,9 +1,10 @@
-import type { PrismaClient } from "@generated/prisma/client";
 import type { IRefreshTokenRepository } from "@core/repositories/refresh-token.repository";
 import type { RefreshToken } from "@core/entities/refresh-token.entity";
 import { RefreshTokenPrismaMapper } from "@infrastructure/mappers/refresh-token.prisma.mapper";
+import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
+
 export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(private readonly prisma: PrismaTransactionalClient) {}
 
     async create(data: {
         token: string;
@@ -65,5 +66,18 @@ export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
         });
 
         return result.count;
+    }
+
+    async revokeAllByUserId(userId: string): Promise<void> {
+        await this.prisma.refreshToken.updateMany({
+            where: {
+                userId,
+                isRevoked: false,
+            },
+            data: {
+                isRevoked: true,
+                updatedAt: new Date(),
+            },
+        });
     }
 }

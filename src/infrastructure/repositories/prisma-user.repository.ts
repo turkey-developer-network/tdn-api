@@ -1,12 +1,12 @@
-import type { PrismaClient } from "@generated/prisma/client";
 import type { User } from "@core/entities/user.entity";
 import type { IUserRepository } from "@core/repositories/user.repository";
 import UserPrismaMapper from "../mappers/user-prisma.mapper";
 import { UserAlreadyExistsError } from "@core/errors";
 import { PrismaClientKnownRequestError } from "@generated/prisma/internal/prismaNamespace";
+import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
 
 export class PrismaUserRepository implements IUserRepository {
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(private readonly prisma: PrismaTransactionalClient) {}
 
     async create(data: {
         email: string;

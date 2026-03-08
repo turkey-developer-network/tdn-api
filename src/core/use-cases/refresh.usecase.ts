@@ -1,7 +1,6 @@
 import { UnauthorizedError } from "@core/errors/unauthorized.error";
 import type { TokenPort, UserPayload } from "@core/ports/token.port";
-import type { IRefreshTokenRepository } from "@core/repositories/refresh-token.repository";
-import type { IUserRepository } from "@core/repositories/user.repository";
+import type { TransactionPort } from "@core/ports/transaction.port";
 
 export interface RefreshInput {
     token: string;
@@ -19,51 +18,69 @@ export interface RefreshOutput {
 
 export class RefreshUseCase {
     constructor(
-        private readonly refreshTokenRepository: IRefreshTokenRepository,
-        private readonly userRepository: IUserRepository,
+        private readonly transactionPort: TransactionPort,
         private readonly tokenService: TokenPort,
     ) {}
 
     async execute(input: RefreshInput): Promise<RefreshOutput> {
-        const currentToken = await this.refreshTokenRepository.findByToken(
-            input.token,
-        );
+        return await this.transactionPort.runInTransaction(async (ctx) => {
+            const currentToken = await ctx.refreshTokenRepository.findByToken(
+                input.token,
+            );
 
-        if (!currentToken || !currentToken.isValid()) {
-            throw new UnauthorizedError("Session is no longer valid");
-        }
+            if (!currentToken) {
+                throw new UnauthorizedError("Session not found");
+            }
 
-        const user = await this.userRepository.findById(currentToken.userId);
+            if (currentToken.isRevoked) {
+                await ctx.refreshTokenRepository.revokeAllByUserId(
+                    currentToken.userId,
+                );
 
-        if (!user || user.isDeleted()) {
-            throw new UnauthorizedError("User account unavailable");
-        }
+                throw new UnauthorizedError(
+                    "Security alert: Session compromised. All sessions revoked.",
+                );
+            }
 
-        currentToken.revoke();
-        await this.refreshTokenRepository.update(currentToken);
+            if (currentToken.isExpired()) {
+                throw new UnauthorizedError("Session expired");
+            }
 
-        const payload: UserPayload = {
-            id: user.id,
-            username: user.username,
-        };
+            const user = await ctx.userRepository.findById(currentToken.userId);
+            if (!user || user.isDeleted()) {
+                throw new UnauthorizedError("User account unavailable");
+            }
 
-        const { accessToken, expiresAt, refreshToken, refreshTokenExpiresAt } =
-            this.tokenService.generate(payload);
+            currentToken.revoke();
+            await ctx.refreshTokenRepository.update(currentToken);
 
-        await this.refreshTokenRepository.create({
-            token: refreshToken,
-            userId: user.id,
-            deviceIp: input.deviceIp,
-            userAgent: input.userAgent,
-            expiresAt: refreshTokenExpiresAt,
+            const payload: UserPayload = {
+                id: user.id,
+                username: user.username,
+            };
+
+            const {
+                accessToken,
+                expiresAt,
+                refreshToken,
+                refreshTokenExpiresAt,
+            } = this.tokenService.generate(payload);
+
+            await ctx.refreshTokenRepository.create({
+                token: refreshToken,
+                userId: user.id,
+                deviceIp: input.deviceIp,
+                userAgent: input.userAgent,
+                expiresAt: refreshTokenExpiresAt,
+            });
+
+            return {
+                accessToken,
+                expiresAt,
+                refreshToken,
+                refreshTokenExpiresAt,
+                user: payload,
+            };
         });
-
-        return {
-            accessToken,
-            expiresAt,
-            refreshToken,
-            refreshTokenExpiresAt,
-            user: payload,
-        };
     }
 }
