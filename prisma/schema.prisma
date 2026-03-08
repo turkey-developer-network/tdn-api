@@ -14,16 +14,39 @@ datasource db {
 }
 
 model User {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    email String @unique
-    username String @unique
+  email    String @unique
+  username String @unique
 
-    password String? //Hashed password
+  password String? //Hashed password
 
-    deletedAt DateTime?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  refreshTokens RefreshToken[]
 
-    @@map("users")
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+
+  isRevoked Boolean @default(false)
+
+  deviceIp  String
+  userAgent String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
 }

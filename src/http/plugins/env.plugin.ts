@@ -4,7 +4,13 @@ import fastifyPlugin from "fastify-plugin";
 
 const envSchema = {
     type: "object",
-    required: ["PORT", "NODE_ENV", "DATABASE_URL"],
+    required: [
+        "PORT",
+        "NODE_ENV",
+        "DATABASE_URL",
+        "ACCESS_TOKEN_SECRET_KEY",
+        "COOKIE_SECRET",
+    ],
     properties: {
         PORT: { type: "number", default: 3000 },
         NODE_ENV: {
@@ -14,6 +20,8 @@ const envSchema = {
         DATABASE_URL: { type: "string" },
         ACCESS_TOKEN_SECRET_KEY: { type: "string" },
         ACCESS_TOKEN_EXPIRES_IN: { type: "number", default: 900 },
+        REFRESH_TOKEN_EXPIRES_IN: { type: "number", default: 90000 },
+        COOKIE_SECRET: { type: "string" },
     },
 };
 

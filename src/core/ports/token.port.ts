@@ -6,6 +6,8 @@ export interface UserPayload {
 export interface TokenResult {
     accessToken: string;
     expiresAt: number;
+    refreshToken: string;
+    refreshTokenExpiresAt: Date;
 }
 
 export interface TokenPort {

@@ -1,12 +1,13 @@
 import type { User } from "@core/entities/user.entity";
-import type { LoginUseCase } from "@core/use-cases/login.usecase";
-import type { RegisterUseCase } from "@core/use-cases/register.usecase";
 import type {
-    RegisterResponseData,
-    RegisterBody,
-    LoginBody,
-    LoginResponseData,
-} from "@typings/schemas/auth.schema";
+    LoginInput,
+    LoginOutput,
+    LoginUseCase,
+} from "@core/use-cases/login.usecase";
+import type {
+    RegisterInput,
+    RegisterUseCase,
+} from "@core/use-cases/register.usecase";
 
 export class AuthService {
     constructor(
@@ -14,19 +15,13 @@ export class AuthService {
         private readonly loginUseCase: LoginUseCase,
     ) {}
 
-    async register(body: RegisterBody): Promise<RegisterResponseData> {
-        const user: User = await this.registerUseCase.execute(body);
-
-        return {
-            id: user.id,
-            username: user.username,
-            createdAt: user.createdAt.toISOString(),
-        };
+    async register(input: RegisterInput): Promise<User> {
+        const user: User = await this.registerUseCase.execute(input);
+        return user;
     }
 
-    async login(body: LoginBody): Promise<LoginResponseData> {
-        const result = await this.loginUseCase.execute(body);
-
+    async login(input: LoginInput): Promise<LoginOutput> {
+        const result = await this.loginUseCase.execute(input);
         return result;
     }
 }

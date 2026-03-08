@@ -10,6 +10,8 @@ declare module "fastify" {
             DATABASE_URL: string;
             ACCESS_TOKEN_SECRET_KEY: string;
             ACCESS_TOKEN_EXPIRES_IN: number;
+            REFRESH_TOKEN_EXPIRES_IN: number;
+            COOKIE_SECRET: string;
         };
         prisma: PrismaClient;
         authService: AuthService;

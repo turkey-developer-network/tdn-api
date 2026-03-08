@@ -18,9 +18,20 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             },
         },
         async (request, reply) => {
-            const response = await fastify.authService.register(request.body);
+            const user = await fastify.authService.register({
+                email: request.body.email,
+                username: request.body.username,
+                password: request.body.password,
+            });
+
+            const responseData = {
+                id: user.id,
+                username: user.username,
+                createdAt: user.createdAt.toISOString(),
+            };
+
             reply.status(201);
-            return response as unknown as RegisterResponse;
+            return responseData as unknown as RegisterResponse;
         },
     );
 
@@ -35,9 +46,33 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             },
         },
         async (request, reply) => {
-            const response = await fastify.authService.login(request.body);
+            const deviceIp = request.ip;
+            const userAgent = request.headers["user-agent"] || "Unknown Device";
+
+            const response = await fastify.authService.login({
+                identifier: request.body.identifier,
+                password: request.body.password,
+                deviceIp,
+                userAgent,
+            });
+
+            reply.setCookie("refreshToken", response.refreshToken, {
+                path: "/",
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                expires: response.refreshTokenExpiresAt,
+                signed: true,
+            });
+
+            const responseData = {
+                accessToken: response.accessToken,
+                expiresAt: response.expiresAt,
+                user: response.user,
+            };
+
             reply.status(200);
-            return response as unknown as LoginResponse;
+            return responseData as unknown as LoginResponse;
         },
     );
 

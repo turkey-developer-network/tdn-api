@@ -23,11 +23,37 @@ export class User {
         return this.props.username;
     }
 
+    get passwordHash(): string | null {
+        return this.props.passwordHash;
+    }
+
+    get deletedAt(): Date | null {
+        return this.props.deletedAt;
+    }
+
     get createdAt(): Date {
         return this.props.createdAt;
     }
 
-    get passwordHash(): string | null {
-        return this.props.passwordHash;
+    get updatedAt(): Date {
+        return this.props.updatedAt;
+    }
+
+    public isDeleted(): boolean {
+        return this.props.deletedAt !== null;
+    }
+
+    public hasPassword(): boolean {
+        return this.props.passwordHash !== null;
+    }
+
+    public delete(): void {
+        this.props.deletedAt = new Date();
+        this.props.updatedAt = new Date();
+    }
+
+    public restore(): void {
+        this.props.deletedAt = null;
+        this.props.updatedAt = new Date();
     }
 }

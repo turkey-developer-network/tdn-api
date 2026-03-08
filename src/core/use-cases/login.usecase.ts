@@ -1,16 +1,21 @@
 import { InvalidCredentialsError } from "@core/errors/invalid-credentials.error";
 import type { PasswordPort } from "@core/ports/password.port";
 import type { TokenPort, UserPayload } from "@core/ports/token.port";
+import type { IRefreshTokenRepository } from "@core/repositories/refresh-token.repository";
 import type { IUserRepository } from "@core/repositories/user.repository";
 
-interface LoginInput {
+export interface LoginInput {
     identifier: string;
     password: string;
+    userAgent: string;
+    deviceIp: string;
 }
 
-interface LoginOutput {
+export interface LoginOutput {
     accessToken: string;
     expiresAt: number;
+    refreshToken: string;
+    refreshTokenExpiresAt: Date;
     user: UserPayload;
 }
 
@@ -19,6 +24,7 @@ export class LoginUseCase {
         private readonly userRepository: IUserRepository,
         private readonly passwordService: PasswordPort,
         private readonly tokenService: TokenPort,
+        private readonly refreshTokenRepository: IRefreshTokenRepository,
     ) {}
 
     async execute(input: LoginInput): Promise<LoginOutput> {
@@ -26,13 +32,21 @@ export class LoginUseCase {
             input.identifier,
         );
 
-        if (!user || !user.passwordHash) {
+        if (!user) {
+            throw new InvalidCredentialsError();
+        }
+
+        if (user.isDeleted()) {
+            throw new InvalidCredentialsError();
+        }
+
+        if (!user.hasPassword()) {
             throw new InvalidCredentialsError();
         }
 
         const isPasswordValid = await this.passwordService.verify(
             input.password,
-            user.passwordHash,
+            user.passwordHash as string,
         );
 
         if (!isPasswordValid) {
@@ -44,11 +58,22 @@ export class LoginUseCase {
             username: user.username,
         };
 
-        const { accessToken, expiresAt } = this.tokenService.generate(payload);
+        const { accessToken, expiresAt, refreshToken, refreshTokenExpiresAt } =
+            this.tokenService.generate(payload);
+
+        await this.refreshTokenRepository.create({
+            token: refreshToken,
+            userId: user.id,
+            deviceIp: input.deviceIp,
+            userAgent: input.userAgent,
+            expiresAt: refreshTokenExpiresAt,
+        });
 
         return {
             accessToken,
             expiresAt,
+            refreshToken,
+            refreshTokenExpiresAt,
             user: payload,
         };
     }

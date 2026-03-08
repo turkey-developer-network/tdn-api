@@ -4,6 +4,7 @@ import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 // Plugins
 import envPlugin from "@plugins/env.plugin";
 import jwtPlugin from "@plugins/jwt.plugin";
+import cookiePlguin from "@plugins/cookie.plguin";
 
 // Hooks
 import responseWrapperHook from "@hooks/response-wrapper.hook";
@@ -43,6 +44,7 @@ const server = Fastify({
 async function registerPlugins(): Promise<void> {
     server.register(envPlugin);
     await server.after();
+    server.register(cookiePlguin);
     server.register(jwtPlugin);
 }
 
