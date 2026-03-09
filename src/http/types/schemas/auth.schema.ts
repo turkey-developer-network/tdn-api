@@ -79,3 +79,17 @@ export const VerifyEmailSchema = Type.Object({
 });
 
 export type VerifyEmailBody = Static<typeof VerifyEmailSchema>;
+
+export const ForgotPasswordSchema = Type.Object({
+    email: Type.String({ format: "email" }),
+});
+
+export type ForgotPasswordBody = Static<typeof ForgotPasswordSchema>;
+
+export const ResetPasswordSchema = Type.Object({
+    email: Type.String({ format: "email" }),
+    otp: Type.String({ minLength: 8, maxLength: 8 }),
+    newPassword: Type.String(),
+});
+
+export type ResetPasswordBody = Static<typeof ResetPasswordSchema>;

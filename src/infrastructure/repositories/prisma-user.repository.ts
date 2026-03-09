@@ -64,4 +64,12 @@ export class PrismaUserRepository implements IUserRepository {
             },
         });
     }
+
+    async findByEmail(email: string): Promise<User | null> {
+        const rawUser = await this.prisma.user.findFirst({ where: { email } });
+
+        if (!rawUser) return null;
+
+        return UserPrismaMapper.toDomainUser(rawUser);
+    }
 }

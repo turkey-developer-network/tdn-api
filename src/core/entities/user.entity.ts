@@ -48,6 +48,10 @@ export class User {
         return this.props.passwordHash !== null;
     }
 
+    public set hashPassword(newPasswordHash: string) {
+        this.props.passwordHash = newPasswordHash;
+    }
+
     public delete(): void {
         this.props.deletedAt = new Date();
         this.props.updatedAt = new Date();

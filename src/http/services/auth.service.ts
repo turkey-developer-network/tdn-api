@@ -1,5 +1,9 @@
 import type { User } from "@core/entities/user.entity";
 import type {
+    ForgotPasswordInput,
+    ForgotPasswordUseCase,
+} from "@core/use-cases/auth/forgot-password.usecase";
+import type {
     LoginInput,
     LoginOutput,
     LoginUseCase,
@@ -18,6 +22,10 @@ import type {
     RegisterUseCase,
 } from "@core/use-cases/auth/register.usecase";
 import type {
+    ResetPasswordInput,
+    ResetPasswordUseCase,
+} from "@core/use-cases/auth/reset-password.usecase";
+import type {
     SendVerificationEmailInput,
     SendVerificationEmailUseCase,
 } from "@core/use-cases/auth/send-verification-email.usecase";
@@ -34,6 +42,8 @@ export class AuthService {
         private readonly logoutUseCase: LogoutUseCase,
         private readonly sendVerificationEmailUseCase: SendVerificationEmailUseCase,
         private readonly verifyEmailUseCase: VerifyEmailUseCase,
+        private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+        private readonly resetPasswordUseCase: ResetPasswordUseCase,
     ) {}
 
     async register(input: RegisterInput): Promise<User> {
@@ -62,5 +72,13 @@ export class AuthService {
 
     async verifyEmail(input: VerifyEmailInput): Promise<void> {
         return this.verifyEmailUseCase.execute(input);
+    }
+
+    async forgotPassword(input: ForgotPasswordInput): Promise<void> {
+        return this.forgotPasswordUseCase.execute(input);
+    }
+
+    async resetPassword(input: ResetPasswordInput): Promise<void> {
+        return this.resetPasswordUseCase.execute(input);
     }
 }

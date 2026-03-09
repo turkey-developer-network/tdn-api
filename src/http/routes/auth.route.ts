@@ -9,6 +9,10 @@ import {
     type LoginResponse,
     type VerifyEmailBody,
     VerifyEmailSchema,
+    ForgotPasswordSchema,
+    type ForgotPasswordBody,
+    type ResetPasswordBody,
+    ResetPasswordSchema,
 } from "@typings/schemas/auth.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
@@ -180,6 +184,42 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             return reply.status(200).send({
                 message:
                     "Email verified successfully. Your account is now fully active.",
+            });
+        },
+    );
+
+    fastify.post<{ Body: ForgotPasswordBody }>(
+        "/forgot-password",
+        {
+            schema: {
+                body: ForgotPasswordSchema,
+            },
+        },
+        async (request, reply) => {
+            const { email } = request.body;
+            await fastify.authService.forgotPassword({ email });
+            reply.status(204).send();
+        },
+    );
+
+    fastify.post<{ Body: ResetPasswordBody }>(
+        "/reset-password",
+        {
+            schema: {
+                body: ResetPasswordSchema,
+            },
+        },
+        async (request, reply) => {
+            const { email, otp, newPassword } = request.body;
+            await fastify.authService.resetPassword({
+                email,
+                otp,
+                newPassword,
+            });
+
+            return reply.status(200).send({
+                message:
+                    "Your password has been reset successfully. You can now login with your new password.",
             });
         },
     );
