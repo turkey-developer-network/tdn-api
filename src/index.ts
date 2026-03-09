@@ -5,9 +5,7 @@ import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import envPlugin from "@plugins/env.plugin";
 import jwtPlugin from "@plugins/jwt.plugin";
 import cookiePlguin from "@plugins/cookie.plguin";
-
-// Hooks
-import responseWrapperHook from "@hooks/response-wrapper.hook";
+import rateLimitPlugin from "@plugins/rate-limit.plugin";
 
 // Custom Plugins
 import errorHandlerPlugin from "@plugins/custom/error-handler.plugin";
@@ -48,6 +46,7 @@ async function registerPlugins(): Promise<void> {
     await server.after();
     server.register(cookiePlguin);
     server.register(jwtPlugin);
+    server.register(rateLimitPlugin);
 }
 
 /**
@@ -62,11 +61,8 @@ function registerCustomPlugins(): void {
 
 /**
  * Registers global lifecycle hooks.
- * Used for intercepting and transforming requests or responses.
  */
-function registerHooks(): void {
-    server.register(responseWrapperHook);
-}
+function registerHooks(): void {}
 
 /**
  * Registers application API routes.

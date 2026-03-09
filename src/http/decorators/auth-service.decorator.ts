@@ -17,6 +17,7 @@ import { SendVerificationEmailUseCase } from "@core/use-cases/auth/send-verifica
 import { VerifyEmailUseCase } from "@core/use-cases/auth/verify-email.usecase";
 import { ForgotPasswordUseCase } from "@core/use-cases/auth/forgot-password.usecase";
 import { ResetPasswordUseCase } from "@core/use-cases/auth/reset-password.usecase";
+import { OtpService } from "@infrastructure/services/otp.service";
 
 function authServiceDecorator(fastify: FastifyInstance): void {
     const userRepo = new PrismaUserRepository(fastify.prisma);
@@ -62,17 +63,20 @@ function authServiceDecorator(fastify: FastifyInstance): void {
         fastify.log,
     );
 
+    const otpService = new OtpService();
+
     const sendVerificationEmailUseCase = new SendVerificationEmailUseCase(
         userRepo,
         verificationTokenRepo,
         jwtService,
         emailService,
+        otpService,
     );
 
     const verifyEmailUseCase = new VerifyEmailUseCase(
         userRepo,
         verificationTokenRepo,
-        jwtService,
+        otpService,
     );
 
     const forgotPasswordUseCase = new ForgotPasswordUseCase(
@@ -80,6 +84,7 @@ function authServiceDecorator(fastify: FastifyInstance): void {
         verificationTokenRepo,
         jwtService,
         emailService,
+        otpService,
     );
 
     const resetPasswordUseCase = new ResetPasswordUseCase(
@@ -87,6 +92,7 @@ function authServiceDecorator(fastify: FastifyInstance): void {
         verificationTokenRepo,
         jwtService,
         passwordService,
+        otpService,
     );
 
     fastify.decorate(

@@ -1,6 +1,6 @@
-import type { User } from "../entities/user.entity";
-import type { PasswordPort } from "../ports/password.port";
-import type { CreateUserUseCase } from "./create-user.usecase";
+import type { PasswordPort } from "@core/ports/password.port";
+import type { CreateUserUseCase } from "../user/create-user.usecase";
+import type { User } from "@core/entities/user.entity";
 
 export interface RegisterInput {
     email: string;

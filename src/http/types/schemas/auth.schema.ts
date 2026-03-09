@@ -1,9 +1,6 @@
-import { type Static, Type } from "@sinclair/typebox";
-import { createResponseSchema } from "./create-response-schema";
+import { type Static, Type } from "@fastify/type-provider-typebox";
+import { ResponseSchema } from "./create-response-schema";
 
-/**
- * Expected HTTP request body schema for user registration.
- */
 export const RegisterBodySchema = Type.Object({
     email: Type.String({ format: "email" }),
     username: Type.String({ minLength: 3, maxLength: 32 }),
@@ -12,31 +9,16 @@ export const RegisterBodySchema = Type.Object({
 
 export type RegisterBody = Static<typeof RegisterBodySchema>;
 
-/**
- * Internal DTO schema for a successful registration response.
- * Note: This payload will be wrapped by the global response formatter.
- */
-export const RegisterResponseDataSchema = Type.Object({
-    id: Type.String({ format: "uuid" }),
-    username: Type.String(),
-    createdAt: Type.String({ format: "date-time" }),
-});
-
-export type RegisterResponseData = Static<typeof RegisterResponseDataSchema>;
-
-/**
- * Standard wrapped HTTP response schema for registration sent to the client.
- */
-export const RegisterResponseSchema = createResponseSchema(
-    RegisterResponseDataSchema,
+export const RegisterResponseSchema = ResponseSchema(
+    Type.Object({
+        id: Type.String({ format: "uuid" }),
+        username: Type.String(),
+        createdAt: Type.String({ format: "date-time" }),
+    }),
 );
 
 export type RegisterResponse = Static<typeof RegisterResponseSchema>;
 
-/**
- * Expected HTTP request body schema for user login.
- * The identifier can be either an email address or a username.
- */
 export const LoginBodySchema = Type.Object({
     identifier: Type.String(),
     password: Type.String(),
@@ -44,52 +26,61 @@ export const LoginBodySchema = Type.Object({
 
 export type LoginBody = Static<typeof LoginBodySchema>;
 
-/**
- * Internal DTO schema for a successful login response.
- * Contains the access token, expiration timestamp, and basic user profile.
- */
-export const LoginResponseDataSchema = Type.Object({
-    accessToken: Type.String(),
-    expiresAt: Type.Number(),
-    user: Type.Object({
-        id: Type.String({ format: "uuid" }),
-        username: Type.String(),
+export const LoginResponseSchema = ResponseSchema(
+    Type.Object({
+        accessToken: Type.String(),
+        expiresAt: Type.Number(),
+        user: Type.Object({
+            id: Type.String({ format: "uuid" }),
+            username: Type.String(),
+        }),
     }),
-});
-
-export type LoginResponseData = Static<typeof LoginResponseDataSchema>;
-
-/**
- * Standard wrapped HTTP response schema for login sent to the client.
- */
-export const LoginResponseSchema = createResponseSchema(
-    LoginResponseDataSchema,
 );
 
 export type LoginResponse = Static<typeof LoginResponseSchema>;
 
-export const VerifyEmailSchema = Type.Object({
-    otp: Type.String({
-        minLength: 8,
-        maxLength: 8,
-        pattern: "^[0-9]+$",
-        description: "The 8-digit verification code sent to the user email",
-        examples: ["12345678"],
-    }),
+export const VerifyEmailBodySchema = Type.Object({
+    otp: Type.String({ minLength: 8, maxLength: 8, pattern: "^[0-9]+$" }),
 });
 
-export type VerifyEmailBody = Static<typeof VerifyEmailSchema>;
+export type VerifyEmailBody = Static<typeof VerifyEmailBodySchema>;
 
-export const ForgotPasswordSchema = Type.Object({
+export const VerifyEmailResponseSchema = ResponseSchema(
+    Type.Object({
+        verified: Type.Boolean(),
+    }),
+);
+
+export type VerifyEmailResponse = Static<typeof VerifyEmailResponseSchema>;
+
+export const SendVerificationResponseSchema = ResponseSchema(
+    Type.Object({
+        sent: Type.Boolean(),
+    }),
+);
+
+export type SendVerificationResponse = Static<
+    typeof SendVerificationResponseSchema
+>;
+
+export const ForgotPasswordBodySchema = Type.Object({
     email: Type.String({ format: "email" }),
 });
 
-export type ForgotPasswordBody = Static<typeof ForgotPasswordSchema>;
+export type ForgotPasswordBody = Static<typeof ForgotPasswordBodySchema>;
 
-export const ResetPasswordSchema = Type.Object({
+export const ResetPasswordBodySchema = Type.Object({
     email: Type.String({ format: "email" }),
     otp: Type.String({ minLength: 8, maxLength: 8 }),
-    newPassword: Type.String(),
+    newPassword: Type.String({ minLength: 8 }),
 });
 
-export type ResetPasswordBody = Static<typeof ResetPasswordSchema>;
+export type ResetPasswordBody = Static<typeof ResetPasswordBodySchema>;
+
+export const ResetPasswordResponseSchema = ResponseSchema(
+    Type.Object({
+        reset: Type.Boolean(),
+    }),
+);
+
+export type ResetPasswordResponse = Static<typeof ResetPasswordResponseSchema>;

@@ -1,8 +1,9 @@
 import type { IUserRepository } from "@core/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/repositories/verification-token.repository";
-import type { TokenPort } from "@core/ports/token.port";
+import type { AuthTokenPort } from "@core/ports/auth-token.port";
 import type { EmailPort } from "@core/ports/email.port";
 import { TokenType } from "@core/entities/verification-token.entity";
+import type { OtpPort } from "@core/ports/otp.port";
 
 export interface ForgotPasswordInput {
     email: string;
@@ -12,8 +13,9 @@ export class ForgotPasswordUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
-        private readonly tokenPort: TokenPort,
+        private readonly tokenPort: AuthTokenPort,
         private readonly emailPort: EmailPort,
+        private readonly otpPort: OtpPort,
     ) {}
 
     async execute(input: ForgotPasswordInput): Promise<void> {
@@ -23,8 +25,8 @@ export class ForgotPasswordUseCase {
             return;
         }
 
-        const otp = this.tokenPort.generateOtp(8);
-        const tokenHash = this.tokenPort.hashOtp(otp);
+        const otp = this.otpPort.generateOtp(8);
+        const tokenHash = this.otpPort.hashOtp(otp);
         /**
          * It can then be done from the .env file.
          */

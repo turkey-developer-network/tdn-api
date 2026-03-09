@@ -1,25 +1,37 @@
 import { UnauthorizedError } from "@core/errors/unauthorized.error";
 import type { FastifyPluginCallbackTypebox } from "@fastify/type-provider-typebox";
+import { RateLimitPolicies } from "../constants/rate-limit.constants";
 import {
     RegisterBodySchema,
     RegisterResponseSchema,
+    type RegisterBody,
+    type RegisterResponse,
     LoginBodySchema,
     LoginResponseSchema,
-    type RegisterResponse,
+    type LoginBody,
     type LoginResponse,
+    VerifyEmailBodySchema,
+    VerifyEmailResponseSchema,
     type VerifyEmailBody,
-    VerifyEmailSchema,
-    ForgotPasswordSchema,
+    type VerifyEmailResponse,
+    SendVerificationResponseSchema,
+    type SendVerificationResponse,
+    ForgotPasswordBodySchema,
     type ForgotPasswordBody,
+    ResetPasswordBodySchema,
+    ResetPasswordResponseSchema,
     type ResetPasswordBody,
-    ResetPasswordSchema,
+    type ResetPasswordResponse,
 } from "@typings/schemas/auth.schema";
-import type { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 
-const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
-    fastify.post(
+export function authRoutes(
+    fastify: FastifyInstance,
+): ReturnType<FastifyPluginCallbackTypebox> {
+    fastify.post<{ Body: RegisterBody; Reply: { 201: RegisterResponse } }>(
         "/register",
         {
+            config: { rateLimit: RateLimitPolicies.STRICT },
             schema: {
                 body: RegisterBodySchema,
                 response: { 201: RegisterResponseSchema },
@@ -32,36 +44,32 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
                 password: request.body.password,
             });
 
-            const responseData = {
-                id: user.id,
-                username: user.username,
-                createdAt: user.createdAt.toISOString(),
-            };
-
-            reply.status(201);
-            return responseData as unknown as RegisterResponse;
+            return reply.status(201).send({
+                data: {
+                    id: user.id,
+                    username: user.username,
+                    createdAt: user.createdAt.toISOString(),
+                },
+                meta: { timestamp: new Date().toISOString() },
+            });
         },
     );
 
-    fastify.post(
+    fastify.post<{ Body: LoginBody; Reply: { 200: LoginResponse } }>(
         "/login",
         {
+            config: { rateLimit: RateLimitPolicies.STRICT },
             schema: {
                 body: LoginBodySchema,
-                response: {
-                    200: LoginResponseSchema,
-                },
+                response: { 200: LoginResponseSchema },
             },
         },
         async (request, reply) => {
-            const deviceIp = request.ip;
-            const userAgent = request.headers["user-agent"] || "Unknown Device";
-
             const response = await fastify.authService.login({
                 identifier: request.body.identifier,
                 password: request.body.password,
-                deviceIp,
-                userAgent,
+                deviceIp: request.ip,
+                userAgent: request.headers["user-agent"] ?? "Unknown Device",
             });
 
             reply.setCookie("refreshToken", response.refreshToken, {
@@ -73,20 +81,21 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
                 signed: true,
             });
 
-            const responseData = {
-                accessToken: response.accessToken,
-                expiresAt: response.expiresAt,
-                user: response.user,
-            };
-
-            reply.status(200);
-            return responseData as unknown as LoginResponse;
+            return reply.status(200).send({
+                data: {
+                    accessToken: response.accessToken,
+                    expiresAt: response.expiresAt,
+                    user: response.user,
+                },
+                meta: { timestamp: new Date().toISOString() },
+            });
         },
     );
 
-    fastify.post(
+    fastify.post<{ Reply: { 200: LoginResponse } }>(
         "/refresh",
         {
+            config: { rateLimit: RateLimitPolicies.SENSITIVE },
             schema: {
                 response: { 200: LoginResponseSchema },
             },
@@ -107,7 +116,7 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             const response = await fastify.authService.refresh({
                 token: unsignedCookie.value,
                 deviceIp: request.ip,
-                userAgent: request.headers["user-agent"] || "Unknown Device",
+                userAgent: request.headers["user-agent"] ?? "Unknown Device",
             });
 
             reply.setCookie("refreshToken", response.refreshToken, {
@@ -119,16 +128,22 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
                 signed: true,
             });
 
-            return {
-                accessToken: response.accessToken,
-                expiresAt: response.expiresAt,
-                user: response.user,
-            } as unknown as LoginResponse;
+            return reply.status(200).send({
+                data: {
+                    accessToken: response.accessToken,
+                    expiresAt: response.expiresAt,
+                    user: response.user,
+                },
+                meta: { timestamp: new Date().toISOString() },
+            });
         },
     );
 
-    fastify.post(
+    fastify.post<{ Reply: { 204: void } }>(
         "/logout",
+        {
+            config: { rateLimit: RateLimitPolicies.STANDARD },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             const rawCookie = request.cookies.refreshToken;
 
@@ -150,81 +165,97 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
                 signed: true,
             });
 
-            reply.status(204).send();
+            return reply.status(204).send();
         },
     );
 
-    fastify.post(
+    fastify.post<{ Reply: { 200: SendVerificationResponse } }>(
         "/send-verification",
         {
             onRequest: [fastify.authenticate],
+            config: { rateLimit: RateLimitPolicies.STRICT },
+            schema: {
+                response: { 200: SendVerificationResponseSchema },
+            },
         },
-        async (request) => {
-            const userId = request.user.id;
-            await fastify.authService.sendVerificationEmail({ userId });
+        async (request, reply) => {
+            await fastify.authService.sendVerificationEmail({
+                userId: request.user.id,
+            });
 
-            return {
-                message: "Send verification code.",
-            };
+            return reply.status(200).send({
+                data: { sent: true },
+                meta: { timestamp: new Date().toISOString() },
+            });
         },
     );
 
-    fastify.post<{ Body: VerifyEmailBody }>(
+    fastify.post<{
+        Body: VerifyEmailBody;
+        Reply: { 200: VerifyEmailResponse };
+    }>(
         "/verify-email",
         {
             onRequest: [fastify.authenticate],
+            config: { rateLimit: RateLimitPolicies.STRICT },
             schema: {
-                body: VerifyEmailSchema,
+                body: VerifyEmailBodySchema,
+                response: { 200: VerifyEmailResponseSchema },
             },
         },
         async (request, reply) => {
-            const userId = request.user.id;
-            const { otp } = request.body;
-            await fastify.authService.verifyEmail({ userId, otp });
+            await fastify.authService.verifyEmail({
+                userId: request.user.id,
+                otp: request.body.otp,
+            });
+
             return reply.status(200).send({
-                message:
-                    "Email verified successfully. Your account is now fully active.",
+                data: { verified: true },
+                meta: { timestamp: new Date().toISOString() },
             });
         },
     );
 
-    fastify.post<{ Body: ForgotPasswordBody }>(
+    fastify.post<{ Body: ForgotPasswordBody; Reply: { 204: void } }>(
         "/forgot-password",
         {
-            schema: {
-                body: ForgotPasswordSchema,
-            },
+            config: { rateLimit: RateLimitPolicies.STRICT },
+            schema: { body: ForgotPasswordBodySchema },
         },
         async (request, reply) => {
-            const { email } = request.body;
-            await fastify.authService.forgotPassword({ email });
-            reply.status(204).send();
+            await fastify.authService.forgotPassword({
+                email: request.body.email,
+            });
+
+            return reply.status(204).send();
         },
     );
 
-    fastify.post<{ Body: ResetPasswordBody }>(
+    fastify.post<{
+        Body: ResetPasswordBody;
+        Reply: { 200: ResetPasswordResponse };
+    }>(
         "/reset-password",
         {
+            config: { rateLimit: RateLimitPolicies.STRICT },
             schema: {
-                body: ResetPasswordSchema,
+                body: ResetPasswordBodySchema,
+                response: { 200: ResetPasswordResponseSchema },
             },
         },
         async (request, reply) => {
-            const { email, otp, newPassword } = request.body;
             await fastify.authService.resetPassword({
-                email,
-                otp,
-                newPassword,
+                email: request.body.email,
+                otp: request.body.otp,
+                newPassword: request.body.newPassword,
             });
 
             return reply.status(200).send({
-                message:
-                    "Your password has been reset successfully. You can now login with your new password.",
+                data: { reset: true },
+                meta: { timestamp: new Date().toISOString() },
             });
         },
     );
-
-    done();
-};
+}
 
 export default authRoutes;

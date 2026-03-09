@@ -1,4 +1,4 @@
-import type { TokenPort } from "@core/ports/token.port";
+import type { AuthTokenPort } from "@core/ports/auth-token.port";
 import type { TransactionPort } from "@core/ports/transaction.port";
 
 export interface LogoutInput {
@@ -8,7 +8,7 @@ export interface LogoutInput {
 export class LogoutUseCase {
     constructor(
         private readonly transactionPort: TransactionPort,
-        private readonly tokenService: TokenPort,
+        private readonly tokenService: AuthTokenPort,
     ) {}
 
     async execute(input: LogoutInput): Promise<void> {

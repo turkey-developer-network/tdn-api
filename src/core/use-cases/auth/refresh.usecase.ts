@@ -1,5 +1,5 @@
 import { UnauthorizedError } from "@core/errors/unauthorized.error";
-import type { TokenPort, UserPayload } from "@core/ports/token.port";
+import type { AuthTokenPort, UserPayload } from "@core/ports/auth-token.port";
 import type { TransactionPort } from "@core/ports/transaction.port";
 
 export interface RefreshInput {
@@ -19,7 +19,7 @@ export interface RefreshOutput {
 export class RefreshUseCase {
     constructor(
         private readonly transactionPort: TransactionPort,
-        private readonly tokenService: TokenPort,
+        private readonly tokenService: AuthTokenPort,
     ) {}
 
     async execute(input: RefreshInput): Promise<RefreshOutput> {

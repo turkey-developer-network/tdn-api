@@ -49,12 +49,10 @@ export class NodemailerEmailService implements EmailPort {
             });
 
             this.logger.info(
-                { to: input.to },
                 "Verification email sent successfully via Nodemailer.",
             );
-        } catch (error) {
+        } catch {
             this.logger.error(
-                { error, to: input.to },
                 "Failed to send verification email via Nodemailer.",
             );
         }
@@ -79,15 +77,9 @@ export class NodemailerEmailService implements EmailPort {
                 `,
             });
 
-            this.logger.info(
-                { to: input.to },
-                "Password reset email sent successfully.",
-            );
-        } catch (error) {
-            this.logger.error(
-                { error, to: input.to },
-                "Failed to send password reset email.",
-            );
+            this.logger.info("Password reset email sent successfully.");
+        } catch {
+            this.logger.error("Failed to send password reset email.");
         }
     }
 }

@@ -10,11 +10,8 @@ export interface TokenResult {
     refreshTokenExpiresAt: Date;
 }
 
-export interface TokenPort {
+export interface AuthTokenPort {
     generate(payload: UserPayload): TokenResult;
     verify(token: string): UserPayload;
-
     hashRefreshSecret(secret: string): string;
-    generateOtp(length?: number): string;
-    hashOtp(otp: string): string;
 }

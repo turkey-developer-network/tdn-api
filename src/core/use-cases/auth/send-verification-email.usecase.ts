@@ -1,9 +1,10 @@
 import { UnauthorizedError } from "@core/errors/unauthorized.error";
 import type { EmailPort } from "@core/ports/email.port";
-import type { TokenPort } from "@core/ports/token.port";
+import type { AuthTokenPort } from "@core/ports/auth-token.port";
 import type { IUserRepository } from "@core/repositories/user.repository";
 import { TokenType } from "@core/entities/verification-token.entity";
 import type { IVerificationTokenRepository } from "@core/repositories/verification-token.repository";
+import type { OtpPort } from "@core/ports/otp.port";
 
 export interface SendVerificationEmailInput {
     userId: string;
@@ -13,8 +14,9 @@ export class SendVerificationEmailUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
-        private readonly tokenPort: TokenPort,
+        private readonly tokenPort: AuthTokenPort,
         private readonly emailPort: EmailPort,
+        private readonly otpPort: OtpPort,
     ) {}
 
     async execute(input: SendVerificationEmailInput): Promise<void> {
@@ -28,9 +30,9 @@ export class SendVerificationEmailUseCase {
             return;
         }
 
-        const plainOtp = this.tokenPort.generateOtp(8);
+        const plainOtp = this.otpPort.generateOtp(8);
 
-        const hashedOtp = this.tokenPort.hashOtp(plainOtp);
+        const hashedOtp = this.otpPort.hashOtp(plainOtp);
 
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 

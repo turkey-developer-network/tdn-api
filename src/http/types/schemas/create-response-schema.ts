@@ -1,17 +1,19 @@
-import {
-    Type,
-    type TSchema,
-    type TObject,
-    type TString,
-} from "@sinclair/typebox";
+import { type TSchema, Type } from "@fastify/type-provider-typebox";
 
-export const createResponseSchema = <T extends TSchema>(
-    dataSchema: T,
-): TObject<{ data: T; meta: TObject<{ timestamp: TString }> }> => {
+const MetaSchema = Type.Object({
+    timestamp: Type.String({ format: "date-time" }),
+});
+
+export function ResponseSchema<T extends TSchema>(
+    data: T,
+): Type.TObject<{
+    data: T;
+    meta: Type.TObject<{
+        timestamp: Type.TString;
+    }>;
+}> {
     return Type.Object({
-        data: dataSchema,
-        meta: Type.Object({
-            timestamp: Type.String({ format: "date-time" }),
-        }),
+        data,
+        meta: MetaSchema,
     });
-};
+}

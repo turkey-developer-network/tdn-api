@@ -1,9 +1,10 @@
 import { BadRequestError } from "@core/errors/bad-request.error";
 import type { IUserRepository } from "@core/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/repositories/verification-token.repository";
-import type { TokenPort } from "@core/ports/token.port";
+import type { AuthTokenPort } from "@core/ports/auth-token.port";
 import type { PasswordService } from "@infrastructure/services/password.service";
 import { TokenType } from "@core/entities/verification-token.entity";
+import type { OtpPort } from "@core/ports/otp.port";
 
 export interface ResetPasswordInput {
     email: string;
@@ -17,8 +18,9 @@ export class ResetPasswordUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
-        private readonly tokenPort: TokenPort,
+        private readonly tokenPort: AuthTokenPort,
         private readonly passwordService: PasswordService,
+        private readonly otpPort: OtpPort,
     ) {}
 
     async execute(input: ResetPasswordInput): Promise<void> {
@@ -38,7 +40,7 @@ export class ResetPasswordUseCase {
             throw new BadRequestError(this.GENERIC_ERROR);
         }
 
-        const hashedInputOtp = this.tokenPort.hashOtp(input.otp);
+        const hashedInputOtp = this.otpPort.hashOtp(input.otp);
 
         if (hashedInputOtp !== verificationToken.tokenHash) {
             throw new BadRequestError(this.GENERIC_ERROR);

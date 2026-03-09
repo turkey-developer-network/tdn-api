@@ -1,6 +1,6 @@
 import { InvalidCredentialsError } from "@core/errors/invalid-credentials.error";
 import type { PasswordPort } from "@core/ports/password.port";
-import type { TokenPort, UserPayload } from "@core/ports/token.port";
+import type { AuthTokenPort, UserPayload } from "@core/ports/auth-token.port";
 import type { IRefreshTokenRepository } from "@core/repositories/refresh-token.repository";
 import type { IUserRepository } from "@core/repositories/user.repository";
 
@@ -23,7 +23,7 @@ export class LoginUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordService: PasswordPort,
-        private readonly tokenService: TokenPort,
+        private readonly tokenService: AuthTokenPort,
         private readonly refreshTokenRepository: IRefreshTokenRepository,
     ) {}
 
