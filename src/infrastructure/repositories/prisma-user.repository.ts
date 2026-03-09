@@ -49,4 +49,19 @@ export class PrismaUserRepository implements IUserRepository {
 
         return UserPrismaMapper.toDomainUser(rawUser);
     }
+
+    async update(user: User): Promise<void> {
+        await this.prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                email: user.email,
+                username: user.username,
+                password: user.passwordHash,
+                isEmailVerified: user.isEmailVerified,
+                deletedAt: user.deletedAt,
+            },
+        });
+    }
 }

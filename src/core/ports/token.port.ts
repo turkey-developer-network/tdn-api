@@ -15,4 +15,6 @@ export interface TokenPort {
     verify(token: string): UserPayload;
 
     hashRefreshSecret(secret: string): string;
+    generateOtp(length?: number): string;
+    hashOtp(otp: string): string;
 }

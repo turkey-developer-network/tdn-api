@@ -12,6 +12,7 @@ export default class UserPrismaMapper {
             email: dbUser.email,
             username: dbUser.username,
             passwordHash: dbUser.password,
+            isEmailVerified: dbUser.isEmailVerified,
             deletedAt: dbUser.deletedAt,
             createdAt: dbUser.createdAt,
             updatedAt: dbUser.updatedAt,

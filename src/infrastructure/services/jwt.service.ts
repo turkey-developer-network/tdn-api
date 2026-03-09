@@ -4,7 +4,7 @@ import type {
     UserPayload,
 } from "@core/ports/token.port";
 import type { FastifyInstance } from "fastify";
-import { randomBytes, createHash } from "crypto";
+import { randomBytes, createHash, randomInt } from "crypto";
 
 export class JwtService implements TokenPort {
     constructor(
@@ -41,5 +41,17 @@ export class JwtService implements TokenPort {
 
     compareRefreshSecret(secret: string, hashedSecret: string): boolean {
         return this.hashRefreshSecret(secret) === hashedSecret;
+    }
+
+    generateOtp(length: number = 8): string {
+        const max = Math.pow(10, length);
+
+        const otp = randomInt(0, max).toString();
+
+        return otp.padStart(length, "0");
+    }
+
+    hashOtp(otp: string): string {
+        return createHash("sha256").update(otp).digest("hex");
     }
 }

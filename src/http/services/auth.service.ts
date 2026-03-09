@@ -17,6 +17,14 @@ import type {
     RegisterInput,
     RegisterUseCase,
 } from "@core/use-cases/auth/register.usecase";
+import type {
+    SendVerificationEmailInput,
+    SendVerificationEmailUseCase,
+} from "@core/use-cases/auth/send-verification-email.usecase";
+import type {
+    VerifyEmailInput,
+    VerifyEmailUseCase,
+} from "@core/use-cases/auth/verify-email.usecase";
 
 export class AuthService {
     constructor(
@@ -24,6 +32,8 @@ export class AuthService {
         private readonly loginUseCase: LoginUseCase,
         private readonly refreshUseCase: RefreshUseCase,
         private readonly logoutUseCase: LogoutUseCase,
+        private readonly sendVerificationEmailUseCase: SendVerificationEmailUseCase,
+        private readonly verifyEmailUseCase: VerifyEmailUseCase,
     ) {}
 
     async register(input: RegisterInput): Promise<User> {
@@ -42,5 +52,15 @@ export class AuthService {
 
     async logout(input: LogoutInput): Promise<void> {
         return await this.logoutUseCase.execute(input);
+    }
+
+    async sendVerificationEmail(
+        input: SendVerificationEmailInput,
+    ): Promise<void> {
+        return this.sendVerificationEmailUseCase.execute(input);
+    }
+
+    async verifyEmail(input: VerifyEmailInput): Promise<void> {
+        return this.verifyEmailUseCase.execute(input);
     }
 }

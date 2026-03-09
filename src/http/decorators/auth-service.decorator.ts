@@ -11,6 +11,11 @@ import { PrismaRefreshTokenRepository } from "@infrastructure/repositories/prism
 import { RefreshUseCase } from "@core/use-cases/auth/refresh.usecase";
 import { PrismaTransactionPort } from "@infrastructure/database/prisma-transaction-port";
 import { LogoutUseCase } from "@core/use-cases/auth/logout.usecase";
+import { PrismaVerificationTokenRepository } from "@infrastructure/repositories/prisma-verification-token.repository";
+import { NodemailerEmailService } from "@infrastructure/services/nodemailer-email.service";
+import { SendVerificationEmailUseCase } from "@core/use-cases/auth/send-verification-email.usecase";
+import { VerifyEmailUseCase } from "@core/use-cases/auth/verify-email.usecase";
+
 function authServiceDecorator(fastify: FastifyInstance): void {
     const userRepo = new PrismaUserRepository(fastify.prisma);
     const passwordService = new PasswordService();
@@ -39,6 +44,35 @@ function authServiceDecorator(fastify: FastifyInstance): void {
 
     const logoutUseCase = new LogoutUseCase(transactionPort, jwtService);
 
+    const verificationTokenRepo = new PrismaVerificationTokenRepository(
+        fastify.prisma,
+    );
+
+    const emailService = new NodemailerEmailService(
+        {
+            host: fastify.config.SMTP_HOST,
+            port: fastify.config.SMTP_PORT,
+            secure: fastify.config.SMTP_SECURE,
+            user: fastify.config.SMTP_USER,
+            pass: fastify.config.SMTP_PASS,
+            from: fastify.config.EMAIL_FROM,
+        },
+        fastify.log,
+    );
+
+    const sendVerificationEmailUseCase = new SendVerificationEmailUseCase(
+        userRepo,
+        verificationTokenRepo,
+        jwtService,
+        emailService,
+    );
+
+    const verifyEmailUseCase = new VerifyEmailUseCase(
+        userRepo,
+        verificationTokenRepo,
+        jwtService,
+    );
+
     fastify.decorate(
         "authService",
         new AuthService(
@@ -46,6 +80,8 @@ function authServiceDecorator(fastify: FastifyInstance): void {
             loginUseCase,
             refreshUseCase,
             logoutUseCase,
+            sendVerificationEmailUseCase,
+            verifyEmailUseCase,
         ),
     );
 }

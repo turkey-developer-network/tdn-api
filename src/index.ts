@@ -16,6 +16,7 @@ import refreshTokenCleanupPlugin from "@plugins/custom/refresh-token-cleanup.plu
 
 //Decorators
 import userServiceDecorator from "@decorators/auth-service.decorator";
+import authenticateDecorator from "@decorators/authenticate.decorator";
 
 // Routes
 import healthRoutes from "@routes/health.route";
@@ -82,6 +83,7 @@ function registerRoutes(): void {
  */
 function registerDecorators(): void {
     server.register(userServiceDecorator);
+    server.register(authenticateDecorator);
 }
 /**
  * Initializes and starts the Fastify server.

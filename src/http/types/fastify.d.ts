@@ -14,9 +14,16 @@ declare module "fastify" {
             COOKIE_SECRET: string;
             REFRESH_TOKEN_CLEANUP_CRON: string;
             REFRESH_TOKEN_CLEANUP_GRACE_PERIOD_HOURS: number;
+            SMTP_HOST: string;
+            SMTP_PORT: number;
+            SMTP_SECURE: boolean;
+            SMTP_USER: string;
+            SMTP_PASS: string;
+            EMAIL_FROM: string;
         };
         prisma: PrismaClient;
         authService: AuthService;
+        authenticate: (request: FastifyRequest) => Promise<void>;
     }
 }
 

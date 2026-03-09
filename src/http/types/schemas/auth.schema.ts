@@ -67,3 +67,15 @@ export const LoginResponseSchema = createResponseSchema(
 );
 
 export type LoginResponse = Static<typeof LoginResponseSchema>;
+
+export const VerifyEmailSchema = Type.Object({
+    otp: Type.String({
+        minLength: 8,
+        maxLength: 8,
+        pattern: "^[0-9]+$",
+        description: "The 8-digit verification code sent to the user email",
+        examples: ["12345678"],
+    }),
+});
+
+export type VerifyEmailBody = Static<typeof VerifyEmailSchema>;

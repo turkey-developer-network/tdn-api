@@ -41,11 +41,13 @@
         "argon2": "^0.44.0",
         "fastify": "^5.8.1",
         "fastify-plugin": "^5.1.0",
-        "node-cron": "^4.2.1"
+        "node-cron": "^4.2.1",
+        "nodemailer": "^8.0.1"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/node": "^25.3.3",
+        "@types/nodemailer": "^7.0.11",
         "cross-env": "^10.1.0",
         "dotenv": "^17.3.1",
         "eslint": "^10.0.2",

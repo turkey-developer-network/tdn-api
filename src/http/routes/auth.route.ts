@@ -7,6 +7,8 @@ import {
     LoginResponseSchema,
     type RegisterResponse,
     type LoginResponse,
+    type VerifyEmailBody,
+    VerifyEmailSchema,
 } from "@typings/schemas/auth.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
@@ -147,6 +149,41 @@ const authRoutes: FastifyPluginCallbackTypebox = (fastify, _opts, done) => {
             reply.status(204).send();
         },
     );
+
+    fastify.post(
+        "/send-verification",
+        {
+            onRequest: [fastify.authenticate],
+        },
+        async (request) => {
+            const userId = request.user.id;
+            await fastify.authService.sendVerificationEmail({ userId });
+
+            return {
+                message: "Send verification code.",
+            };
+        },
+    );
+
+    fastify.post<{ Body: VerifyEmailBody }>(
+        "/verify-email",
+        {
+            onRequest: [fastify.authenticate],
+            schema: {
+                body: VerifyEmailSchema,
+            },
+        },
+        async (request, reply) => {
+            const userId = request.user.id;
+            const { otp } = request.body;
+            await fastify.authService.verifyEmail({ userId, otp });
+            return reply.status(200).send({
+                message:
+                    "Email verified successfully. Your account is now fully active.",
+            });
+        },
+    );
+
     done();
 };
 

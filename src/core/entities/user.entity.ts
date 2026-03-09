@@ -3,6 +3,7 @@ export interface UserProps {
     email: string;
     username: string;
     passwordHash: string | null;
+    isEmailVerified: boolean;
     deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
@@ -52,8 +53,15 @@ export class User {
         this.props.updatedAt = new Date();
     }
 
+    get isEmailVerified(): boolean {
+        return this.props.isEmailVerified;
+    }
     public restore(): void {
         this.props.deletedAt = null;
         this.props.updatedAt = new Date();
+    }
+
+    verifyEmail(): void {
+        this.props.isEmailVerified = true;
     }
 }

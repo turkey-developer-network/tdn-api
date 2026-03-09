@@ -20,8 +20,10 @@ model User {
   username String @unique
 
   password String? //Hashed password
+  isEmailVerified Boolean @default(false)
 
   refreshTokens RefreshToken[]
+  verificationTokens VerificationToken[]
 
   deletedAt DateTime?
   createdAt DateTime  @default(now())
@@ -49,4 +51,25 @@ model RefreshToken {
   @@index([userId])
   @@index([token])
   @@map("refresh_tokens")
+}
+
+model VerificationToken {
+  id String @id @default(uuid())
+  token String @unique
+  userId String
+  type TokenType
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@unique([userId, type])
+  @@map("verification_tokens")
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
 }
