@@ -2,7 +2,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import envPlugin from "@plugins/env.plugin";
 import jwtPlugin from "@plugins/jwt.plugin";
-import cookiePlguin from "@plugins/cookie.plugin";
+import cookiePlugin from "@plugins/cookie.plugin";
 import rateLimitPlugin from "@plugins/rate-limit.plugin";
 import corsPlugin from "@plugins/cors.plugin";
 import helmetPlugin from "@plugins/helmet.plugin";
@@ -10,9 +10,9 @@ import errorHandlerPlugin from "@plugins/custom/error-handler.plugin";
 import prismaPlugin from "@plugins/custom/prisma.plugin";
 import refreshTokenCleanupPlugin from "@plugins/custom/refresh-token-cleanup.plugin";
 import healthRoutes from "@routes/health.route";
-import authRoutes from "@routes/auth/auth.route";
+import authRoutes from "@routes/auth.routes";
 import dependencyInjectionPlugin from "@plugins/dependency-injection.plugin";
-import userRoute from "@routes/user.route";
+import userRoutes from "@routes/user.routes";
 import authenticationDecorator from "@decorators/authenticate.decorator";
 
 /**
@@ -55,7 +55,7 @@ export class App {
     private async registerPlugins(): Promise<void> {
         await this.server.register(envPlugin);
         await this.server.after(); // Essential to load config before subsequent plugins
-        this.server.register(cookiePlguin);
+        this.server.register(cookiePlugin);
         this.server.register(jwtPlugin);
         this.server.register(rateLimitPlugin);
         this.server.register(corsPlugin);
@@ -91,7 +91,7 @@ export class App {
     private registerRoutes(): void {
         this.server.register(healthRoutes, { prefix: "/api/v1" });
         this.server.register(authRoutes, { prefix: "/api/v1/auth" });
-        this.server.register(userRoute, { prefix: "/api/v1/users" });
+        this.server.register(userRoutes, { prefix: "/api/v1/users" });
     }
 
     /**
