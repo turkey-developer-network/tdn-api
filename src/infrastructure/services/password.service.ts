@@ -1,5 +1,5 @@
 import argon2 from "argon2";
-import type { PasswordPort } from "@core/ports/password.port";
+import type { PasswordPort } from "@core/ports/services/password.port";
 
 export class PasswordService implements PasswordPort {
     async hash(plain: string): Promise<string> {

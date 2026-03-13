@@ -1,4 +1,4 @@
-import type { IVerificationTokenRepository } from "@core/repositories/verification-token.repository";
+import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import type {
     VerificationToken,
     TokenType,

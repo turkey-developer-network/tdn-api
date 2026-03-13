@@ -2,7 +2,7 @@ import type { PrismaClient } from "@generated/prisma/client";
 import type {
     TransactionPort,
     TransactionContext,
-} from "@core/ports/transaction.port";
+} from "@core/ports/services/transaction.port";
 import { PrismaUserRepository } from "../repositories/prisma-user.repository";
 import { PrismaRefreshTokenRepository } from "../repositories/prisma-refresh-token.repository";
 

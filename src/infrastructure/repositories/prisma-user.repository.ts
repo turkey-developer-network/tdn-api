@@ -1,5 +1,5 @@
 import type { User } from "@core/entities/user.entity";
-import type { IUserRepository } from "@core/repositories/user.repository";
+import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import UserPrismaMapper from "../mappers/user-prisma.mapper";
 import { UserAlreadyExistsError } from "@core/errors";
 import { PrismaClientKnownRequestError } from "@generated/prisma/internal/prismaNamespace";

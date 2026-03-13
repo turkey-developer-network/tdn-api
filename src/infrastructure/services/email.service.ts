@@ -3,7 +3,7 @@ import type {
     EmailInput,
     EmailPort,
     OtpEmailInput,
-} from "@core/ports/email.port";
+} from "@core/ports/services/email.port";
 import type { FastifyBaseLogger } from "fastify";
 
 export interface SmtpConfig {
@@ -232,6 +232,7 @@ export class EmailService implements EmailPort {
         });
 
         await this.send(input.to, "E-posta Doğrulama Kodunuz (OTP)", html);
+        this.logger.info("Send");
     }
 
     async sendPasswordResetEmail(input: OtpEmailInput): Promise<void> {

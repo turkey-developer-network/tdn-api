@@ -1,4 +1,4 @@
-import type { IRefreshTokenRepository } from "@core/repositories/refresh-token.repository";
+import type { IRefreshTokenRepository } from "@core/ports/repositories/refresh-token.repository";
 import type { RefreshToken } from "@core/entities/refresh-token.entity";
 import { RefreshTokenPrismaMapper } from "@infrastructure/mappers/refresh-token.prisma.mapper";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";

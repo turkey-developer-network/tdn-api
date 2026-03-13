@@ -5,7 +5,7 @@ import type {
     RecoveryPayload,
     TokenResult,
     UserPayload,
-} from "@core/ports/auth-token.port";
+} from "@core/ports/services/auth-token.port";
 
 export class AuthTokenService implements AuthTokenPort {
     constructor(

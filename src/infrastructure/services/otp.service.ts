@@ -1,5 +1,5 @@
 import { randomInt, createHash } from "crypto";
-import type { OtpPort } from "@core/ports/otp.port";
+import type { OtpPort } from "@core/ports/services/otp.port";
 
 export class OtpService implements OtpPort {
     generateOtp(length: number = 8): string {
