@@ -11,13 +11,15 @@ import { TransactionService } from "@infrastructure/database/transaction.service
 import { PasswordService } from "@infrastructure/services/password.service";
 import { EmailService } from "@infrastructure/services/email.service";
 import { AuthTokenService } from "@infrastructure/services/auth-token.service";
-import { OtpService } from "@infrastructure/services/otp.service";
+import { CryptoService } from "@infrastructure/services/crypto.service";
+import { GithubAuthService } from "@infrastructure/services/github-auth.service";
 
 // --- Use Cases Imports ---
 import SoftDeleteUserUseCase from "@core/use-cases/user/soft-delete/soft-delete-user.usecase";
 import { CreateUserUseCase } from "@core/use-cases/user/create-user/create-user.usecase";
 import { RegisterUseCase } from "@core/use-cases/auth/register/register.usecase";
 import { LoginUseCase } from "@core/use-cases/auth/login/login.usecase";
+import { GithubLoginUseCase } from "@core/use-cases/oauth/oauth-github/github-login.usecase";
 import { RefreshUseCase } from "@core/use-cases/auth/refresh/refresh.usecase";
 import { LogoutUseCase } from "@core/use-cases/auth/logout/logout.usecase";
 import { SendVerificationEmailUseCase } from "@core/use-cases/auth/send-verification-email/send-verification-email.usecase";
@@ -29,6 +31,7 @@ import { RecoverAccountUseCase } from "@core/use-cases/auth/recover-account/reco
 // --- Ana Servisler (Facades) Imports ---
 import UserController from "@services/user.controller";
 import AuthController from "@services/auth.controller";
+import OAuthController from "@services/oauth.controller";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -56,7 +59,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         transactionService: asClass(TransactionService).singleton(),
 
         passwordService: asClass(PasswordService).singleton(),
-        otpService: asClass(OtpService).singleton(),
+        cryptoService: asClass(CryptoService).singleton(),
 
         emailService: asFunction((config, logger) => {
             return new EmailService(
@@ -80,6 +83,14 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
             );
         }).singleton(),
 
+        githubAuthService: asFunction((config) => {
+            return new GithubAuthService({
+                clientId: config.GITHUB_CLIENT_ID,
+                clientSecret: config.GITHUB_CLIENT_SECRET,
+                callbackUrl: config.GITHUB_CALLBACK_URL,
+            });
+        }).singleton(),
+
         softDeleteUserUseCase: asFunction(
             (userRepository, passwordService, emailService) => {
                 return new SoftDeleteUserUseCase(
@@ -95,6 +106,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         // AUTH
         registerUseCase: asClass(RegisterUseCase).singleton(),
         loginUseCase: asClass(LoginUseCase).singleton(),
+        githubLoginUseCase: asClass(GithubLoginUseCase).singleton(),
         refreshUseCase: asClass(RefreshUseCase).singleton(),
         logoutUseCase: asClass(LogoutUseCase).singleton(),
         sendVerificationEmailUseCase: asClass(
@@ -107,6 +119,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
 
         userController: asClass(UserController).singleton(),
         authController: asClass(AuthController).singleton(),
+        oauthController: asClass(OAuthController).singleton(),
     });
 }
 

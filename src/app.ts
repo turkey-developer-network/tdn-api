@@ -14,6 +14,7 @@ import authRoutes from "@routes/auth.routes";
 import dependencyInjectionPlugin from "@plugins/dependency-injection.plugin";
 import userRoutes from "@routes/user.routes";
 import authenticationDecorator from "@decorators/authenticate.decorator";
+import oauthRoutes from "@routes/oauth.route";
 
 /**
  * Main Application class responsible for orchestrating the Fastify server lifecycle.
@@ -92,6 +93,7 @@ export class App {
         this.server.register(healthRoutes, { prefix: "/api/v1" });
         this.server.register(authRoutes, { prefix: "/api/v1/auth" });
         this.server.register(userRoutes, { prefix: "/api/v1/users" });
+        this.server.register(oauthRoutes, { prefix: "/api/v1/oauth" });
     }
 
     /**

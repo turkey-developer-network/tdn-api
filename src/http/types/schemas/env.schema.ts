@@ -27,6 +27,10 @@ export const EnvSchema = Type.Object({
 
     // --- Others ---
     CORS_ORIGIN: Type.String({ default: "http://localhost:3000" }),
+
+    GITHUB_CLIENT_ID: Type.String(),
+    GITHUB_CLIENT_SECRET: Type.String(),
+    GITHUB_CALLBACK_URL: Type.String(),
 });
 
 export type EnvConfig = Static<typeof EnvSchema>;

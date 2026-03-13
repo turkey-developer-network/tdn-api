@@ -12,4 +12,11 @@ export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>;
     softDeleteById(id: string, deletedAt: Date): Promise<void>;
     restoreById(id: string): Promise<void>;
+    findByUsername(username: string): Promise<User | null>;
+    createWithOAuth(data: {
+        email: string;
+        username: string;
+        provider: string;
+        providerAccountId: string;
+    }): Promise<User>;
 }

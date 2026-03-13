@@ -15,8 +15,9 @@ import type { RegisterBody } from "@typings/schemas/auth/register.schema";
 import type { ResetPasswordBody } from "@typings/schemas/auth/reset-password.schema";
 import type { VerifyEmailBody } from "@typings/schemas/auth/verify-email.schema";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { BaseAuthController } from "./base-auth.controller";
 
-export default class AuthController {
+export default class AuthController extends BaseAuthController {
     constructor(
         private readonly registerUseCase: RegisterUseCase,
         private readonly loginUseCase: LoginUseCase,
@@ -27,51 +28,9 @@ export default class AuthController {
         private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
         private readonly resetPasswordUseCase: ResetPasswordUseCase,
         private readonly recoverAccountUseCase: RecoverAccountUseCase,
-        private readonly fastify: FastifyInstance,
-    ) {}
-
-    private get isProduction(): boolean {
-        return this.fastify.config.NODE_ENV === "production";
-    }
-
-    private dateToMaxAge(date: Date): number {
-        return Math.floor((date.getTime() - Date.now()) / 1000);
-    }
-
-    private setRefreshTokenCookie(
-        reply: FastifyReply,
-        token: string,
-        maxAge: number | Date,
-        path: string = "/",
-    ): void {
-        reply.setCookie("refreshToken", token, {
-            path,
-            httpOnly: true,
-            secure: this.isProduction,
-            sameSite: "strict",
-            maxAge: maxAge instanceof Date ? this.dateToMaxAge(maxAge) : maxAge,
-            signed: true,
-        });
-    }
-
-    private clearRefreshTokenCookie(reply: FastifyReply): void {
-        reply.clearCookie("refreshToken", {
-            path: "/",
-            httpOnly: true,
-            secure: this.isProduction,
-            sameSite: "strict",
-            signed: true,
-        });
-    }
-
-    private unsignRefreshToken(request: FastifyRequest): string | null {
-        const rawCookie = request.cookies.refreshToken;
-
-        if (!rawCookie) return null;
-
-        const unsigned = request.unsignCookie(rawCookie);
-
-        return unsigned.valid && unsigned.value ? unsigned.value : null;
+        config: FastifyInstance["config"],
+    ) {
+        super(config);
     }
 
     async register(
@@ -229,7 +188,7 @@ export default class AuthController {
         this.setRefreshTokenCookie(
             reply,
             response.refreshToken,
-            this.fastify.config.REFRESH_TOKEN_EXPIRES_IN,
+            this.config.REFRESH_TOKEN_EXPIRES_IN,
             "/auth/refresh",
         );
 

@@ -3,7 +3,7 @@ import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import type { PasswordService } from "@infrastructure/services/password.service";
 import { TokenType } from "@core/entities/verification-token.entity";
-import type { OtpPort } from "@core/ports/services/otp.port";
+import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { ResetPasswordInput } from "./reset-password.input";
 
 export class ResetPasswordUseCase {
@@ -13,7 +13,7 @@ export class ResetPasswordUseCase {
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
         private readonly passwordService: PasswordService,
-        private readonly otpService: OtpPort,
+        private readonly cryptoService: CryptoPort,
     ) {}
 
     async execute(input: ResetPasswordInput): Promise<void> {
@@ -33,7 +33,7 @@ export class ResetPasswordUseCase {
             throw new BadRequestError(this.GENERIC_ERROR);
         }
 
-        const hashedInputOtp = this.otpService.hashOtp(input.otp);
+        const hashedInputOtp = this.cryptoService.hashOtp(input.otp);
 
         if (hashedInputOtp !== verificationToken.tokenHash) {
             throw new BadRequestError(this.GENERIC_ERROR);

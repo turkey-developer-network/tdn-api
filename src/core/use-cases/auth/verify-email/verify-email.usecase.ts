@@ -3,13 +3,13 @@ import { UnauthorizedError } from "@core/errors/unauthorized.error";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import { TokenType } from "@core/entities/verification-token.entity";
-import { type OtpPort } from "@core/ports/services/otp.port";
+import { type CryptoPort } from "@core/ports/services/crypto.port";
 import type { VerifyEmailInput } from "./verify-email.input";
 export class VerifyEmailUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
-        private readonly otpService: OtpPort,
+        private readonly cryptoService: CryptoPort,
     ) {}
 
     async execute(input: VerifyEmailInput): Promise<void> {
@@ -39,7 +39,7 @@ export class VerifyEmailUseCase {
             );
         }
 
-        const hashedInputOtp = this.otpService.hashOtp(input.otp);
+        const hashedInputOtp = this.cryptoService.hashOtp(input.otp);
         if (hashedInputOtp !== verificationToken.tokenHash) {
             throw new BadRequestError("Invalid verification code.");
         }

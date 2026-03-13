@@ -1,7 +1,11 @@
-import { randomInt, createHash } from "crypto";
-import type { OtpPort } from "@core/ports/services/otp.port";
+import { randomInt, createHash, randomBytes } from "crypto";
+import type { CryptoPort } from "@core/ports/services/crypto.port";
 
-export class OtpService implements OtpPort {
+export class CryptoService implements CryptoPort {
+    generateRandomHex(bytes: number): string {
+        return randomBytes(bytes).toString("hex");
+    }
+
     generateOtp(length: number = 8): string {
         const max = Math.pow(10, length);
         const otp = randomInt(0, max).toString();

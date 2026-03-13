@@ -28,6 +28,38 @@ export class PrismaUserRepository implements IUserRepository {
         }
     }
 
+    async createWithOAuth(data: {
+        email: string;
+        username: string;
+        provider: string;
+        providerAccountId: string;
+    }): Promise<User> {
+        try {
+            const user = await this.prisma.user.create({
+                data: {
+                    email: data.email,
+                    username: data.username,
+                    password: null,
+
+                    oauthAccounts: {
+                        create: {
+                            provider: data.provider,
+                            providerAccountId: data.providerAccountId,
+                        },
+                    },
+                },
+            });
+
+            return UserPrismaMapper.toDomainUser(user);
+        } catch (error: unknown) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                if (error.code === "P2002") throw new UserAlreadyExistsError();
+            }
+
+            throw error;
+        }
+    }
+
     async findByIdentifier(identifier: string): Promise<User | null> {
         const user = await this.prisma.user.findFirst({
             where: {
@@ -91,5 +123,13 @@ export class PrismaUserRepository implements IUserRepository {
                 deletedAt: null,
             },
         });
+    }
+
+    async findByUsername(username: string): Promise<User | null> {
+        const user = await this.prisma.user.findUnique({ where: { username } });
+
+        if (!user) return null;
+
+        return UserPrismaMapper.toDomainUser(user);
     }
 }

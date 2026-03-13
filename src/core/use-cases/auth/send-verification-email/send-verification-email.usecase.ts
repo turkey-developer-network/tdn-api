@@ -3,7 +3,7 @@ import type { EmailPort } from "@core/ports/services/email.port";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import { TokenType } from "@core/entities/verification-token.entity";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
-import type { OtpPort } from "@core/ports/services/otp.port";
+import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { SendVerificationEmailInput } from "./send-verification-email.input";
 
 export class SendVerificationEmailUseCase {
@@ -11,7 +11,7 @@ export class SendVerificationEmailUseCase {
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
         private readonly emailService: EmailPort,
-        private readonly otpService: OtpPort,
+        private readonly cryptoService: CryptoPort,
     ) {}
 
     async execute(input: SendVerificationEmailInput): Promise<void> {
@@ -25,9 +25,9 @@ export class SendVerificationEmailUseCase {
             return;
         }
 
-        const plainOtp = this.otpService.generateOtp(8);
+        const plainOtp = this.cryptoService.generateOtp(8);
 
-        const hashedOtp = this.otpService.hashOtp(plainOtp);
+        const hashedOtp = this.cryptoService.hashOtp(plainOtp);
 
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
