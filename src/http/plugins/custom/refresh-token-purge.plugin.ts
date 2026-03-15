@@ -15,7 +15,7 @@ function refreshTokenPurge(fastify: FastifyInstance): void {
                 status: "Started",
                 config: {
                     cronExpression: fastify.config.REFRESH_TOKEN_PURGE_CRON,
-                    gracePeriodHours:
+                    gracePeriodDays:
                         fastify.config.REFRESH_TOKEN_PURGE_GRACE_PERIOD_DAYS,
                 },
             },
