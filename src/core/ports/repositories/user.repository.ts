@@ -77,6 +77,7 @@ export interface IUserRepository {
         username: string;
         provider: string;
         providerAccountId: string;
+        isEmailVerified?: boolean;
     }): Promise<User>;
 
     /**

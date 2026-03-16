@@ -48,6 +48,7 @@ export class GithubLoginUseCase {
                 username: finalUsername,
                 provider: "github",
                 providerAccountId: profile.providerAccountId,
+                isEmailVerified: profile.isEmailVerified,
             });
         }
 

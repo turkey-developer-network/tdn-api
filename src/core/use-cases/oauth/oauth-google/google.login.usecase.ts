@@ -48,6 +48,7 @@ export class GoogleLoginUseCase {
                 username: finalUsername,
                 provider: "google",
                 providerAccountId: profile.providerAccountId,
+                isEmailVerified: true,
             });
         }
 

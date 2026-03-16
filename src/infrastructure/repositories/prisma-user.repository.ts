@@ -40,6 +40,7 @@ export class PrismaUserRepository implements IUserRepository {
         username: string;
         provider: string;
         providerAccountId: string;
+        isEmailVerified: boolean;
     }): Promise<User> {
         try {
             const user = await this.prisma.user.create({
@@ -47,7 +48,7 @@ export class PrismaUserRepository implements IUserRepository {
                     email: data.email,
                     username: data.username,
                     password: null,
-
+                    isEmailVerified: data.isEmailVerified,
                     oauthAccounts: {
                         create: {
                             provider: data.provider,

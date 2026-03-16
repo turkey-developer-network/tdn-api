@@ -11,6 +11,13 @@ export interface GithubAuthConfig {
     callbackUrl: string;
 }
 
+interface GithubEmail {
+    email: string;
+    primary: boolean;
+    verified: boolean;
+    visibility: string | null;
+}
+
 export class GithubAuthService implements GithubAuthPort {
     constructor(private readonly config: GithubAuthConfig) {}
 
@@ -51,10 +58,26 @@ export class GithubAuthService implements GithubAuthPort {
 
         const githubUser = userResponse.data;
 
+        const { data: emails } = await axios.get<GithubEmail[]>(
+            "https://api.github.com/user/emails",
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            },
+        );
+
+        const primaryEmail = emails.find((email) => email.primary);
+
+        if (!primaryEmail) {
+            throw new OAuthProviderError(
+                "No primary email found on GitHub account.",
+            );
+        }
+
         return {
             providerAccountId: githubUser.id.toString(),
             username: githubUser.login,
-            email: githubUser.email,
+            email: primaryEmail.email,
+            isEmailVerified: primaryEmail.verified,
         };
     }
 }

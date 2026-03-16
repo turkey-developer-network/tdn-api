@@ -23,6 +23,12 @@ export class ResetPasswordUseCase {
             throw new BadRequestError(this.GENERIC_ERROR);
         }
 
+        if (!user.passwordHash) {
+            throw new BadRequestError(
+                "This account uses an external provider (like Google or GitHub). Please log in using that provider.",
+            );
+        }
+
         const verificationToken =
             await this.verificationTokenRepository.findByUserIdAndType(
                 user.id,

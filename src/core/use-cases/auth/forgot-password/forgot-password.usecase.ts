@@ -16,7 +16,12 @@ export class ForgotPasswordUseCase {
     async execute(input: ForgotPasswordInput): Promise<void> {
         const user = await this.userRepository.findByEmail(input.email);
 
-        if (!user || user.isDeleted() || !user.isEmailVerified) {
+        if (
+            !user ||
+            user.isDeleted() ||
+            !user.isEmailVerified ||
+            !user.passwordHash
+        ) {
             return;
         }
 

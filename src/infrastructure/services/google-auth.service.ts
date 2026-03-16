@@ -1,3 +1,4 @@
+import axios from "axios";
 import OAuthProviderError from "@core/errors/oauth-provider.error";
 
 import type {
@@ -34,43 +35,47 @@ export class GoogleAuthService implements GoogleAuthPort {
 
     async getUserProfileByCode(code: string): Promise<GoogleProfile> {
         const tokenUrl = "https://oauth2.googleapis.com/token";
-        const tokenResponse = await fetch(tokenUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                code,
-                client_id: this.config.clientId,
-                client_secret: this.config.clientSecret,
-                redirect_uri: this.config.callbackUrl,
-                grant_type: "authorization_code",
-            }).toString(),
-        });
 
-        if (!tokenResponse.ok) {
-            const error = await tokenResponse.text();
-            throw new OAuthProviderError(
-                `Google token exchange failed: ${error}`,
-            );
-        }
+        const tokenData = await axios
+            .post(
+                tokenUrl,
+                new URLSearchParams({
+                    code,
+                    client_id: this.config.clientId,
+                    client_secret: this.config.clientSecret,
+                    redirect_uri: this.config.callbackUrl,
+                    grant_type: "authorization_code",
+                }).toString(),
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                },
+            )
+            .then((res) => res.data)
+            .catch((err) => {
+                const error = err.response?.data ?? err.message;
+                throw new OAuthProviderError(
+                    `Google token exchange failed: ${JSON.stringify(error)}`,
+                );
+            });
 
-        const tokenData = await tokenResponse.json();
         const accessToken = tokenData.access_token;
 
         const userUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
 
-        const userResponse = await fetch(userUrl, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-
-        if (!userResponse.ok) {
-            throw new OAuthProviderError("Failed to fetch Google user profile");
-        }
-
-        const googleUser = await userResponse.json();
+        const googleUser = await axios
+            .get(userUrl, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+            .then((res) => res.data)
+            .catch(() => {
+                throw new OAuthProviderError(
+                    "Failed to fetch Google user profile",
+                );
+            });
 
         const derivedUsername = googleUser.email
             .split("@")[0]
