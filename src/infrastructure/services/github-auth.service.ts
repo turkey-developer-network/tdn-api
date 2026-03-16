@@ -1,4 +1,4 @@
-import OAuthProviderError from "@core/errors/oauth-provider.error.ts";
+import OAuthProviderError from "@core/errors/oauth-provider.error";
 import type {
     GithubAuthPort,
     GithubProfile,
