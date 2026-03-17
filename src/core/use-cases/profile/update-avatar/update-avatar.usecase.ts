@@ -1,5 +1,5 @@
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
-import type { UpdateAvatarInput } from "./update-avatar-usecase.input";
+import type { UpdateAvatarUseCaseInput } from "./update-avatar-usecase.input";
 import type { StoragePort } from "@core/ports/services/storage.port";
 import type { LoggerPort } from "@core/ports/services/logger.port";
 import { InvalidFileTypeError } from "@core/errors/invalid-file-type.error";
@@ -11,7 +11,7 @@ export class UpdateAvatarUseCase {
         private readonly logger: LoggerPort,
     ) {}
 
-    async execute(input: UpdateAvatarInput): Promise<string> {
+    async execute(input: UpdateAvatarUseCaseInput): Promise<string> {
         if (!input.mimeType.startsWith("image/")) {
             throw new InvalidFileTypeError(
                 "Invalid file type. Only images are allowed.",

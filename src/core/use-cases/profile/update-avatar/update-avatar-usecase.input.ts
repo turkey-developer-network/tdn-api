@@ -1,4 +1,4 @@
-export interface UpdateAvatarInput {
+export interface UpdateAvatarUseCaseInput {
     userId: string;
     fileBuffer: Buffer;
     mimeType: string;

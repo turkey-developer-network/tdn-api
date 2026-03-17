@@ -48,9 +48,10 @@ import { ChangePasswordUseCase } from "@core/use-cases/user/change-password/chan
 import { ChangeUsernameUseCase } from "@core/use-cases/user/change-username/change-username.usecase";
 import { ChangeEmailUseCase } from "@core/use-cases/user/change-email/change-email.usecase";
 import { ProfileController } from "@services/profile.controller";
-import { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar.usecase";
+import { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar/update-avatar.usecase";
 import { PrismaProfileRepository } from "@infrastructure/repositories/prisma-profile.repository";
 import { S3StorageService } from "@infrastructure/services/s3-storage.service";
+import { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -156,6 +157,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         changeUsernameUseCase: asClass(ChangeUsernameUseCase).singleton(),
         changeEmailUseCase: asClass(ChangeEmailUseCase).singleton(),
         updateAvatarUseCase: asClass(UpdateAvatarUseCase).singleton(),
+        updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
         refreshTokenPurgeJob: asClass(RefreshTokenPurgeJob).singleton(),

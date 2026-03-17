@@ -1,8 +1,37 @@
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
+import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
+import type {
+    Profile as PrismaProfile,
+    Prisma,
+} from "@generated/prisma/client";
+import type { Profile } from "@core/entities/profile.entitiy";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
+import ProfilePrismaMapper from "@infrastructure/mappers/profile-prisma.mapper";
 
 export class PrismaProfileRepository implements IProfileRepository {
     constructor(private readonly prisma: PrismaTransactionalClient) {}
+
+    async findByUserId(userId: string): Promise<Profile | null> {
+        const profile = await this.prisma.profile.findUnique({
+            where: { userId },
+        });
+
+        if (!profile) return null;
+
+        return ProfilePrismaMapper.toDomain(profile as PrismaProfile);
+    }
+
+    async update(userId: string, data: UpdateProfileInput): Promise<void> {
+        await this.prisma.profile.updateMany({
+            where: { userId },
+            data: {
+                fullName: data.fullName,
+                bio: data.bio,
+                location: data.location,
+                socials: data.socials as Prisma.InputJsonValue,
+            },
+        });
+    }
 
     async updateAvatar(
         userId: string,
@@ -10,7 +39,9 @@ export class PrismaProfileRepository implements IProfileRepository {
     ): Promise<void> {
         await this.prisma.profile.update({
             where: { userId },
-            data: { avatarUrl },
+            data: {
+                avatarUrl: avatarUrl ?? undefined,
+            },
         });
     }
 
