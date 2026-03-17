@@ -103,4 +103,14 @@ export interface IUserRepository {
      * @param hashedNewPassword - The newly generated and securely hashed password string.
      */
     updatePassword(id: string, hashedNewPassword: string): Promise<void>;
+    /**
+     * Updates the unique username of a specific user in the persistence layer.
+     * This operation relies on the underlying database to enforce uniqueness constraints.
+     * If a collision occurs, it should throw a domain-specific conflict error.
+     *
+     * @param id - The unique identifier (UUID) of the user.
+     * @param username - The new, desired username string.
+     * @throws {ConflictError} If the provided username is already in use by another account.
+     */
+    updateUsername(id: string, username: string): Promise<void>;
 }

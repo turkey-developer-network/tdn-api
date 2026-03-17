@@ -3,6 +3,10 @@ import {
     ChangePasswordSchema,
 } from "@typings/schemas/user/change-password.schema";
 import {
+    type ChangeUsernameBody,
+    ChangeUsernameSchema,
+} from "@typings/schemas/user/change-username.schema";
+import {
     type SoftDeleteUserBody,
     SoftDeleteUserSchema,
 } from "@typings/schemas/user/solft-delete.schema";
@@ -37,6 +41,17 @@ function userRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
         },
         userController.changePasswordMe.bind(userController),
+    );
+
+    fastify.patch<{ Body: ChangeUsernameBody }>(
+        "/me/username",
+        {
+            schema: {
+                body: ChangeUsernameSchema,
+            },
+            onRequest: [fastify.authenticate],
+        },
+        userController.changeUsernameMe.bind(userController),
     );
 }
 
