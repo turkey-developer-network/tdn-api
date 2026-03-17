@@ -1,7 +1,9 @@
 import type { ChangePasswordUseCase } from "@core/use-cases/user/change-password/change-password-use.case";
+import type { ChangeUsernameUseCase } from "@core/use-cases/user/change-username/change-username.usecase";
 import type { GetMeUserUseCase } from "@core/use-cases/user/get-me/get-me-user-.usecase";
 import type SoftDeleteUserUseCase from "@core/use-cases/user/soft-delete/soft-delete-user.usecase";
 import type { ChangePasswordBody } from "@typings/schemas/user/change-password.schema";
+import type { ChangeUsernameBody } from "@typings/schemas/user/change-username.schema";
 import type { SoftDeleteUserBody } from "@typings/schemas/user/solft-delete.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
@@ -10,6 +12,7 @@ export default class UserController {
         private readonly softDeleteUserUseCase: SoftDeleteUserUseCase,
         private readonly getMeUserUseCase: GetMeUserUseCase,
         private readonly changePasswordUseCase: ChangePasswordUseCase,
+        private readonly changeUsernameUseCase: ChangeUsernameUseCase,
     ) {}
 
     async softDeleteMe(
@@ -48,5 +51,19 @@ export default class UserController {
         });
 
         reply.status(204).send();
+    }
+
+    async changeUsernameMe(
+        request: FastifyRequest<{ Body: ChangeUsernameBody }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const userId = request.user.id;
+
+        await this.changeUsernameUseCase.execute({
+            id: userId,
+            newUsername: request.body.newUsername,
+        });
+
+        return reply.status(204).send();
     }
 }

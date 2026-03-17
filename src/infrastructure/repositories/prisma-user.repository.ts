@@ -4,6 +4,8 @@ import UserPrismaMapper from "../mappers/user-prisma.mapper";
 import { UserAlreadyExistsError } from "@core/errors";
 import { PrismaClientKnownRequestError } from "@generated/prisma/internal/prismaNamespace";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
+import { Prisma } from "@generated/prisma/client";
+import { ConflictError } from "@core/errors/conflict.error";
 
 export interface PrismaUserRepositoryOptions {
     gracePeriodDays: number;
@@ -173,5 +175,26 @@ export class PrismaUserRepository implements IUserRepository {
                 password: hashedNewPassword,
             },
         });
+    }
+
+    async updateUsername(id: string, username: string): Promise<void> {
+        try {
+            await this.prisma.user.update({
+                where: { id },
+                data: {
+                    username,
+                },
+            });
+        } catch (error: unknown) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === "P2002") {
+                    throw new ConflictError(
+                        "This username is already taken. Please choose another one.",
+                    );
+                }
+            }
+
+            throw error;
+        }
     }
 }
