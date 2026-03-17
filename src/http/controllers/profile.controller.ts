@@ -1,9 +1,29 @@
 import { BadRequestError } from "@core/errors";
-import type { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar.usecase";
+import type { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar/update-avatar.usecase";
+import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
+import type { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 import type { FastifyRequest, FastifyReply } from "fastify";
 
 export class ProfileController {
-    constructor(private readonly updateAvatarUseCase: UpdateAvatarUseCase) {}
+    constructor(
+        private readonly updateAvatarUseCase: UpdateAvatarUseCase,
+        private readonly updateProfileUseCase: UpdateProfileUseCase,
+    ) {}
+
+    async updateProfileMe(
+        request: FastifyRequest<{ Body: Omit<UpdateProfileInput, "userId"> }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const userId = request.user.id;
+        const body = request.body;
+
+        await this.updateProfileUseCase.execute({
+            userId,
+            ...body,
+        });
+
+        reply.status(204).send();
+    }
 
     async uploadAvatarMe(
         request: FastifyRequest,

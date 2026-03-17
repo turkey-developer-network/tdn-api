@@ -6,10 +6,10 @@ model Profile {
 
     fullName String
     bio String?
-    localation String?
+    location String?
 
-    avatarUrl String?
-    bannerUrl String?
+    avatarUrl String @default("https://pub-2e6c13927ac24d548fd5b783e3cdaeb5.r2.dev/avatars/default_profile.png")
+    bannerUrl String @default("https://pub-2e6c13927ac24d548fd5b783e3cdaeb5.r2.dev/avatars/default_banner.jpe")
 
     socials Json? 
 

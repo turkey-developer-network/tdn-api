@@ -1,4 +1,8 @@
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
+import {
+    type UpdateProfileBody,
+    UpdateProfileBodySchema,
+} from "@typings/schemas/profile/update-profile.schema";
 import type { FastifyInstance } from "fastify";
 
 function profileRoutes(fastify: FastifyInstance): void {
@@ -13,6 +17,17 @@ function profileRoutes(fastify: FastifyInstance): void {
             },
         },
         profileController.uploadAvatarMe.bind(profileController),
+    );
+
+    fastify.patch<{ Body: UpdateProfileBody }>(
+        "/me",
+        {
+            schema: {
+                body: UpdateProfileBodySchema,
+            },
+            onRequest: [fastify.authenticate],
+        },
+        profileController.updateProfileMe.bind(profileController),
     );
 }
 
