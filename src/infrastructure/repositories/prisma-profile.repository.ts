@@ -85,4 +85,35 @@ export class PrismaProfileRepository implements IProfileRepository {
 
         return ProfilePrismaMapper.toDomain(dbProfile);
     }
+
+    async search(query: string, limit: number = 10): Promise<Profile[]> {
+        const dbProfiles = await this.prisma.profile.findMany({
+            where: {
+                OR: [
+                    {
+                        fullName: {
+                            contains: query,
+                            mode: "insensitive",
+                        },
+                    },
+                    {
+                        user: {
+                            username: {
+                                contains: query,
+                                mode: "insensitive",
+                            },
+                        },
+                    },
+                ],
+            },
+            include: {
+                user: true,
+            },
+            take: limit,
+        });
+
+        return dbProfiles.map((dbProfile) =>
+            ProfilePrismaMapper.toDomain(dbProfile),
+        );
+    }
 }

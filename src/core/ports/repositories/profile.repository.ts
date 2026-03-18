@@ -60,4 +60,11 @@ export interface IProfileRepository {
      * @returns A promise resolving to the Profile entity or null if not found.
      */
     findByUsername(username: string): Promise<Profile | null>;
+    /**
+     * Searches for profiles based on a query string matching username or full name.
+     * @param query - The search term.
+     * @param limit - Maximum number of results to return (default: 10).
+     * @returns A promise resolving to an array of Profile entities.
+     */
+    search(query: string, limit?: number): Promise<Profile[]>;
 }

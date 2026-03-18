@@ -4,6 +4,10 @@ import {
     GetProfileParamsSchema,
 } from "@typings/schemas/profile/get-profile.schema";
 import {
+    type SearchProfilesQuery,
+    SearchProfilesQuerySchema,
+} from "@typings/schemas/profile/search-profile.schema";
+import {
     type UpdateProfileBody,
     UpdateProfileBodySchema,
 } from "@typings/schemas/profile/update-profile.schema";
@@ -43,6 +47,21 @@ function profileRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
         },
         profileController.updateProfileMe.bind(profileController),
+    );
+
+    fastify.get<{ Querystring: SearchProfilesQuery }>(
+        "/search",
+        {
+            schema: {
+                querystring: SearchProfilesQuerySchema,
+            },
+            onRequest: async (request) => {
+                if (request.headers.authorization) {
+                    await request.jwtVerify();
+                }
+            },
+        },
+        profileController.searchProfiles.bind(profileController),
     );
 
     fastify.get<{ Params: GetProfileParams }>(

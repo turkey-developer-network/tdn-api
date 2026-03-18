@@ -1,11 +1,13 @@
 import { BadRequestError } from "@core/errors";
 import type { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
+import type { SearchProfilesUseCase } from "@core/use-cases/profile/search-profile/search-profile.usecase";
 import type { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar/update-avatar.usecase";
 import type { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/update-banner.use-case";
 import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
 import type { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 import ProfilePrismaMapper from "@infrastructure/mappers/profile-prisma.mapper";
 import type { GetProfileParams } from "@typings/schemas/profile/get-profile.schema";
+import type { SearchProfilesQuery } from "@typings/schemas/profile/search-profile.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 
 export class ProfileController {
@@ -14,6 +16,7 @@ export class ProfileController {
         private readonly updateProfileUseCase: UpdateProfileUseCase,
         private readonly updateBannerUseCase: UpdateBannerUseCase,
         private readonly getProfileUseCase: GetProfileUseCase,
+        private readonly searchProfileUseCase: SearchProfilesUseCase,
         private readonly publicUrl: string,
     ) {}
 
@@ -114,6 +117,39 @@ export class ProfileController {
                 isMe,
                 avatarUrl: this.getFullImageUrl(profileData.avatarUrl),
                 bannerUrl: this.getFullImageUrl(profileData.bannerUrl),
+            },
+        });
+    }
+
+    async searchProfiles(
+        request: FastifyRequest<{ Querystring: SearchProfilesQuery }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const { q, limit } = request.query;
+        const currentUserId = request.user?.id;
+
+        const results = await this.searchProfileUseCase.execute(
+            q,
+            currentUserId,
+            limit,
+        );
+
+        const responseData = results.map(({ profile, isMe }) => {
+            const profileData = ProfilePrismaMapper.toResponse(profile);
+
+            return {
+                ...profileData,
+                isMe,
+                avatarUrl: this.getFullImageUrl(profileData.avatarUrl),
+                bannerUrl: this.getFullImageUrl(profileData.bannerUrl),
+            };
+        });
+
+        reply.status(200).send({
+            data: responseData,
+            meta: {
+                timestamp: new Date().toISOString(),
+                count: responseData.length,
             },
         });
     }

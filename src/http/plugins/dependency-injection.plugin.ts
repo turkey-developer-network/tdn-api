@@ -54,6 +54,7 @@ import { S3StorageService } from "@infrastructure/services/s3-storage.service";
 import { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 import { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/update-banner.use-case";
 import { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
+import { SearchProfilesUseCase } from "@core/use-cases/profile/search-profile/search-profile.usecase";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -162,6 +163,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
         updateBannerUseCase: asClass(UpdateBannerUseCase).singleton(),
         getProfileUseCase: asClass(GetProfileUseCase).singleton(),
+        searchProfileUseCase: asClass(SearchProfilesUseCase).singleton(),
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
         refreshTokenPurgeJob: asClass(RefreshTokenPurgeJob).singleton(),
@@ -195,6 +197,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                 updateProfileUseCase,
                 updateBannerUseCase,
                 getProfileUseCase,
+                searchProfileUseCase,
                 config,
             ) => {
                 return new ProfileController(
@@ -202,6 +205,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                     updateProfileUseCase,
                     updateBannerUseCase,
                     getProfileUseCase,
+                    searchProfileUseCase,
                     config.R2_PUBLIC_URL,
                 );
             },
