@@ -1,8 +1,14 @@
-import { Profile, type ProfileProps } from "@core/entities/profile.entitiy";
+import { Profile } from "@core/entities/profile.entitiy";
 import type {
     Prisma,
     Profile as PrismaProfile,
 } from "@generated/prisma/client";
+
+type PrismaProfileWithUser = PrismaProfile & {
+    user?: {
+        username: string;
+    };
+};
 
 /**
  * Mapper class responsible for transforming Profile data across different layers.
@@ -14,10 +20,12 @@ export default class ProfilePrismaMapper {
      * * @param dbProfile - The profile record retrieved from the Prisma database.
      * @returns The instantiated Profile domain entity.
      */
-    static toDomain(dbProfile: PrismaProfile): Profile {
+    static toDomain(dbProfile: PrismaProfileWithUser): Profile {
         return new Profile({
             id: dbProfile.id,
             userId: dbProfile.userId,
+
+            username: dbProfile.user?.username || "unknown",
             fullName: dbProfile.fullName,
             bio: dbProfile.bio,
             location: dbProfile.location,
@@ -51,8 +59,19 @@ export default class ProfilePrismaMapper {
      * * @param profile - The Profile domain entity.
      * @returns A sanitized profile object safe for external API responses.
      */
-    static toResponse(profile: Profile): Omit<ProfileProps, "id" | "userId"> {
+    static toResponse(profile: Profile): {
+        username: string;
+        fullName: string;
+        bio: string | null;
+        location: string | null;
+        avatarUrl: string;
+        bannerUrl: string;
+        socials: Record<string, string>;
+        createdAt: Date;
+        updatedAt: Date;
+    } {
         return {
+            username: profile.username,
             fullName: profile.fullName,
             bio: profile.bio,
             location: profile.location,

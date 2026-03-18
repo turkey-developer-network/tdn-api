@@ -101,7 +101,7 @@ export class App {
         this.server.register(authRoutes, { prefix: "/api/v1/auth" });
         this.server.register(userRoutes, { prefix: "/api/v1/users" });
         this.server.register(oauthRoutes, { prefix: "/api/v1/oauth" });
-        this.server.register(profileRoutes, { prefix: "/api/v1/profile" });
+        this.server.register(profileRoutes, { prefix: "/api/v1/profiles" });
     }
 
     /**

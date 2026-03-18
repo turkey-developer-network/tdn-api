@@ -54,4 +54,10 @@ export interface IProfileRepository {
      * @returns A promise resolving to the banner URL string, or null if no banner is set.
      */
     findBannerByUserId(userId: string): Promise<string | null>;
+    /**
+     * Retrieves a profile along with user data using the unique username.
+     * @param username - The unique handle of the user.
+     * @returns A promise resolving to the Profile entity or null if not found.
+     */
+    findByUsername(username: string): Promise<Profile | null>;
 }

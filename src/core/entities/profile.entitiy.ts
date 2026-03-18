@@ -9,6 +9,11 @@ export interface ProfileProps {
     socials: Record<string, string> | null;
     createdAt: Date;
     updatedAt: Date;
+
+    /**
+     * User
+     */
+    username: string;
 }
 
 export class Profile {
@@ -54,6 +59,9 @@ export class Profile {
         return this.props.updatedAt;
     }
 
+    get username(): string {
+        return this.props.username;
+    }
     public update(
         data: Partial<
             Pick<ProfileProps, "fullName" | "bio" | "location" | "socials">

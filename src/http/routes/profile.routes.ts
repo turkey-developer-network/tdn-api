@@ -1,5 +1,9 @@
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
+    type GetProfileParams,
+    GetProfileParamsSchema,
+} from "@typings/schemas/profile/get-profile.schema";
+import {
     type UpdateProfileBody,
     UpdateProfileBodySchema,
 } from "@typings/schemas/profile/update-profile.schema";
@@ -39,6 +43,16 @@ function profileRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
         },
         profileController.updateProfileMe.bind(profileController),
+    );
+
+    fastify.get<{ Params: GetProfileParams }>(
+        "/:username",
+        {
+            schema: {
+                params: GetProfileParamsSchema,
+            },
+        },
+        profileController.getProfile.bind(profileController),
     );
 }
 

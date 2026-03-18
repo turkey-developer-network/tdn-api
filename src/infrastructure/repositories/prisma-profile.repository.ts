@@ -59,6 +59,7 @@ export class PrismaProfileRepository implements IProfileRepository {
             },
         });
     }
+
     async findBannerByUserId(userId: string): Promise<string | null> {
         const profile = await this.prisma.profile.findUnique({
             where: { userId },
@@ -66,5 +67,22 @@ export class PrismaProfileRepository implements IProfileRepository {
         });
 
         return profile?.bannerUrl ?? null;
+    }
+
+    async findByUsername(username: string): Promise<Profile | null> {
+        const dbProfile = await this.prisma.profile.findFirst({
+            where: {
+                user: {
+                    username: username,
+                },
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        if (!dbProfile) return null;
+
+        return ProfilePrismaMapper.toDomain(dbProfile);
     }
 }

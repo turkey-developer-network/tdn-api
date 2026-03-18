@@ -1,8 +1,11 @@
 import { BadRequestError } from "@core/errors";
+import type { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
 import type { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar/update-avatar.usecase";
 import type { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/update-banner.use-case";
 import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
 import type { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
+import ProfilePrismaMapper from "@infrastructure/mappers/profile-prisma.mapper";
+import type { GetProfileParams } from "@typings/schemas/profile/get-profile.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 
 export class ProfileController {
@@ -10,6 +13,7 @@ export class ProfileController {
         private readonly updateAvatarUseCase: UpdateAvatarUseCase,
         private readonly updateProfileUseCase: UpdateProfileUseCase,
         private readonly updateBannerUseCase: UpdateBannerUseCase,
+        private readonly getProfileUseCase: GetProfileUseCase,
         private readonly publicUrl: string,
     ) {}
 
@@ -85,6 +89,24 @@ export class ProfileController {
             },
             meta: {
                 timestamp: new Date().toISOString(),
+            },
+        });
+    }
+
+    async getProfile(
+        request: FastifyRequest<{ Params: GetProfileParams }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const { username } = request.params;
+        const profile = await this.getProfileUseCase.execute(username);
+
+        const profileData = ProfilePrismaMapper.toResponse(profile);
+
+        reply.status(200).send({
+            data: {
+                ...profileData,
+                avatarUrl: this.getFullImageUrl(profileData.avatarUrl),
+                bannerUrl: this.getFullImageUrl(profileData.bannerUrl),
             },
         });
     }

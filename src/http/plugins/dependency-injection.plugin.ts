@@ -53,6 +53,7 @@ import { PrismaProfileRepository } from "@infrastructure/repositories/prisma-pro
 import { S3StorageService } from "@infrastructure/services/s3-storage.service";
 import { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 import { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/update-banner.use-case";
+import { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -160,6 +161,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         updateAvatarUseCase: asClass(UpdateAvatarUseCase).singleton(),
         updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
         updateBannerUseCase: asClass(UpdateBannerUseCase).singleton(),
+        getProfileUseCase: asClass(GetProfileUseCase).singleton(),
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
         refreshTokenPurgeJob: asClass(RefreshTokenPurgeJob).singleton(),
@@ -192,12 +194,14 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                 updateAvatarUseCase,
                 updateProfileUseCase,
                 updateBannerUseCase,
+                getProfileUseCase,
                 config,
             ) => {
                 return new ProfileController(
                     updateAvatarUseCase,
                     updateProfileUseCase,
                     updateBannerUseCase,
+                    getProfileUseCase,
                     config.R2_PUBLIC_URL,
                 );
             },
