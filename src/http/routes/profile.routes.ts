@@ -7,7 +7,7 @@ import {
     type UpdateProfileBody,
     UpdateProfileBodySchema,
 } from "@typings/schemas/profile/update-profile.schema";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 
 function profileRoutes(fastify: FastifyInstance): void {
     const profileController = fastify.diContainer.cradle.profileController;
@@ -50,6 +50,11 @@ function profileRoutes(fastify: FastifyInstance): void {
         {
             schema: {
                 params: GetProfileParamsSchema,
+            },
+            onRequest: async (request: FastifyRequest) => {
+                if (request.headers.authorization) {
+                    await request.jwtVerify();
+                }
             },
         },
         profileController.getProfile.bind(profileController),

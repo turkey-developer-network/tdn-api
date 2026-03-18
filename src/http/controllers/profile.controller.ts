@@ -98,13 +98,20 @@ export class ProfileController {
         reply: FastifyReply,
     ): Promise<void> {
         const { username } = request.params;
-        const profile = await this.getProfileUseCase.execute(username);
+
+        const currentUserId = request.user?.id;
+
+        const { profile, isMe } = await this.getProfileUseCase.execute(
+            username,
+            currentUserId,
+        );
 
         const profileData = ProfilePrismaMapper.toResponse(profile);
 
         reply.status(200).send({
             data: {
                 ...profileData,
+                isMe,
                 avatarUrl: this.getFullImageUrl(profileData.avatarUrl),
                 bannerUrl: this.getFullImageUrl(profileData.bannerUrl),
             },
