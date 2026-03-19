@@ -1,5 +1,8 @@
 import type { PrismaClient } from "@generated/prisma/client";
-import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
+import type {
+    FollowList,
+    IFollowRepository,
+} from "@core/ports/repositories/follow.repository";
 
 export class PrismaFollowUserRepository implements IFollowRepository {
     constructor(private readonly prisma: PrismaClient) {}
@@ -37,5 +40,94 @@ export class PrismaFollowUserRepository implements IFollowRepository {
                 },
             },
         });
+    }
+
+    async getFollowers(
+        targetId: string,
+        limit: number,
+        offset: number,
+    ): Promise<FollowList[]> {
+        const follows = await this.prisma.follow.findMany({
+            where: { followingId: targetId },
+            take: limit,
+            skip: offset,
+            orderBy: { createdAt: "desc" },
+            select: {
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profile: {
+                            select: {
+                                fullName: true,
+                                avatarUrl: true,
+                                bio: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        return follows.map((f) => ({
+            userId: f.follower.id,
+            username: f.follower.username,
+            fullName: f.follower.profile?.fullName || "",
+            avatarUrl: f.follower.profile?.avatarUrl || "",
+            bio: f.follower.profile?.bio || null,
+        }));
+    }
+
+    async getFollowing(
+        targetId: string,
+        limit: number,
+        offset: number,
+    ): Promise<FollowList[]> {
+        const follows = await this.prisma.follow.findMany({
+            where: { followerId: targetId },
+            take: limit,
+            skip: offset,
+            orderBy: { createdAt: "desc" },
+            select: {
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profile: {
+                            select: {
+                                fullName: true,
+                                avatarUrl: true,
+                                bio: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        return follows.map((f) => ({
+            userId: f.following.id,
+            username: f.following.username,
+            fullName: f.following.profile?.fullName || "",
+            avatarUrl: f.following.profile?.avatarUrl || "",
+            bio: f.following.profile?.bio || null,
+        }));
+    }
+
+    async checkIsFollowingBulk(
+        followerId: string,
+        followingIds: string[],
+    ): Promise<string[]> {
+        if (followingIds.length === 0) return [];
+
+        const follows = await this.prisma.follow.findMany({
+            where: {
+                followerId: followerId,
+                followingId: { in: followingIds },
+            },
+            select: { followingId: true },
+        });
+
+        return follows.map((f) => f.followingId);
     }
 }

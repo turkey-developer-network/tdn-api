@@ -1,5 +1,9 @@
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
+    FollowersParamsSchema,
+    PaginationQuerySchema,
+} from "@typings/schemas/profile/followers.schema";
+import {
     type GetProfileParams,
     GetProfileParamsSchema,
 } from "@typings/schemas/profile/get-profile.schema";
@@ -77,6 +81,28 @@ function profileRoutes(fastify: FastifyInstance): void {
             },
         },
         profileController.getProfile.bind(profileController),
+    );
+
+    fastify.get(
+        "/:username/followers",
+        {
+            schema: {
+                params: FollowersParamsSchema,
+                querystring: PaginationQuerySchema,
+            },
+        },
+        profileController.getFollowers.bind(profileController),
+    );
+
+    fastify.get(
+        "/:username/following",
+        {
+            schema: {
+                params: FollowersParamsSchema,
+                querystring: PaginationQuerySchema,
+            },
+        },
+        profileController.getFollowing.bind(profileController),
     );
 }
 

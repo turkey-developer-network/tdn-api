@@ -1,3 +1,11 @@
+export interface FollowList {
+    userId: string;
+    username: string;
+    fullName: string;
+    avatarUrl: string;
+    bio: string | null;
+}
+
 export interface IFollowRepository {
     /**
      * Checks if a user is following another user.
@@ -19,4 +27,29 @@ export interface IFollowRepository {
      * @param followingId - The ID of the user being unfollowed.
      */
     unfollowUser(followerId: string, followingId: string): Promise<void>;
+    /**
+     * Retrieves a paginated list of users who follow the target user.
+     */
+    getFollowers(
+        targetId: string,
+        limit: number,
+        offset: number,
+    ): Promise<FollowList[]>;
+
+    /**
+     * Retrieves a paginated list of users that the target user is following.
+     */
+    getFollowing(
+        targetId: string,
+        limit: number,
+        offset: number,
+    ): Promise<FollowList[]>;
+    /**
+     *
+     *
+     */
+    checkIsFollowingBulk(
+        followerId: string,
+        followingIds: string[],
+    ): Promise<string[]>;
 }
