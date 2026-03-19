@@ -55,6 +55,10 @@ import { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/upda
 import { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/update-banner.use-case";
 import { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
 import { SearchProfilesUseCase } from "@core/use-cases/profile/search-profile/search-profile.usecase";
+import { PrismaFollowUserRepository } from "@infrastructure/repositories/prisma-follow.repository";
+import { FollowUserUseCase } from "@core/use-cases/follow-user/follow-user.usecase";
+import { UnfollowUserUseCase } from "@core/use-cases/follow-user/unfollow-user.usecase";
+import { FollowUserController } from "@services/follow-user.controller";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -92,6 +96,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
             PrismaOAuthAccountRepository,
         ).singleton(),
         profileRepository: asClass(PrismaProfileRepository).singleton(),
+        followUserRepository: asClass(PrismaFollowUserRepository).singleton(),
         // --- Services ---
         transactionService: asClass(TransactionService).singleton(),
         passwordService: asClass(PasswordService).singleton(),
@@ -164,6 +169,9 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         updateBannerUseCase: asClass(UpdateBannerUseCase).singleton(),
         getProfileUseCase: asClass(GetProfileUseCase).singleton(),
         searchProfileUseCase: asClass(SearchProfilesUseCase).singleton(),
+        followUserUseCase: asClass(FollowUserUseCase).singleton(),
+        unfollowUserUseCase: asClass(UnfollowUserUseCase).singleton(),
+
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
         refreshTokenPurgeJob: asClass(RefreshTokenPurgeJob).singleton(),
@@ -210,6 +218,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                 );
             },
         ),
+        followUserController: asClass(FollowUserController).singleton(),
     });
 }
 

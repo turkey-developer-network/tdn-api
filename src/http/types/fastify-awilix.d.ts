@@ -5,6 +5,7 @@ import type { UserPurgeJob } from "@infrastructure/jobs/user-purge.job";
 import type { UserPurgeScheduler } from "@infrastructure/jobs/user-purge.scheduler";
 import type { RefreshTokenPurgeScheduler } from "@infrastructure/jobs/refresh-token-purge.scheduler";
 import type { ProfileController } from "@services/profile.controller";
+import type { FollowUserController } from "@services/follow-user.controller";
 
 declare module "@fastify/awilix" {
     interface Cradle {
@@ -15,6 +16,7 @@ declare module "@fastify/awilix" {
         userPurgeJob: UserPurgeJob;
         userPurgeScheduler: UserPurgeScheduler;
         refreshTokenPurgeScheduler: RefreshTokenPurgeScheduler;
+        followUserController: FollowUserController;
     }
 }
 
