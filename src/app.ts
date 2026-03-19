@@ -18,6 +18,7 @@ import userPurgePlugin from "@plugins/custom/user-purge.plugin";
 import refreshTokenPurgePlugin from "@plugins/custom/refresh-token-purge.plugin";
 import multipartPlugin from "@plugins/multipart.plugin";
 import profileRoutes from "@routes/profile.routes";
+import followRoutes from "@routes/follow.routes";
 /**
  * Main Application class responsible for orchestrating the Fastify server lifecycle.
  * It handles plugin registration, decorator injection, and route mounting.
@@ -102,6 +103,7 @@ export class App {
         this.server.register(userRoutes, { prefix: "/api/v1/users" });
         this.server.register(oauthRoutes, { prefix: "/api/v1/oauth" });
         this.server.register(profileRoutes, { prefix: "/api/v1/profiles" });
+        this.server.register(followRoutes, { prefix: "/api/v1/follows" });
     }
 
     /**

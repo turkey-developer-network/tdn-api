@@ -1,20 +1,18 @@
 import NotFoundError from "@core/errors/not-found.error";
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
-import type { Profile } from "@core/entities/profile.entitiy";
-
-export interface GetProfileResult {
-    profile: Profile;
-    isMe: boolean;
-    isFollowing: boolean;
-}
+import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
+import type { GetProfileOutput } from "./get-profile-usecase.output";
 
 export class GetProfileUseCase {
-    constructor(private readonly profileRepository: IProfileRepository) {}
+    constructor(
+        private readonly profileRepository: IProfileRepository,
+        private readonly followUserRepository: IFollowRepository,
+    ) {}
 
     async execute(
         username: string,
         currentUserId?: string,
-    ): Promise<GetProfileResult> {
+    ): Promise<GetProfileOutput> {
         const profile = await this.profileRepository.findByUsername(username);
 
         if (!profile) throw new NotFoundError("Profile not found.");
@@ -23,7 +21,7 @@ export class GetProfileUseCase {
 
         let isFollowing = false;
         if (currentUserId && !isMe) {
-            isFollowing = await this.profileRepository.checkIsFollowing(
+            isFollowing = await this.followUserRepository.checkIsFollowing(
                 currentUserId,
                 profile.userId,
             );
