@@ -56,9 +56,11 @@ import { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/updat
 import { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
 import { SearchProfilesUseCase } from "@core/use-cases/profile/search-profile/search-profile.usecase";
 import { PrismaFollowUserRepository } from "@infrastructure/repositories/prisma-follow.repository";
-import { FollowUserUseCase } from "@core/use-cases/follow-user/follow-user.usecase";
-import { UnfollowUserUseCase } from "@core/use-cases/follow-user/unfollow-user.usecase";
+import { FollowUserUseCase } from "@core/use-cases/follow-user/follow-user/follow-user.usecase";
+import { UnfollowUserUseCase } from "@core/use-cases/follow-user/unfollow-user/unfollow-user.usecase";
 import { FollowUserController } from "@services/follow-user.controller";
+import { GetFollowersUseCase } from "@core/use-cases/follow-user/get-followers/get-followers.usecase";
+import { GetFollowingUseCase } from "@core/use-cases/follow-user/get-following/get-following.usecase";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -171,6 +173,8 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         searchProfileUseCase: asClass(SearchProfilesUseCase).singleton(),
         followUserUseCase: asClass(FollowUserUseCase).singleton(),
         unfollowUserUseCase: asClass(UnfollowUserUseCase).singleton(),
+        getFollowersUseCase: asClass(GetFollowersUseCase).singleton(),
+        getFollowingUseCase: asClass(GetFollowingUseCase).singleton(),
 
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
@@ -206,6 +210,8 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                 updateBannerUseCase,
                 getProfileUseCase,
                 searchProfileUseCase,
+                getFollowersUseCase,
+                getFollowingUseCase,
                 config,
             ) => {
                 return new ProfileController(
@@ -214,6 +220,8 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                     updateBannerUseCase,
                     getProfileUseCase,
                     searchProfileUseCase,
+                    getFollowersUseCase,
+                    getFollowingUseCase,
                     config.R2_PUBLIC_URL,
                 );
             },

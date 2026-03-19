@@ -1,4 +1,6 @@
 import { BadRequestError } from "@core/errors";
+import type { GetFollowersUseCase } from "@core/use-cases/follow-user/get-followers/get-followers.usecase";
+import type { GetFollowingUseCase } from "@core/use-cases/follow-user/get-following/get-following.usecase";
 import type { GetProfileUseCase } from "@core/use-cases/profile/get-profile/get-profile.usecase";
 import type { SearchProfilesUseCase } from "@core/use-cases/profile/search-profile/search-profile.usecase";
 import type { UpdateAvatarUseCase } from "@core/use-cases/profile/update-avatar/update-avatar.usecase";
@@ -6,6 +8,10 @@ import type { UpdateBannerUseCase } from "@core/use-cases/profile/update-banner/
 import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
 import type { UpdateProfileUseCase } from "@core/use-cases/profile/update-profil/update-profile.use-case";
 import ProfilePrismaMapper from "@infrastructure/mappers/profile-prisma.mapper";
+import {
+    type FollowersParams,
+    type PaginationQuery,
+} from "@typings/schemas/profile/followers.schema";
 import type { GetProfileParams } from "@typings/schemas/profile/get-profile.schema";
 import type { SearchProfilesQuery } from "@typings/schemas/profile/search-profile.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
@@ -17,6 +23,8 @@ export class ProfileController {
         private readonly updateBannerUseCase: UpdateBannerUseCase,
         private readonly getProfileUseCase: GetProfileUseCase,
         private readonly searchProfileUseCase: SearchProfilesUseCase,
+        private readonly getFollowersUseCase: GetFollowersUseCase,
+        private readonly getFollowingUseCase: GetFollowingUseCase,
         private readonly publicUrl: string,
     ) {}
 
@@ -153,6 +161,68 @@ export class ProfileController {
                 timestamp: new Date().toISOString(),
                 count: responseData.length,
             },
+        });
+    }
+
+    async getFollowers(
+        request: FastifyRequest<{
+            Params: FollowersParams;
+            Querystring: PaginationQuery;
+        }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const { username } = request.params;
+        const { limit, offset } = request.query;
+        const currentUserId = request.user?.id;
+
+        const { profile } = await this.getProfileUseCase.execute(username);
+
+        const followers = await this.getFollowersUseCase.execute(
+            profile.userId,
+            currentUserId,
+            limit,
+            offset,
+        );
+
+        const response = followers.map((f) => ({
+            ...f,
+            avatarUrl: this.getFullImageUrl(f.avatarUrl),
+        }));
+
+        reply.status(200).send({
+            data: response,
+            meta: { limit, offset, count: response.length },
+        });
+    }
+
+    async getFollowing(
+        request: FastifyRequest<{
+            Params: FollowersParams;
+            Querystring: PaginationQuery;
+        }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const { username } = request.params;
+        const { limit, offset } = request.query;
+        const currentUserId = request.user?.id;
+
+        const { profile } = await this.getProfileUseCase.execute(username);
+
+        const following = await this.getFollowingUseCase.execute(
+            profile.userId,
+            currentUserId,
+            limit,
+            offset,
+        );
+
+        const response = following.map((f) => ({
+            ...f,
+            avatarUrl: this.getFullImageUrl(f.avatarUrl),
+        }));
+
+        reply.status(200).send({
+            data: response,
+            meta: { limit, offset, count: response.length },
         });
     }
 }
