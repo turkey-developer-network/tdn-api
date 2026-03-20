@@ -1,10 +1,13 @@
 import type {
-    INotificationRepository,
+    NotificationRepository,
     CreateNotificationInput,
+    GetNotificationOutput,
+    FindNotificationsInput,
 } from "@core/ports/repositories/notification.repository";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
+import { NotificationPrismaMapper } from "@infrastructure/mappers/notification-prisma.mapper";
 
-export class PrismaNotificationRepository implements INotificationRepository {
+export class PrismaNotificationRepository implements NotificationRepository {
     constructor(private readonly prisma: PrismaTransactionalClient) {}
 
     async create(data: CreateNotificationInput): Promise<void> {
@@ -25,6 +28,41 @@ export class PrismaNotificationRepository implements INotificationRepository {
             where: {
                 recipientId: userId,
                 isRead: false,
+            },
+        });
+    }
+
+    async findAllByUserId({
+        userId,
+        take,
+        skip,
+    }: FindNotificationsInput): Promise<GetNotificationOutput[]> {
+        const raws = await this.prisma.notification.findMany({
+            where: { recipientId: userId },
+            take,
+            skip,
+            orderBy: { createdAt: "desc" },
+            include: {
+                issuer: {
+                    select: {
+                        username: true,
+                        profile: {
+                            select: {
+                                avatarUrl: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        return raws.map((raw) => NotificationPrismaMapper.toResponse(raw));
+    }
+
+    async countByUserId(userId: string): Promise<number> {
+        return this.prisma.notification.count({
+            where: {
+                recipientId: userId,
             },
         });
     }

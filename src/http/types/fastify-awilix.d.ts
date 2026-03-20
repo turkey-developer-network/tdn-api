@@ -7,6 +7,7 @@ import type { RefreshTokenPurgeScheduler } from "@infrastructure/jobs/refresh-to
 import type { ProfileController } from "@services/profile.controller";
 import type { FollowUserController } from "@services/follow-user.controller";
 import type { WebSocketManager } from "@infrastructure/websocket/websocket-manager";
+import type NotificationController from "@services/notification.controller";
 
 declare module "@fastify/awilix" {
     interface Cradle {
@@ -19,6 +20,7 @@ declare module "@fastify/awilix" {
         refreshTokenPurgeScheduler: RefreshTokenPurgeScheduler;
         followUserController: FollowUserController;
         wsManager: WebSocketManager;
+        notificationController: NotificationController;
     }
 }
 
