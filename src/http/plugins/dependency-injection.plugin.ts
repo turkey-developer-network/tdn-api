@@ -65,6 +65,8 @@ import { WebSocketManager } from "@infrastructure/websocket/websocket-manager";
 import { FastifyRealtimeService } from "@infrastructure/services/fastify-realtime.service";
 import { PrismaNotificationRepository } from "@infrastructure/repositories/prisma-notification.repository";
 import { RedisService } from "@infrastructure/redis/redis.service";
+import { GetUserNotificatonUseCase } from "@core/use-cases/notification/get-user-notification.usecase";
+import NotificationController from "@services/notification.controller";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -182,7 +184,9 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         unfollowUserUseCase: asClass(UnfollowUserUseCase).singleton(),
         getFollowersUseCase: asClass(GetFollowersUseCase).singleton(),
         getFollowingUseCase: asClass(GetFollowingUseCase).singleton(),
-
+        getUserNotificationsUseCase: asClass(
+            GetUserNotificatonUseCase,
+        ).singleton(),
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
         refreshTokenPurgeJob: asClass(RefreshTokenPurgeJob).singleton(),
@@ -234,6 +238,8 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
             },
         ),
         followUserController: asClass(FollowUserController).singleton(),
+        notificationController: asClass(NotificationController).singleton(),
+
         redisService: asClass(RedisService).singleton(),
         wsManager: asClass(WebSocketManager).singleton(),
         realtimeService: asClass(FastifyRealtimeService).singleton(),

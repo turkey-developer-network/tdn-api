@@ -10,7 +10,26 @@ export interface CreateNotificationInput {
     referenceId?: string;
 }
 
-export interface INotificationRepository {
+export interface FindNotificationsInput {
+    userId: string;
+    take: number;
+    skip: number;
+}
+
+export interface GetNotificationOutput {
+    recipientId: string;
+    username: string;
+    type: NotificationType;
+    avatar_url: string;
+    createdAt: Date;
+    isRead: boolean;
+}
+
+export interface NotificationRepository {
     create(data: CreateNotificationInput): Promise<void>;
     getUnreadCount(userId: string): Promise<number>;
+    findAllByUserId(
+        input: FindNotificationsInput,
+    ): Promise<GetNotificationOutput[]>;
+    countByUserId(userId: string): Promise<number>;
 }
