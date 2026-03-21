@@ -1,0 +1,87 @@
+enum PostType {
+  COMMUNITY
+  TECH_NEWS
+  SYSTEM_UPDATE
+  JOB_POSTING
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  content     String   @db.Text
+  type        PostType @default(COMMUNITY)
+  mediaUrls   String[] @map("media_urls")
+
+  authorId    String   @map("author_id")
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  tags        Tag[]    
+  likes       PostLike[]
+  bookmarks   PostBookmark[]
+  comments    Comment[]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([type])
+  @@map("posts") 
+}
+
+model Tag {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  posts       Post[]
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([name])
+  @@map("tags")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("post_likes")
+}
+
+model PostBookmark {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("post_bookmarks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+
+  postId    String   @map("post_id")
+  authorId  String   @map("author_id")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
+}

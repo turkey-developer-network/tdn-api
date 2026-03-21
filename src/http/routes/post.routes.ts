@@ -1,0 +1,20 @@
+import {
+    type CreatePostBody,
+    createPostBodySchema,
+} from "@typings/schemas/post/create-post.schema";
+import type { FastifyInstance } from "fastify";
+
+export function postRoutes(fastify: FastifyInstance): void {
+    const { postController } = fastify.diContainer.cradle;
+
+    fastify.post<{ Body: CreatePostBody }>(
+        "/",
+        {
+            onRequest: [fastify.authenticate],
+            schema: {
+                body: createPostBodySchema,
+            },
+        },
+        postController.create.bind(postController),
+    );
+}
