@@ -9,6 +9,7 @@ import type { FollowUserController } from "@services/follow-user.controller";
 import type { WebSocketManager } from "@infrastructure/websocket/websocket-manager";
 import type NotificationController from "@services/notification.controller";
 import type { NotificationPurgeScheduler } from "@infrastructure/jobs/notification/notification-purge.scheduler";
+import type PostController from "@services/post.controller";
 
 declare module "@fastify/awilix" {
     interface Cradle {
@@ -23,6 +24,7 @@ declare module "@fastify/awilix" {
         wsManager: WebSocketManager;
         notificationController: NotificationController;
         notificationPurgeScheduler: NotificationPurgeScheduler;
+        postController: PostController;
     }
 }
 

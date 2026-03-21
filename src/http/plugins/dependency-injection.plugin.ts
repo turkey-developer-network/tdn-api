@@ -71,6 +71,9 @@ import { MarkAllNotificationsAsReadUseCase } from "@core/use-cases/notification/
 import NotificationPurgeJob from "@infrastructure/jobs/notification/notification-purge.job";
 import { NotificationPurgeScheduler } from "@infrastructure/jobs/notification/notification-purge.scheduler";
 import { PurgeExpiredNotificationsUseCase } from "@core/use-cases/notification/purge-expired/purge-expired-notifications.usecase";
+import { CreatePostUseCase } from "@core/use-cases/post/create-post/create-post.usecase";
+import PostController from "@services/post.controller";
+import { PrismaPostRepository } from "@infrastructure/repositories/prisma-post.repository";
 
 function dependencyInjectionPlugin(fastify: FastifyInstance): void {
     fastify.register(fastifyAwilixPlugin, {
@@ -130,7 +133,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
                 logger,
             );
         }).singleton(),
-
+        postRepository: asClass(PrismaPostRepository).singleton(),
         authTokenService: asFunction((jwt, config) => {
             return new AuthTokenService(
                 jwt,
@@ -197,6 +200,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         purgeExpiredNotificationsUseCase: asClass(
             PurgeExpiredNotificationsUseCase,
         ).singleton(),
+        createPostUseCase: asClass(CreatePostUseCase).singleton(),
 
         // --- Jobs ---
         userPurgeJob: asClass(UserPurgeJob).singleton(),
@@ -265,7 +269,7 @@ function dependencyInjectionPlugin(fastify: FastifyInstance): void {
         ),
         followUserController: asClass(FollowUserController).singleton(),
         notificationController: asClass(NotificationController).singleton(),
-
+        postController: asClass(PostController).singleton(),
         redisService: asClass(RedisService).singleton(),
         wsManager: asClass(WebSocketManager).singleton(),
         realtimeService: asClass(FastifyRealtimeService).singleton(),
