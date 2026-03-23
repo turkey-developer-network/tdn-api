@@ -1,4 +1,4 @@
-import { CustomError } from "./custom.error";
+import { CustomError } from "../common/custom.error";
 
 export class MediaLimitExceededError extends CustomError {
     constructor(message = "Maximum 4 media files are allowed per post.") {

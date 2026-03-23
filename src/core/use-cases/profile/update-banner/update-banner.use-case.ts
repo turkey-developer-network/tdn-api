@@ -1,6 +1,6 @@
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
 import type { UpdateBannerUseCaseInput } from "./update-banner-usecase.input";
-import { InvalidFileTypeError } from "@core/errors/invalid-file-type.error";
+import { InvalidFileTypeError } from "@core/errors";
 import type { StoragePort } from "@core/ports/services/storage.port";
 import type { LoggerPort } from "@core/ports/services/logger.port";
 

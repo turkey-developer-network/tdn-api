@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@core/errors/unauthorized.error";
+import { UnauthorizedError } from "@core/errors";
 import type { ForgotPasswordUseCase } from "@core/use-cases/auth/forgot-password/forgot-password.usecase";
 import type { LoginUseCase } from "@core/use-cases/auth/login/login.usecase";
 import type { LogoutUseCase } from "@core/use-cases/auth/logout/logout.usecase";

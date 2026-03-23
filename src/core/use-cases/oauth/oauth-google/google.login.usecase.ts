@@ -5,7 +5,7 @@ import type {
     AuthTokenPort,
     UserPayload,
 } from "@core/ports/services/auth-token.port";
-import { AccountPendingDeletionError } from "@core/errors/account-pending-deletion.error";
+import { AccountPendingDeletionError } from "@core/errors";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { IRefreshTokenRepository } from "@core/ports/repositories/refresh-token.repository";
 import type { GoogleLoginInput } from "./google-login.input";

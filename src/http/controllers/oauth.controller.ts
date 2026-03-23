@@ -1,7 +1,7 @@
 import { BaseAuthController } from "./base-auth.controller";
 import type { FastifyReply, FastifyRequest, FastifyInstance } from "fastify";
 import type { GithubAuthPort } from "@core/ports/services/github-auth.port";
-import { AccountPendingDeletionError } from "@core/errors/account-pending-deletion.error";
+import { AccountPendingDeletionError } from "@core/errors";
 import type { GithubLoginUseCase } from "@core/use-cases/oauth/oauth-github/github-login.usecase";
 import type { GoogleAuthService } from "@infrastructure/services/google-auth.service";
 import type { GoogleLoginUseCase } from "@core/use-cases/oauth/oauth-google/google.login.usecase";

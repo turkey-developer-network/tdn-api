@@ -1,4 +1,4 @@
-import { BadRequestError } from "@core/errors/bad-request.error";
+import { BadRequestError } from "@core/errors";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import type { PasswordService } from "@infrastructure/services/password.service";

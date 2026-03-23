@@ -1,7 +1,7 @@
 import {
     InvalidCredentialsError,
     AccountPendingDeletionError,
-} from "@core/errors/";
+} from "@core/errors";
 import type { PasswordPort } from "@core/ports/services/password.port";
 import type {
     AuthTokenPort,

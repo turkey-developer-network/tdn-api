@@ -2,7 +2,7 @@ import type { IProfileRepository } from "@core/ports/repositories/profile.reposi
 import type { UpdateAvatarUseCaseInput } from "./update-avatar-usecase.input";
 import type { StoragePort } from "@core/ports/services/storage.port";
 import type { LoggerPort } from "@core/ports/services/logger.port";
-import { InvalidFileTypeError } from "@core/errors/invalid-file-type.error";
+import { InvalidFileTypeError } from "@core/errors";
 
 export class UpdateAvatarUseCase {
     constructor(

@@ -1,8 +1,7 @@
 import type { IPostRepository } from "@core/ports/repositories/post.repository";
 import type { StoragePort } from "@core/ports/services/storage.port";
 import type { LoggerPort } from "@core/ports/services/logger.port";
-import { UnauthorizedActionError } from "@core/errors/unauthorized-action.error";
-import NotFoundError from "@core/errors/not-found.error";
+import { UnauthorizedActionError, NotFoundError } from "@core/errors";
 import type { DeletePostUseCaseInput } from "./delete-post-usecase.input";
 import type { CachePort } from "@core/ports/services/cache.port";
 

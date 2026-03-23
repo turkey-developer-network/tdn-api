@@ -1,6 +1,6 @@
-import { CustomError } from "./custom.error";
+import { CustomError } from "../common/custom.error";
 
-export default class OAuthProviderError extends CustomError {
+export class OAuthProviderError extends CustomError {
     constructor(message = "An error occurred during authorization.") {
         super(message, 502);
     }

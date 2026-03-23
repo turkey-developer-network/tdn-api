@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@core/errors/unauthorized.error";
+import { UnauthorizedError } from "@core/errors";
 import type { EmailPort } from "@core/ports/services/email.port";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import { TokenType } from "@core/entities/verification-token.entity";

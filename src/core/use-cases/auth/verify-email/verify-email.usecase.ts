@@ -1,5 +1,4 @@
-import { BadRequestError } from "@core/errors/bad-request.error";
-import { UnauthorizedError } from "@core/errors/unauthorized.error";
+import { BadRequestError, UnauthorizedError } from "@core/errors";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import { TokenType } from "@core/entities/verification-token.entity";

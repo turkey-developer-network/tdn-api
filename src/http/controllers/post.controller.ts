@@ -1,5 +1,4 @@
-import { MediaLimitExceededError } from "@core/errors/media-limit-exceeded.error";
-import { NoMediaProvidedError } from "@core/errors/no-media-provided.error";
+import { MediaLimitExceededError, NoMediaProvidedError } from "@core/errors";
 import type { CreatePostUseCase } from "@core/use-cases/post/create-post/create-post.usecase";
 import type { DeletePostUseCase } from "@core/use-cases/post/delete-post/delete-post.usecase";
 import type { GetPostsUseCase } from "@core/use-cases/post/get-post/get-posts.usecase";

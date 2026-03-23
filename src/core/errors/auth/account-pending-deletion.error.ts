@@ -1,4 +1,4 @@
-import { CustomError } from "./custom.error";
+import { CustomError } from "../common/custom.error";
 
 export class AccountPendingDeletionError extends CustomError {
     public readonly recoveryToken: string;
