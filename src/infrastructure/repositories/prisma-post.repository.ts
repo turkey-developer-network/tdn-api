@@ -1,20 +1,14 @@
 import type { PrismaClient } from "@generated/prisma/client";
-import { PostType as PrismaPostType } from "@generated/prisma/client";
 
 import type {
     IPostRepository,
     GetPostsParams,
 } from "@core/ports/repositories/post.repository";
 import { Post } from "@core/domain/entities/post.entity";
+import { PostPrismaMapper } from "@infrastructure/mappers/post-prisma.mapper";
+import type { PostType } from "@core/domain/enums/post-type.enum";
 
 export class PrismaPostRepository implements IPostRepository {
-    private readonly typeMap: Record<string, PrismaPostType> = {
-        [PrismaPostType.COMMUNITY]: PrismaPostType.COMMUNITY,
-        [PrismaPostType.TECH_NEWS]: PrismaPostType.TECH_NEWS,
-        [PrismaPostType.SYSTEM_UPDATE]: PrismaPostType.SYSTEM_UPDATE,
-        [PrismaPostType.JOB_POSTING]: PrismaPostType.JOB_POSTING,
-    };
-
     constructor(private readonly prisma: PrismaClient) {}
 
     async create(post: Post): Promise<void> {
@@ -26,14 +20,11 @@ export class PrismaPostRepository implements IPostRepository {
             ),
         ];
 
-        const prismaType = this.typeMap[post.type];
+        const prismaData = PostPrismaMapper.toPrisma(post);
 
         await this.prisma.post.create({
             data: {
-                content: post.content,
-                type: prismaType,
-                mediaUrls: post.mediaUrls,
-                authorId: post.author.id,
+                ...prismaData,
                 tags: {
                     connectOrCreate: uniqueTags.map((tag: string) => ({
                         where: { name: tag },
@@ -50,7 +41,7 @@ export class PrismaPostRepository implements IPostRepository {
         const { page, limit, type } = params;
         const skip = (page - 1) * limit;
 
-        const whereCondition = type ? { type: this.typeMap[type] } : {};
+        const whereCondition = type ? { type } : {};
 
         const [total, rawPosts] = await Promise.all([
             this.prisma.post.count({ where: whereCondition }),
@@ -80,7 +71,7 @@ export class PrismaPostRepository implements IPostRepository {
             return new Post({
                 id: post.id,
                 content: post.content,
-                type: post.type,
+                type: post.type as PostType,
                 mediaUrls: post.mediaUrls,
                 author: {
                     id: post.author.id,
@@ -116,7 +107,7 @@ export class PrismaPostRepository implements IPostRepository {
         return new Post({
             id: post.id,
             content: post.content,
-            type: post.type,
+            type: post.type as PostType,
             mediaUrls: post.mediaUrls,
             author: {
                 id: post.author.id,

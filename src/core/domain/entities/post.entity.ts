@@ -1,10 +1,12 @@
+import type { PostType } from "@core/domain/enums/post-type.enum";
+
 /**
  * Props interface for Post entity
  */
 export interface PostProps {
-    id: string;
+    id?: string;
     content: string;
-    type: string; // PostType enum value
+    type: PostType;
     mediaUrls: string[];
     author: {
         id: string;
@@ -12,8 +14,19 @@ export interface PostProps {
         avatarUrl?: string;
     };
     tags: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+/**
+ * Input interface for creating a new Post entity
+ * Excludes auto-generated fields (id, createdAt, updatedAt)
+ */
+export interface CreatePostInput {
+    content: string;
+    type: PostType;
+    authorId: string;
+    mediaUrls?: string[];
 }
 
 /**
@@ -33,19 +46,16 @@ export class Post {
      */
     public static create(
         content: string,
-        type: string,
+        type: PostType,
         authorId: string,
         mediaUrls: string[] = [],
     ): Post {
         return new Post({
-            id: crypto.randomUUID(),
             content,
             type,
             mediaUrls,
             author: { id: authorId },
             tags: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
         });
     }
 
@@ -53,7 +63,7 @@ export class Post {
      * Get the unique identifier of the post
      */
     get id(): string {
-        return this.props.id;
+        return this.props.id!;
     }
 
     /**
@@ -95,14 +105,14 @@ export class Post {
      * Get the creation date of the post
      */
     get createdAt(): Date {
-        return this.props.createdAt;
+        return this.props.createdAt!;
     }
 
     /**
      * Get the last update date of the post
      */
     get updatedAt(): Date {
-        return this.props.updatedAt;
+        return this.props.updatedAt!;
     }
 
     /**

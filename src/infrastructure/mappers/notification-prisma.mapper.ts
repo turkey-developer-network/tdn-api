@@ -19,6 +19,11 @@ export interface PrismaNotificationItem {
 }
 
 export class NotificationPrismaMapper {
+    /**
+     * Maps a Prisma notification item to a response object
+     * @param item - The Prisma notification item
+     * @returns A response object with notification data
+     */
     public static toResponse(item: PrismaNotificationItem): {
         avatarUrl: string;
         createdAt: Date;
@@ -37,6 +42,11 @@ export class NotificationPrismaMapper {
         };
     }
 
+    /**
+     * Maps a Notification entity to a response object
+     * @param notification - The Notification entity
+     * @returns A response object with notification data
+     */
     public static toGetNotificationOutput(notification: Notification): {
         avatarUrl: string;
         createdAt: Date;
@@ -46,12 +56,31 @@ export class NotificationPrismaMapper {
         isRead: boolean;
     } {
         return {
-            avatarUrl: notification.avatarUrl,
+            avatarUrl: notification.avatarUrl || "",
             createdAt: notification.createdAt,
             type: notification.type as CoreNotificationType,
             recipientId: notification.recipientId,
-            username: notification.username,
+            username: notification.username || "",
             isRead: notification.isRead,
+        };
+    }
+
+    /**
+     * Maps a Notification entity to Prisma notification data
+     * @param notification - The Notification entity
+     * @returns Prisma notification data
+     */
+    public static toPrisma(notification: Notification): {
+        recipientId: string;
+        issuerId: string;
+        type: NotificationType;
+        referenceId?: string | null;
+    } {
+        return {
+            recipientId: notification.recipientId,
+            issuerId: notification.issuerId,
+            type: notification.type as unknown as NotificationType,
+            referenceId: notification.referenceId || null,
         };
     }
 }

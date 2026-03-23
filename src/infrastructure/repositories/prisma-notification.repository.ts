@@ -4,28 +4,18 @@ import type {
 } from "@core/ports/repositories/notification.repository";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
 import { Notification } from "@core/domain/entities/notification.entity";
-import { NotificationType } from "@generated/prisma/client";
+import { NotificationPrismaMapper } from "@infrastructure/mappers/notification-prisma.mapper";
 
 export class PrismaNotificationRepository implements INotificationRepository {
-    private readonly typeMap: Record<string, NotificationType> = {
-        [NotificationType.FOLLOW]: NotificationType.FOLLOW,
-        [NotificationType.NEW_POST]: NotificationType.NEW_POST,
-    };
-
     constructor(private readonly prisma: PrismaTransactionalClient) {}
 
     async create(notification: Notification): Promise<void> {
         const notificationLimit = 100;
 
-        const prismaType = this.typeMap[notification.type];
+        const prismaData = NotificationPrismaMapper.toPrisma(notification);
 
         await this.prisma.notification.create({
-            data: {
-                recipientId: notification.recipientId,
-                issuerId: notification.issuerId,
-                type: prismaType,
-                referenceId: notification.referenceId,
-            },
+            data: prismaData,
         });
 
         const cutoffNotification = await this.prisma.notification.findMany({
@@ -80,13 +70,14 @@ export class PrismaNotificationRepository implements INotificationRepository {
         });
 
         return raws.map((raw) => {
+            const notificationData = NotificationPrismaMapper.toResponse(raw);
             return new Notification({
                 recipientId: raw.recipientId,
                 issuerId: raw.issuerId,
-                type: raw.type,
+                type: notificationData.type,
                 referenceId: raw.referenceId || undefined,
-                username: raw.issuer.username,
-                avatarUrl: raw.issuer.profile?.avatarUrl || "",
+                username: notificationData.username,
+                avatarUrl: notificationData.avatarUrl,
                 createdAt: raw.createdAt,
                 isRead: raw.isRead,
             });

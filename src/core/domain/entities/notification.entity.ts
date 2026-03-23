@@ -1,14 +1,16 @@
+import type { NotificationType } from "@core/domain/enums/notification-type.enum";
+
 /**
  * Props interface for Notification entity
  */
 export interface NotificationProps {
     recipientId: string;
     issuerId: string;
-    type: string; // NotificationType enum value
+    type: NotificationType;
     referenceId?: string;
-    username: string;
-    avatarUrl: string;
-    createdAt: Date;
+    username?: string;
+    avatarUrl?: string;
+    createdAt?: Date;
     isRead: boolean;
 }
 
@@ -30,7 +32,7 @@ export class Notification {
     public static create(
         recipientId: string,
         issuerId: string,
-        type: string,
+        type: NotificationType,
         referenceId?: string,
     ): Notification {
         return new Notification({
@@ -38,9 +40,9 @@ export class Notification {
             issuerId,
             type,
             referenceId,
-            username: "", // Will be populated by repository layer
-            avatarUrl: "", // Will be populated by repository layer
-            createdAt: new Date(),
+            username: undefined,
+            avatarUrl: undefined,
+            createdAt: undefined,
             isRead: false,
         });
     }
@@ -53,13 +55,6 @@ export class Notification {
     }
 
     /**
-     * Get the username of the notification issuer
-     */
-    get username(): string {
-        return this.props.username;
-    }
-
-    /**
      * Get the ID of the user who issued this notification
      */
     get issuerId(): string {
@@ -67,16 +62,23 @@ export class Notification {
     }
 
     /**
+     * Get the username of the notification issuer
+     */
+    get username(): string | undefined {
+        return this.props.username;
+    }
+
+    /**
      * Get the type of the notification
      */
-    get type(): string {
+    get type(): NotificationType {
         return this.props.type;
     }
 
     /**
      * Get the avatar URL of the notification issuer
      */
-    get avatarUrl(): string {
+    get avatarUrl(): string | undefined {
         return this.props.avatarUrl;
     }
 
@@ -91,7 +93,7 @@ export class Notification {
      * Get the creation date of the notification
      */
     get createdAt(): Date {
-        return this.props.createdAt;
+        return this.props.createdAt!;
     }
 
     /**
@@ -154,6 +156,7 @@ export class Notification {
      * Check if the notification was created within the last specified hours
      */
     public isRecent(hours: number): boolean {
+        if (!this.props.createdAt) return false;
         const now = new Date();
         const timeDiff = now.getTime() - this.props.createdAt.getTime();
         const hoursDiff = timeDiff / (1000 * 60 * 60);
