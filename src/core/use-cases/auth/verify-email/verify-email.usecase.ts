@@ -1,7 +1,7 @@
 import { BadRequestError, UnauthorizedError } from "@core/errors";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
-import { TokenType } from "@core/entities/verification-token.entity";
+import { TokenType } from "@core/domain/enums/token-type.enum";
 import { type CryptoPort } from "@core/ports/services/crypto.port";
 import type { VerifyEmailInput } from "./verify-email.input";
 export class VerifyEmailUseCase {

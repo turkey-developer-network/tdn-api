@@ -1,4 +1,4 @@
-import type { User } from "@core/entities/user.entity";
+import type { User } from "@core/domain/entities/user.entity";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import UserPrismaMapper from "../mappers/user-prisma.mapper";
 import { UserAlreadyExistsError } from "@core/errors";

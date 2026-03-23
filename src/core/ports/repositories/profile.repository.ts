@@ -1,5 +1,5 @@
 import type { UpdateProfileInput } from "@core/use-cases/profile/update-profil/update-profile-usecase.input";
-import type { Profile } from "@core/entities/profile.entitiy";
+import type { Profile } from "@core/domain/entities/profile.entity";
 
 /**
  * Data access contract for managing User Profile persistence.

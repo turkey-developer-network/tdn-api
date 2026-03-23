@@ -1,4 +1,4 @@
-import type { PostType } from "@core/ports/repositories/post.repository";
+import type { PostType } from "@core/domain/enums/post-type.enum";
 
 export interface GetPostsInput {
     page?: number;

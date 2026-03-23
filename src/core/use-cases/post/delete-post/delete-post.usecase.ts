@@ -26,7 +26,7 @@ export class DeletePostUseCase {
             );
         }
 
-        if (post.mediaUrls && post.mediaUrls.length > 0) {
+        if (post.hasMedia()) {
             for (const fullUrl of post.mediaUrls) {
                 try {
                     const fileKey = fullUrl

@@ -1,9 +1,7 @@
 import { BadRequestError } from "@core/errors";
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
-import {
-    NotificationType,
-    type INotificationRepository,
-} from "@core/ports/repositories/notification.repository";
+import type { INotificationRepository } from "@core/ports/repositories/notification.repository";
+import { NotificationType } from "@core/domain/enums/notification-type.enum";
 import type { RealtimePort } from "@core/ports/services/realtime.port";
 
 export class FollowUserUseCase {

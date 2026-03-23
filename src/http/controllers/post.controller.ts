@@ -106,8 +106,8 @@ export default class PostController {
             return {
                 ...post,
                 author: {
-                    ...post.author,
-
+                    id: post.author.id,
+                    username: post.author.username,
                     avatarUrl: post.author.avatarUrl.startsWith("http")
                         ? post.author.avatarUrl
                         : `${cdnUrl}/${post.author.avatarUrl}`,

@@ -1,7 +1,5 @@
-import type {
-    VerificationToken,
-    TokenType,
-} from "../../entities/verification-token.entity";
+import type { VerificationToken } from "@core/domain/entities/verification-token.entity";
+import type { TokenType } from "@core/domain/enums/token-type.enum";
 
 export interface IVerificationTokenRepository {
     upsert(data: {

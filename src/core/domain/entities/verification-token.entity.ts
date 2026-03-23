@@ -1,7 +1,4 @@
-export enum TokenType {
-    EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
-    PASSWORD_RESET = "PASSWORD_RESET",
-}
+import type { TokenType } from "@core/domain/enums/token-type.enum";
 
 export class VerificationToken {
     constructor(

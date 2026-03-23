@@ -1,7 +1,7 @@
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import type { EmailPort } from "@core/ports/services/email.port";
-import { TokenType } from "@core/entities/verification-token.entity";
+import { TokenType } from "@core/domain/enums/token-type.enum";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { ForgotPasswordInput } from "./forgot-password.input";
 

@@ -4,13 +4,15 @@ import type {
 } from "@generated/prisma/client";
 
 import type {
-    PostType,
     IPostRepository,
     CreatePostInput,
     GetPostsParams,
     PaginatedPosts,
     PostOutput,
 } from "@core/ports/repositories/post.repository";
+import { Post } from "@core/domain/entities/post.entity";
+import type { PostType } from "@core/domain/enums/post-type.enum";
+import { PostPrismaMapper } from "@infrastructure/mappers/post-prisma.mapper";
 
 export class PrismaPostRepository implements IPostRepository {
     constructor(private readonly prisma: PrismaClient) {}
@@ -69,26 +71,28 @@ export class PrismaPostRepository implements IPostRepository {
         ]);
 
         const posts: PostOutput[] = rawPosts.map((post) => {
-            return {
-                id: post.id,
-                content: post.content,
-                type: post.type as unknown as PostType,
-                mediaUrls: post.mediaUrls,
-                author: {
-                    id: post.author.id,
-                    username: post.author.username,
-                    avatarUrl: post.author.profile?.avatarUrl as string,
-                },
-                tags: post.tags.map((tag) => tag.name),
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt,
-            };
+            return PostPrismaMapper.toPostOutput(
+                new Post({
+                    id: post.id,
+                    content: post.content,
+                    type: post.type as unknown as PostType,
+                    mediaUrls: post.mediaUrls,
+                    author: {
+                        id: post.author.id,
+                        username: post.author.username,
+                        avatarUrl: post.author.profile?.avatarUrl as string,
+                    },
+                    tags: post.tags.map((tag) => tag.name),
+                    createdAt: post.createdAt,
+                    updatedAt: post.updatedAt,
+                }),
+            );
         });
 
         return { posts, total };
     }
 
-    async findById(id: string): Promise<PostOutput | null> {
+    async findById(id: string): Promise<Post | null> {
         const post = await this.prisma.post.findUnique({
             where: { id },
             include: {
@@ -105,7 +109,7 @@ export class PrismaPostRepository implements IPostRepository {
 
         if (!post) return null;
 
-        return {
+        return new Post({
             id: post.id,
             content: post.content,
             type: post.type as unknown as PostType,
@@ -118,7 +122,7 @@ export class PrismaPostRepository implements IPostRepository {
             tags: post.tags.map((tag) => tag.name),
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
-        };
+        });
     }
 
     async delete(id: string): Promise<void> {
