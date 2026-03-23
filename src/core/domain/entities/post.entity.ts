@@ -8,8 +8,8 @@ export interface PostProps {
     mediaUrls: string[];
     author: {
         id: string;
-        username: string;
-        avatarUrl: string;
+        username?: string;
+        avatarUrl?: string;
     };
     tags: string[];
     createdAt: Date;
@@ -22,6 +22,32 @@ export interface PostProps {
  */
 export class Post {
     constructor(private readonly props: PostProps) {}
+
+    /**
+     * Creates a new Post entity with minimal required data.
+     * @param content - The content of the post
+     * @param type - The type of the post
+     * @param authorId - The ID of the post author
+     * @param mediaUrls - Optional array of media URLs
+     * @returns A new Post entity
+     */
+    public static create(
+        content: string,
+        type: string,
+        authorId: string,
+        mediaUrls: string[] = [],
+    ): Post {
+        return new Post({
+            id: crypto.randomUUID(),
+            content,
+            type,
+            mediaUrls,
+            author: { id: authorId },
+            tags: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+    }
 
     /**
      * Get the unique identifier of the post
@@ -54,7 +80,7 @@ export class Post {
     /**
      * Get the author information of the post
      */
-    get author(): { id: string; username: string; avatarUrl: string } {
+    get author(): { id: string; username?: string; avatarUrl?: string } {
         return this.props.author;
     }
 

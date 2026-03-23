@@ -3,8 +3,10 @@
  */
 export interface NotificationProps {
     recipientId: string;
-    username: string;
+    issuerId: string;
     type: string; // NotificationType enum value
+    referenceId?: string;
+    username: string;
     avatarUrl: string;
     createdAt: Date;
     isRead: boolean;
@@ -16,6 +18,32 @@ export interface NotificationProps {
  */
 export class Notification {
     constructor(private readonly props: NotificationProps) {}
+
+    /**
+     * Creates a new Notification entity with minimal required data.
+     * @param recipientId - The ID of the user receiving the notification
+     * @param issuerId - The ID of the user issuing the notification
+     * @param type - The type of the notification
+     * @param referenceId - Optional reference ID for the notification
+     * @returns A new Notification entity
+     */
+    public static create(
+        recipientId: string,
+        issuerId: string,
+        type: string,
+        referenceId?: string,
+    ): Notification {
+        return new Notification({
+            recipientId,
+            issuerId,
+            type,
+            referenceId,
+            username: "", // Will be populated by repository layer
+            avatarUrl: "", // Will be populated by repository layer
+            createdAt: new Date(),
+            isRead: false,
+        });
+    }
 
     /**
      * Get the ID of the user who received this notification
@@ -32,6 +60,13 @@ export class Notification {
     }
 
     /**
+     * Get the ID of the user who issued this notification
+     */
+    get issuerId(): string {
+        return this.props.issuerId;
+    }
+
+    /**
      * Get the type of the notification
      */
     get type(): string {
@@ -43,6 +78,13 @@ export class Notification {
      */
     get avatarUrl(): string {
         return this.props.avatarUrl;
+    }
+
+    /**
+     * Get the reference ID of the notification (optional)
+     */
+    get referenceId(): string | undefined {
+        return this.props.referenceId;
     }
 
     /**
