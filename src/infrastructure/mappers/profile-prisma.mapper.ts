@@ -1,4 +1,4 @@
-import { Profile } from "@core/entities/profile.entitiy";
+import { Profile } from "@core/domain/entities/profile.entity";
 import type {
     Prisma,
     Profile as PrismaProfile,

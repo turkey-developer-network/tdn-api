@@ -1,5 +1,4 @@
-import { BadRequestError } from "@core/errors";
-import NotFoundError from "@core/errors/not-found.error";
+import { BadRequestError, NotFoundError } from "@core/errors";
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
 

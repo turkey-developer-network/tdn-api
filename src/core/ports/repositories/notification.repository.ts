@@ -1,7 +1,4 @@
-export enum NotificationType {
-    FOLLOW = "FOLLOW",
-    NEW_POST = "NEW_POST",
-}
+import type { NotificationType } from "@core/domain/enums/notification-type.enum";
 
 export interface CreateNotificationInput {
     recipientId: string;
@@ -20,7 +17,7 @@ export interface GetNotificationOutput {
     recipientId: string;
     username: string;
     type: NotificationType;
-    avatar_url: string;
+    avatarUrl: string;
     createdAt: Date;
     isRead: boolean;
 }

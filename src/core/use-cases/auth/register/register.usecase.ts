@@ -1,5 +1,5 @@
 import type { PasswordPort } from "@core/ports/services/password.port";
-import type { User } from "@core/entities/user.entity";
+import type { User } from "@core/domain/entities/user.entity";
 import type { CreateUserUseCase } from "@core/use-cases/user/create-user/create-user.usecase";
 import type { RegisterInput } from "./register.input";
 

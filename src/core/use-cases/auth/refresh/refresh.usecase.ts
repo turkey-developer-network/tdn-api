@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@core/errors/unauthorized.error";
+import { UnauthorizedError } from "@core/errors";
 import type {
     AuthTokenPort,
     UserPayload,

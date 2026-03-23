@@ -1,5 +1,5 @@
 import { Type, type Static } from "@sinclair/typebox";
-import { PostType } from "@core/ports/repositories/post.repository";
+import { PostType } from "@core/domain/enums/post-type.enum";
 
 export const getPostsQuerySchema = Type.Object({
     page: Type.Optional(Type.Number({ default: 1, minimum: 1 })),

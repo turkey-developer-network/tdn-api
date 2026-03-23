@@ -1,8 +1,8 @@
 import type {
     INotificationRepository,
     CreateNotificationInput,
-    GetNotificationOutput,
     FindNotificationsInput,
+    GetNotificationOutput,
 } from "@core/ports/repositories/notification.repository";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
 import { NotificationPrismaMapper } from "@infrastructure/mappers/notification-prisma.mapper";
@@ -75,7 +75,9 @@ export class PrismaNotificationRepository implements INotificationRepository {
             },
         });
 
-        return raws.map((raw) => NotificationPrismaMapper.toResponse(raw));
+        return raws.map((raw) => {
+            return NotificationPrismaMapper.toResponse(raw);
+        });
     }
 
     async countByUserId(userId: string): Promise<number> {

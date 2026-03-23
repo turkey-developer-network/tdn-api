@@ -1,7 +1,7 @@
-import { UnauthorizedError } from "@core/errors/unauthorized.error";
+import { UnauthorizedError } from "@core/errors";
 import type { EmailPort } from "@core/ports/services/email.port";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
-import { TokenType } from "@core/entities/verification-token.entity";
+import { TokenType } from "@core/domain/enums/token-type.enum";
 import type { IVerificationTokenRepository } from "@core/ports/repositories/verification-token.repository";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { SendVerificationEmailInput } from "./send-verification-email.input";

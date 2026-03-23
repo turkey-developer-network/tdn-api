@@ -1,9 +1,5 @@
-export enum PostType {
-    COMMUNITY = "COMMUNITY",
-    TECH_NEWS = "TECH_NEWS",
-    SYSTEM_UPDATE = "SYSTEM_UPDATE",
-    JOB_POSTING = "JOB_POSTING",
-}
+import type { PostType } from "@core/domain/enums/post-type.enum";
+import type { Post } from "@core/domain/entities/post.entity";
 
 export interface CreatePostInput {
     content: string;
@@ -17,6 +13,12 @@ export interface GetPostsParams {
     limit: number;
     type?: PostType;
 }
+
+export interface PaginatedPosts {
+    posts: PostOutput[];
+    total: number;
+}
+
 export interface PostOutput {
     id: string;
     content: string;
@@ -27,19 +29,13 @@ export interface PostOutput {
         username: string;
         avatarUrl: string;
     };
-    tags: string[];
     createdAt: Date;
     updatedAt: Date;
-}
-
-export interface PaginatedPosts {
-    posts: PostOutput[];
-    total: number;
 }
 
 export interface IPostRepository {
     create(data: CreatePostInput): Promise<void>;
     findAll(params: GetPostsParams): Promise<PaginatedPosts>;
-    findById(id: string): Promise<PostOutput | null>;
+    findById(id: string): Promise<Post | null>;
     delete(id: string): Promise<void>;
 }

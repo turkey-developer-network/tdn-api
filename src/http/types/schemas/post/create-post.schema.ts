@@ -1,5 +1,5 @@
 import { Type, type Static } from "@sinclair/typebox";
-import { PostType } from "@core/ports/repositories/post.repository";
+import { PostType } from "@core/domain/enums/post-type.enum";
 
 export const createPostBodySchema = Type.Object({
     content: Type.String({

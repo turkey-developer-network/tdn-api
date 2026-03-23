@@ -1,11 +1,11 @@
 import { BadRequestError } from "@core/errors";
-import NotFoundError from "@core/errors/not-found.error";
+import { NotFoundError } from "@core/errors/common/not-found.error";
 import type { EmailPort } from "@core/ports/services/email.port";
 import type { PasswordPort } from "@core/ports/services/password.port";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { SoftDeleteUserUseCaseInput } from "./soft-delete-user-usecase.input";
 
-export default class SoftDeleteUserUseCase {
+export class SoftDeleteUserUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordService: PasswordPort,

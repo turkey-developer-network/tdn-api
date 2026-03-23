@@ -4,7 +4,7 @@ import type {
     Profile as PrismaProfile,
     Prisma,
 } from "@generated/prisma/client";
-import type { Profile } from "@core/entities/profile.entitiy";
+import type { Profile } from "@core/domain/entities/profile.entity";
 import type { PrismaTransactionalClient } from "@infrastructure/database/prisma-client.type";
 import ProfilePrismaMapper from "@infrastructure/mappers/profile-prisma.mapper";
 

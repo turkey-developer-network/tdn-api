@@ -1,4 +1,4 @@
-import type { User } from "../../entities/user.entity";
+import type { User } from "@core/domain/entities/user.entity";
 
 /**
  * Interface for User persistence operations.

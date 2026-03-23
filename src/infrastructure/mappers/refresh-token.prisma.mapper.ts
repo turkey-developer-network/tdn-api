@@ -1,4 +1,4 @@
-import { RefreshToken } from "@core/entities/refresh-token.entity";
+import { RefreshToken } from "@core/domain/entities/refresh-token.entity";
 import type { RefreshToken as PrismaRefreshToken } from "@generated/prisma/client";
 
 export class RefreshTokenPrismaMapper {

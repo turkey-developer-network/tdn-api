@@ -1,4 +1,4 @@
-import NotFoundError from "@core/errors/not-found.error";
+import { NotFoundError } from "@core/errors/common/not-found.error";
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
 import type { GetProfileOutput } from "./get-profile-usecase.output";

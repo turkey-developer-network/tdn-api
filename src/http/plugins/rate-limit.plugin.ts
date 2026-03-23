@@ -1,7 +1,7 @@
 import fastifyPlugin from "fastify-plugin";
 import fastifyRateLimit from "@fastify/rate-limit";
 import type { FastifyInstance } from "fastify";
-import { TooManyRequestsError } from "@core/errors/too-many-requests.error";
+import { TooManyRequestsError } from "@core/errors";
 
 export const RateLimitPolicies = {
     STRICT: {
