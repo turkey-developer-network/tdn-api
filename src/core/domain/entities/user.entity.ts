@@ -1,70 +1,132 @@
-export interface UserProps {
-    id: string;
-    email: string;
-    username: string;
-    passwordHash: string | null;
-    isEmailVerified: boolean;
-    deletedAt: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import type { UserProps } from "@core/domain/interfaces/user-props.interface";
 
+/**
+ * Rich domain model for User entity
+ *
+ * Encapsulates both data and business logic related to user accounts.
+ * Users are the primary entities in the system with authentication,
+ * authorization, and profile management capabilities.
+ *
+ * This entity follows domain-driven design principles by encapsulating
+ * business logic and validation within the entity itself.
+ */
 export class User {
+    /**
+     * Private constructor to enforce creation through factory methods
+     * @param props - The user properties
+     */
     constructor(private readonly props: UserProps) {}
 
+    /**
+     * Get the unique identifier for the user
+     * @returns The user ID
+     */
     get id(): string {
         return this.props.id;
     }
 
+    /**
+     * Get the email address of the user
+     * @returns The user's email address
+     */
     get email(): string {
         return this.props.email;
     }
 
+    /**
+     * Get the username chosen by the user
+     * @returns The user's username
+     */
     get username(): string {
         return this.props.username;
     }
 
+    /**
+     * Get the hashed password for authentication
+     * @returns The password hash or null for OAuth users
+     */
     get passwordHash(): string | null {
         return this.props.passwordHash;
     }
 
+    /**
+     * Get the timestamp when the user account was soft-deleted
+     * @returns The deletion timestamp or null if not deleted
+     */
     get deletedAt(): Date | null {
         return this.props.deletedAt;
     }
 
+    /**
+     * Get the creation timestamp of the user account
+     * @returns The creation date
+     */
     get createdAt(): Date {
         return this.props.createdAt;
     }
 
+    /**
+     * Get the last update timestamp of the user account
+     * @returns The last update date
+     */
     get updatedAt(): Date {
         return this.props.updatedAt;
     }
 
+    /**
+     * Check if the user account has been soft-deleted
+     * @returns True if the user has been deleted, false otherwise
+     */
     public isDeleted(): boolean {
         return this.props.deletedAt !== null;
     }
 
+    /**
+     * Check if the user has a password set (not an OAuth user)
+     * @returns True if the user has a password, false for OAuth users
+     */
     public hasPassword(): boolean {
         return this.props.passwordHash !== null;
     }
 
+    /**
+     * Set the hashed password for the user
+     * @param newPasswordHash - The new password hash to set
+     */
     public set hashPassword(newPasswordHash: string) {
         this.props.passwordHash = newPasswordHash;
     }
 
+    /**
+     * Soft-delete the user account
+     * This method mutates the entity state to mark the user as deleted
+     */
     public delete(): void {
         this.props.deletedAt = new Date();
         this.props.updatedAt = new Date();
     }
 
+    /**
+     * Check if the user's email has been verified
+     * @returns True if the email is verified, false otherwise
+     */
     get isEmailVerified(): boolean {
         return this.props.isEmailVerified;
     }
+
+    /**
+     * Restore a soft-deleted user account
+     * This method mutates the entity state to restore the user
+     */
     public restore(): void {
         this.props.deletedAt = null;
         this.props.updatedAt = new Date();
     }
 
+    /**
+     * Mark the user's email as verified
+     * This method mutates the entity state to verify the email
+     */
     verifyEmail(): void {
         this.props.isEmailVerified = true;
     }

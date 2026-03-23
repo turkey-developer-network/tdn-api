@@ -4,13 +4,13 @@ import type { VerificationToken as PrismaVerificationToken } from "@generated/pr
 
 export class VerificationTokenPrismaMapper {
     static toDomain(raw: PrismaVerificationToken): VerificationToken {
-        return new VerificationToken(
-            raw.id,
-            raw.token,
-            raw.userId,
-            raw.type as TokenType,
-            raw.expiresAt,
-            raw.createdAt,
-        );
+        return new VerificationToken({
+            id: raw.id,
+            tokenHash: raw.token,
+            userId: raw.userId,
+            type: raw.type as TokenType,
+            expiresAt: raw.expiresAt,
+            createdAt: raw.createdAt,
+        });
     }
 }

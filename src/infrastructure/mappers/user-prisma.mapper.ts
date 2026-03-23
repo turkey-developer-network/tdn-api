@@ -1,6 +1,6 @@
 import type { Prisma, User as PrismaUser } from "@generated/prisma/client";
-import { User, type UserProps } from "@core/domain/entities/user.entity";
-
+import { User } from "@core/domain/entities/user.entity";
+import type { UserProps } from "@core/domain/interfaces/user-props.interface";
 /**
  * Mapper class responsible for transforming User data across different layers.
  * Handles conversions between Prisma database records, Domain entities, and safe Response objects.
