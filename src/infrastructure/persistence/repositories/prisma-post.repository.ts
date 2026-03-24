@@ -8,9 +8,25 @@ import { Post } from "@core/domain/entities/post.entity";
 import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 
+/**
+ * Prisma implementation of the Post repository
+ *
+ * Provides database operations for Post entities using Prisma ORM.
+ * Implements the IPostRepository interface to ensure consistent
+ * data access patterns across different persistence implementations.
+ */
 export class PrismaPostRepository implements IPostRepository {
+    /**
+     * Creates a new PrismaPostRepository instance
+     * @param prisma - The Prisma client instance
+     */
     constructor(private readonly prisma: PrismaClient) {}
 
+    /**
+     * Creates a new post in the database
+     * @param post - The Post entity to create
+     * @returns Promise<void>
+     */
     async create(post: Post): Promise<void> {
         const hashtagRegex = /#[\p{L}\p{N}_]+/gu;
         const matches = post.content.match(hashtagRegex) || [];
@@ -35,6 +51,11 @@ export class PrismaPostRepository implements IPostRepository {
         });
     }
 
+    /**
+     * Retrieves a paginated list of posts with optional type filtering
+     * @param params - Pagination and filtering parameters
+     * @returns Promise containing posts array and total count
+     */
     async findAll(
         params: GetPostsParams,
     ): Promise<{ posts: Post[]; total: number }> {
@@ -63,6 +84,9 @@ export class PrismaPostRepository implements IPostRepository {
                     tags: {
                         select: { name: true },
                     },
+                    _count: {
+                        select: { likes: true },
+                    },
                 },
             }),
         ]);
@@ -81,12 +105,18 @@ export class PrismaPostRepository implements IPostRepository {
                 tags: post.tags.map((tag) => tag.name),
                 createdAt: post.createdAt,
                 updatedAt: post.updatedAt,
+                likeCount: post._count.likes,
             });
         });
 
         return { posts, total };
     }
 
+    /**
+     * Retrieves a post by its unique identifier
+     * @param id - The unique identifier of the post
+     * @returns Promise containing the Post entity or null if not found
+     */
     async findById(id: string): Promise<Post | null> {
         const post = await this.prisma.post.findUnique({
             where: { id },
@@ -99,6 +129,9 @@ export class PrismaPostRepository implements IPostRepository {
                     },
                 },
                 tags: { select: { name: true } },
+                _count: {
+                    select: { likes: true },
+                },
             },
         });
 
@@ -117,9 +150,15 @@ export class PrismaPostRepository implements IPostRepository {
             tags: post.tags.map((tag) => tag.name),
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
+            likeCount: post._count.likes,
         });
     }
 
+    /**
+     * Deletes a post by its unique identifier
+     * @param id - The unique identifier of the post to delete
+     * @returns Promise<void>
+     */
     async delete(id: string): Promise<void> {
         await this.prisma.post.delete({
             where: { id },

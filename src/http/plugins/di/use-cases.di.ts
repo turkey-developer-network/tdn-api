@@ -34,53 +34,201 @@ import { CreatePostUseCase } from "@core/use-cases/post/create-post";
 import { UploadPostMediaUseCase } from "@core/use-cases/post/upload-post-media";
 import { GetPostsUseCase } from "@core/use-cases/post/get-post";
 import { DeletePostUseCase } from "@core/use-cases/post/delete-post";
+import { LikePostUseCase } from "@core/use-cases/post/like-post";
 
+/**
+ * Dependency injection module for use cases
+ *
+ * Registers all use case implementations with the dependency injection container.
+ * Use cases are configured as singletons to ensure consistent behavior and
+ * shared dependencies across the application.
+ */
 export const useCasesModule = {
     // --- Use Cases ---
+
+    /**
+     * Use case for soft deleting a user account
+     */
     softDeleteUserUseCase: asClass(SoftDeleteUserUseCase).singleton(),
+
+    /**
+     * Use case for creating a new user
+     */
     createUserUseCase: asClass(CreateUserUseCase).singleton(),
+
+    /**
+     * Use case for user registration
+     */
     registerUseCase: asClass(RegisterUseCase).singleton(),
+
+    /**
+     * Use case for user login
+     */
     loginUseCase: asClass(LoginUseCase).singleton(),
+
+    /**
+     * Use case for GitHub OAuth login
+     */
     githubLoginUseCase: asClass(GithubLoginUseCase).singleton(),
+
+    /**
+     * Use case for Google OAuth login
+     */
     googleLoginUseCase: asClass(GoogleLoginUseCase).singleton(),
+
+    /**
+     * Use case for JWT token refresh
+     */
     refreshUseCase: asClass(RefreshUseCase).singleton(),
+
+    /**
+     * Use case for user logout
+     */
     logoutUseCase: asClass(LogoutUseCase).singleton(),
+
+    /**
+     * Use case for sending email verification
+     */
     sendVerificationEmailUseCase: asClass(
         SendVerificationEmailUseCase,
     ).singleton(),
+
+    /**
+     * Use case for verifying email address
+     */
     verifyEmailUseCase: asClass(VerifyEmailUseCase).singleton(),
+
+    /**
+     * Use case for password reset request
+     */
     forgotPasswordUseCase: asClass(ForgotPasswordUseCase).singleton(),
+
+    /**
+     * Use case for password reset confirmation
+     */
     resetPasswordUseCase: asClass(ResetPasswordUseCase).singleton(),
+
+    /**
+     * Use case for account recovery
+     */
     recoverAccountUseCase: asClass(RecoverAccountUseCase).singleton(),
+
+    /**
+     * Use case for purging expired user accounts
+     */
     purgeExpiredUsersUseCase: asClass(PurgeExpiredUsersUseCase).singleton(),
+
+    /**
+     * Use case for purging expired refresh tokens
+     */
     purgeExpiredTokensUseCase: asClass(PurgeExpiredTokensUseCase).singleton(),
+
+    /**
+     * Use case for getting current user information
+     */
     getMeUserUseCase: asClass(GetMeUserUseCase).singleton(),
+
+    /**
+     * Use case for changing user password
+     */
     changePasswordUseCase: asClass(ChangePasswordUseCase).singleton(),
+
+    /**
+     * Use case for changing username
+     */
     changeUsernameUseCase: asClass(ChangeUsernameUseCase).singleton(),
+
+    /**
+     * Use case for changing email address
+     */
     changeEmailUseCase: asClass(ChangeEmailUseCase).singleton(),
+
+    /**
+     * Use case for updating user avatar
+     */
     updateAvatarUseCase: asClass(UpdateAvatarUseCase).singleton(),
+
+    /**
+     * Use case for updating user profile
+     */
     updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
+
+    /**
+     * Use case for updating user banner
+     */
     updateBannerUseCase: asClass(UpdateBannerUseCase).singleton(),
+
+    /**
+     * Use case for getting user profile
+     */
     getProfileUseCase: asClass(GetProfileUseCase).singleton(),
+
+    /**
+     * Use case for searching user profiles
+     */
     searchProfileUseCase: asClass(SearchProfilesUseCase).singleton(),
+
+    /**
+     * Use case for following another user
+     */
     followUserUseCase: asClass(FollowUserUseCase).singleton(),
+
+    /**
+     * Use case for unfollowing another user
+     */
     unfollowUserUseCase: asClass(UnfollowUserUseCase).singleton(),
+
+    /**
+     * Use case for getting user followers
+     */
     getFollowersUseCase: asClass(GetFollowersUseCase).singleton(),
+
+    /**
+     * Use case for getting users being followed
+     */
     getFollowingUseCase: asClass(GetFollowingUseCase).singleton(),
+
+    /**
+     * Use case for getting user notifications
+     */
     getUserNotificationsUseCase: asClass(GetUserNotificatonUseCase).singleton(),
+
+    /**
+     * Use case for marking all notifications as read
+     */
     markAllReadUseCase: asClass(MarkAllNotificationsAsReadUseCase).singleton(),
+
+    /**
+     * Use case for purging expired notifications
+     */
     purgeExpiredNotificationsUseCase: asClass(
         PurgeExpiredNotificationsUseCase,
     ).singleton(),
+
+    /**
+     * Use case for creating a new post
+     */
     createPostUseCase: asFunction(
         (postRepository, redisService) =>
             new CreatePostUseCase(postRepository, redisService),
     ).singleton(),
+
+    /**
+     * Use case for uploading post media files
+     */
     uploadPostMediaUseCase: asClass(UploadPostMediaUseCase).singleton(),
+
+    /**
+     * Use case for retrieving posts
+     */
     getPostsUseCase: asFunction(
         (postRepository, redisService) =>
             new GetPostsUseCase(postRepository, redisService),
     ).singleton(),
+
+    /**
+     * Use case for deleting a post
+     */
     deletePostUseCase: asFunction(
         (postRepository, storageService, logger, redisService) =>
             new DeletePostUseCase(
@@ -90,4 +238,9 @@ export const useCasesModule = {
                 redisService,
             ),
     ).singleton(),
+
+    /**
+     * Use case for liking a post
+     */
+    likePostUseCase: asClass(LikePostUseCase).singleton(),
 };

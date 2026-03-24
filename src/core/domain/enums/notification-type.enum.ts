@@ -11,4 +11,9 @@ export enum NotificationType {
      * Notification when a user creates a new post
      */
     NEW_POST = "NEW_POST",
+
+    /**
+     * Notification when a user likes another user's post
+     */
+    LIKE = "LIKE",
 }

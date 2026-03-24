@@ -18,10 +18,21 @@ import {
     getPostsQuerySchema,
     type GetPostsQuery,
 } from "@typings/schemas/post/get-post.schema";
+import {
+    type LikePostParams,
+    LikePostParamsSchema,
+} from "@typings/schemas/post/like-post.schema";
 import type { FastifyInstance } from "fastify";
 
 /**
  * Sets up post routes on the Fastify instance
+ *
+ * Registers all post-related HTTP endpoints including:
+ * - POST / - Create a new post
+ * - POST /media - Upload media files for posts
+ * - GET / - Retrieve paginated post feed
+ * - DELETE /:id - Delete a post by ID
+ * - POST /:id/like - Like a post by ID
  *
  * @param fastify - The Fastify application instance
  * @returns void
@@ -29,6 +40,10 @@ import type { FastifyInstance } from "fastify";
 export function postRoutes(fastify: FastifyInstance): void {
     const { postController } = fastify.diContainer.cradle;
 
+    /**
+     * Create a new post
+     * Requires authentication and applies sensitive rate limiting
+     */
     fastify.post<{ Body: CreatePostBody }>(
         "/",
         {
@@ -41,6 +56,11 @@ export function postRoutes(fastify: FastifyInstance): void {
         },
         postController.create.bind(postController),
     );
+
+    /**
+     * Upload media files for a post
+     * Requires authentication and applies sensitive rate limiting
+     */
     fastify.post(
         "/media",
         {
@@ -53,6 +73,10 @@ export function postRoutes(fastify: FastifyInstance): void {
         postController.uploadMedia.bind(postController),
     );
 
+    /**
+     * Retrieve paginated post feed
+     * Applies standard rate limiting
+     */
     fastify.get<{ Querystring: GetPostsQuery }>(
         "/",
         {
@@ -65,6 +89,10 @@ export function postRoutes(fastify: FastifyInstance): void {
         postController.getFeed.bind(postController),
     );
 
+    /**
+     * Delete a post by ID
+     * Requires authentication and applies sensitive rate limiting
+     */
     fastify.delete<{ Params: DeletePostParams }>(
         "/:id",
         {
@@ -76,5 +104,22 @@ export function postRoutes(fastify: FastifyInstance): void {
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
         },
         postController.deletePost.bind(postController),
+    );
+
+    /**
+     * Like a post by ID
+     * Requires authentication and applies sensitive rate limiting
+     */
+    fastify.post<{ Params: LikePostParams }>(
+        "/:id/like",
+        {
+            onRequest: [fastify.authenticate],
+            schema: {
+                params: LikePostParamsSchema,
+                tags: ["Post"],
+            },
+            config: { rateLimit: RateLimitPolicies.SENSITIVE },
+        },
+        postController.likePost.bind(postController),
     );
 }

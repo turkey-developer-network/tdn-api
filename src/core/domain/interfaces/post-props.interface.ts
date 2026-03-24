@@ -40,4 +40,7 @@ export interface PostProps {
 
     /** Optional last update timestamp, defaults to current time if not provided */
     updatedAt?: Date;
+
+    /** Optional like count for the post */
+    likeCount?: number;
 }

@@ -110,6 +110,14 @@ export class Post {
     }
 
     /**
+     * Get the like count of the post
+     * @returns The number of likes the post has received
+     */
+    get likeCount(): number {
+        return this.props.likeCount || 0;
+    }
+
+    /**
      * Check if the post has any media attached
      * @returns True if the post has one or more media items
      */
