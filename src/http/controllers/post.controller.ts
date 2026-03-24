@@ -2,20 +2,43 @@ import { MediaLimitExceededError, NoMediaProvidedError } from "@core/errors";
 import type { CreatePostUseCase } from "@core/use-cases/post/create-post";
 import type { DeletePostUseCase } from "@core/use-cases/post/delete-post";
 import type { GetPostsUseCase } from "@core/use-cases/post/get-post";
+import type { LikePostUseCase } from "@core/use-cases/post/like-post";
 import type { UploadPostMediaUseCase } from "@core/use-cases/post/upload-post-media";
 import type { CreatePostBody } from "@typings/schemas/post/create-post.schema";
 import type { DeletePostParams } from "@typings/schemas/post/delete-post.schema";
 import type { GetPostsQuery } from "@typings/schemas/post/get-post.schema";
+import type { LikePostParams } from "@typings/schemas/post/like-post.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+/**
+ * Controller for handling post-related HTTP requests
+ *
+ * Manages the HTTP layer for post operations including creation, media upload,
+ * feed retrieval, deletion, and liking posts. This controller acts as the
+ * interface between HTTP requests and the underlying use cases.
+ */
 export class PostController {
+    /**
+     * Creates a new PostController instance
+     * @param createPostUseCase - Use case for creating posts
+     * @param uploadPostMediaUseCase - Use case for uploading post media
+     * @param getPostsUseCase - Use case for retrieving posts
+     * @param deletePostUseCase - Use case for deleting posts
+     * @param likePostUseCase - Use case for liking posts
+     */
     constructor(
         private readonly createPostUseCase: CreatePostUseCase,
         private readonly uploadPostMediaUseCase: UploadPostMediaUseCase,
         private readonly getPostsUseCase: GetPostsUseCase,
         private readonly deletePostUseCase: DeletePostUseCase,
+        private readonly likePostUseCase: LikePostUseCase,
     ) {}
 
+    /**
+     * Creates a new post
+     * @param request - HTTP request containing post creation data
+     * @param reply - HTTP response object
+     */
     async create(
         request: FastifyRequest<{ Body: CreatePostBody }>,
         reply: FastifyReply,
@@ -37,6 +60,11 @@ export class PostController {
         });
     }
 
+    /**
+     * Uploads media files for a post
+     * @param request - HTTP request containing multipart form data with media files
+     * @param reply - HTTP response object
+     */
     async uploadMedia(
         request: FastifyRequest,
         reply: FastifyReply,
@@ -88,6 +116,11 @@ export class PostController {
         });
     }
 
+    /**
+     * Retrieves a paginated feed of posts
+     * @param request - HTTP request containing pagination and filtering parameters
+     * @param reply - HTTP response object
+     */
     async getFeed(
         request: FastifyRequest<{ Querystring: GetPostsQuery }>,
         reply: FastifyReply,
@@ -130,6 +163,11 @@ export class PostController {
         });
     }
 
+    /**
+     * Deletes a post by ID
+     * @param request - HTTP request containing the post ID to delete
+     * @param reply - HTTP response object
+     */
     async deletePost(
         request: FastifyRequest<{ Params: DeletePostParams }>,
         reply: FastifyReply,
@@ -148,6 +186,23 @@ export class PostController {
             userId,
             cdnBaseUrl,
         });
+
+        return reply.status(204).send();
+    }
+
+    /**
+     * Likes a post by ID
+     * @param request - HTTP request containing the post ID to like
+     * @param reply - HTTP response object
+     */
+    async likePost(
+        request: FastifyRequest<{ Params: LikePostParams }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const userId = request.user.id;
+        const postId = request.params.id;
+
+        await this.likePostUseCase.execute({ postId, userId });
 
         return reply.status(204).send();
     }

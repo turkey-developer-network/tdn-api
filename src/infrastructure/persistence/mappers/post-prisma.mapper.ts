@@ -1,6 +1,13 @@
 import type { Post } from "@core/domain/entities/post.entity";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 
+/**
+ * Mapper class for converting between Post entities and Prisma data structures
+ *
+ * Provides utility methods for transforming Post domain entities to and from
+ * the data structures used by Prisma ORM. This ensures clean separation between
+ * the domain layer and the persistence layer.
+ */
 export class PostPrismaMapper {
     /**
      * Maps a Post entity to a response object
@@ -19,6 +26,7 @@ export class PostPrismaMapper {
         };
         createdAt: Date;
         updatedAt: Date;
+        likeCount: number;
     } {
         return {
             id: post.id,
@@ -32,6 +40,7 @@ export class PostPrismaMapper {
             },
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
+            likeCount: post.likeCount,
         };
     }
 
