@@ -1,4 +1,4 @@
-import type { Post } from "@core/domain/entities/post.entity";
+import type { PostType } from "@core/domain/enums/post-type.enum";
 
 /**
  * Output interface for retrieving posts with pagination and metadata.
@@ -11,30 +11,65 @@ export interface GetPostsOutput {
     /**
      * Array of post entities matching the query criteria.
      */
-    data: Post[];
+    posts: PostOutput[];
 
     /**
-     * Metadata about the pagination and total results.
+     * Total number of posts matching the query criteria.
      */
-    meta: {
+    total: number;
+}
+
+/**
+ * Output interface for a single post entity.
+ */
+export interface PostOutput {
+    /**
+     * Unique identifier for the post.
+     */
+    id: string;
+
+    /**
+     * Content of the post.
+     */
+    content: string;
+
+    /**
+     * Type of the post.
+     */
+    type: PostType;
+
+    /**
+     * URLs of media files associated with the post.
+     */
+    mediaUrls: string[];
+
+    /**
+     * Author of the post.
+     */
+    author: {
         /**
-         * Total number of posts matching the query criteria.
+         * Unique identifier for the author.
          */
-        total: number;
+        id: string;
 
         /**
-         * Current page number (1-based).
+         * Username of the author.
          */
-        page: number;
+        username: string;
 
         /**
-         * Number of posts per page.
+         * URL of the author's avatar.
          */
-        limit: number;
-
-        /**
-         * Total number of pages available.
-         */
-        totalPages: number;
+        avatarUrl: string;
     };
+
+    /**
+     * Date and time when the post was created.
+     */
+    createdAt: Date;
+
+    /**
+     * Date and time when the post was last updated.
+     */
+    updatedAt: Date;
 }

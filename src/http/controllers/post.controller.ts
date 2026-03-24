@@ -8,7 +8,7 @@ import type { DeletePostParams } from "@typings/schemas/post/delete-post.schema"
 import type { GetPostsQuery } from "@typings/schemas/post/get-post.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-export default class PostController {
+export class PostController {
     constructor(
         private readonly createPostUseCase: CreatePostUseCase,
         private readonly uploadPostMediaUseCase: UploadPostMediaUseCase,
@@ -102,7 +102,7 @@ export default class PostController {
             type,
         });
 
-        const formattedData = result.data.map((post) => {
+        const formattedData = result.posts.map((post) => {
             return {
                 ...post,
                 author: {
@@ -117,9 +117,16 @@ export default class PostController {
             };
         });
 
+        const totalPages = Math.ceil(result.total / (limit || 10));
+
         return reply.status(200).send({
             data: formattedData,
-            meta: result.meta,
+            meta: {
+                total: result.total,
+                page,
+                limit,
+                totalPages,
+            },
         });
     }
 

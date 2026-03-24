@@ -2,6 +2,7 @@ import type { IPostRepository } from "@core/ports/repositories/post.repository";
 import type { CachePort } from "@core/ports/services/cache.port";
 import type { GetPostsInput } from "./get-posts-usecase.input";
 import type { GetPostsOutput } from "./get-posts-usecase.output";
+import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
 
 /**
  * Use case for retrieving posts with pagination and caching.
@@ -24,7 +25,7 @@ export class GetPostsUseCase {
     /**
      * Executes the get posts process with caching.
      *
-     * @param request - Input containing pagination and filtering options
+     * @param input - Input containing pagination and filtering options
      * @returns Promise<GetPostsOutput> Posts with pagination metadata
      *
      * @remarks
@@ -33,10 +34,10 @@ export class GetPostsUseCase {
      * that data. Otherwise, it fetches from the database, caches the result
      * for 60 seconds, and returns the data with pagination metadata.
      */
-    async execute(request: GetPostsInput): Promise<GetPostsOutput> {
-        const page = request.page || 1;
-        const limit = request.limit || 10;
-        const typeStr = request.type || "ALL";
+    async execute(input: GetPostsInput): Promise<GetPostsOutput> {
+        const page = input.page || 1;
+        const limit = input.limit || 10;
+        const typeStr = input.type || "ALL";
 
         const cacheKey = `posts:feed:page:${page}:limit:${limit}:type:${typeStr}`;
 
@@ -49,14 +50,16 @@ export class GetPostsUseCase {
         const { posts, total } = await this.postRepository.findAll({
             page,
             limit,
-            type: request.type,
+            type: input.type,
         });
 
-        const totalPages = Math.ceil(total / limit);
+        const mappedPosts = posts.map((post) =>
+            PostPrismaMapper.toPostOutput(post),
+        );
 
         const response: GetPostsOutput = {
-            data: posts,
-            meta: { total, page, limit, totalPages },
+            posts: mappedPosts,
+            total,
         };
 
         await this.cacheService.set(cacheKey, JSON.stringify(response), 60);
