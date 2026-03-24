@@ -5,7 +5,21 @@ import { TokenType } from "@core/domain/enums/token-type.enum";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { ForgotPasswordInput } from "./forgot-password.input";
 
+/**
+ * Use case for handling password reset requests.
+ *
+ * This use case manages the process of initiating a password reset for a user
+ * by generating a verification token and sending a reset email.
+ */
 export class ForgotPasswordUseCase {
+    /**
+     * Creates a new instance of ForgotPasswordUseCase.
+     *
+     * @param userRepository - Repository for managing user data
+     * @param verificationTokenRepository - Repository for managing verification tokens
+     * @param emailService - Service for sending emails
+     * @param cryptoService - Service for cryptographic operations
+     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
@@ -13,6 +27,19 @@ export class ForgotPasswordUseCase {
         private readonly cryptoService: CryptoPort,
     ) {}
 
+    /**
+     * Executes the password reset request process.
+     *
+     * @param input - The forgot password request input containing user email
+     *
+     * @returns Promise<void> - Resolves when the process is complete
+     *
+     * @throws Will throw an error if email service fails
+     *
+     * @remarks
+     * If the user doesn't exist, is deleted, has unverified email, or no password,
+     * the method returns silently to prevent email enumeration attacks.
+     */
     async execute(input: ForgotPasswordInput): Promise<void> {
         const user = await this.userRepository.findByEmail(input.email);
 

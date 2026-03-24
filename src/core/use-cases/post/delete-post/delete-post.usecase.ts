@@ -5,7 +5,21 @@ import { UnauthorizedActionError, NotFoundError } from "@core/errors";
 import type { DeletePostUseCaseInput } from "./delete-post-usecase.input";
 import type { CachePort } from "@core/ports/services/cache.port";
 
+/**
+ * Use case for deleting a post.
+ *
+ * This use case handles the complete process of deleting a post including
+ * media cleanup, cache invalidation, and permission validation.
+ */
 export class DeletePostUseCase {
+    /**
+     * Creates a new instance of DeletePostUseCase.
+     *
+     * @param postRepository - Repository for managing post data
+     * @param storageService - Service for file storage operations
+     * @param logger - Service for logging operations
+     * @param cacheService - Service for cache operations
+     */
     constructor(
         private readonly postRepository: IPostRepository,
         private readonly storageService: StoragePort,
@@ -13,6 +27,20 @@ export class DeletePostUseCase {
         private readonly cacheService: CachePort,
     ) {}
 
+    /**
+     * Executes the post deletion process.
+     *
+     * @param input - Input containing post ID, user ID, and CDN base URL
+     * @returns Promise<void> - Resolves when post deletion is complete
+     *
+     * @throws NotFoundError - When the post is not found
+     * @throws UnauthorizedActionError - When user is not the post author
+     *
+     * @remarks
+     * This method validates ownership, deletes associated media files,
+     * clears cache entries, and removes the post from the database.
+     * Media deletion errors are logged but don't prevent post deletion.
+     */
     async execute(input: DeletePostUseCaseInput): Promise<void> {
         const post = await this.postRepository.findById(input.postId);
 

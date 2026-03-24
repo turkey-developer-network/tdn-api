@@ -1,8 +1,31 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
 
+/**
+ * Input interface for creating a new post.
+ *
+ * This interface defines the required parameters for creating a post
+ * with optional media attachments.
+ */
 export interface CreatePostInput {
+    /**
+     * The unique identifier of the user creating the post.
+     */
     authorId: string;
+
+    /**
+     * The textual content of the post.
+     * Can be empty for media-only posts.
+     */
     content: string;
+
+    /**
+     * The type of the post (e.g., text, image, video).
+     */
     type: PostType;
+
+    /**
+     * Optional array of media URLs associated with the post.
+     * These URLs should point to uploaded media files.
+     */
     mediaUrls?: string[];
 }

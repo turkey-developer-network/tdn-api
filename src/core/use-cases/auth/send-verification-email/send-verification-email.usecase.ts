@@ -6,7 +6,21 @@ import type { IVerificationTokenRepository } from "@core/ports/repositories/veri
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { SendVerificationEmailInput } from "./send-verification-email.input";
 
+/**
+ * Use case for sending email verification to a user.
+ *
+ * This use case handles the process of generating a verification OTP
+ * and sending it to the user's email address.
+ */
 export class SendVerificationEmailUseCase {
+    /**
+     * Creates a new instance of SendVerificationEmailUseCase.
+     *
+     * @param userRepository - Repository for managing user data
+     * @param verificationTokenRepository - Repository for managing verification tokens
+     * @param emailService - Service for sending emails
+     * @param cryptoService - Service for cryptographic operations
+     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
@@ -14,6 +28,18 @@ export class SendVerificationEmailUseCase {
         private readonly cryptoService: CryptoPort,
     ) {}
 
+    /**
+     * Executes the email verification sending process.
+     *
+     * @param input - Input containing the user ID for verification
+     * @returns Promise<void> - Resolves when email is sent
+     *
+     * @throws UnauthorizedError - When user is not found or deleted
+     *
+     * @remarks
+     * If the user's email is already verified, the method returns silently.
+     * Otherwise, it generates a new OTP and sends it via email.
+     */
     async execute(input: SendVerificationEmailInput): Promise<void> {
         const user = await this.userRepository.findById(input.userId);
 

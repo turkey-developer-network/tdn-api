@@ -5,15 +5,40 @@ import type { PasswordPort } from "@core/ports/services/password.port";
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { SoftDeleteUserUseCaseInput } from "./soft-delete-user-usecase.input";
 
+/**
+ * Use case for soft deleting a user account.
+ *
+ * This use case handles the process of marking a user account as deleted
+ * while preserving the data for a grace period, including password validation
+ * and sending a confirmation email.
+ */
 export class SoftDeleteUserUseCase {
+    /**
+     * Creates a new instance of SoftDeleteUserUseCase.
+     *
+     * @param userRepository - Repository for managing user data
+     * @param passwordService - Service for password verification
+     * @param emailService - Service for sending emails
+     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordService: PasswordPort,
         private readonly emailService: EmailPort,
     ) {}
+
     /**
+     * Executes the soft delete process for a user account.
      *
-     * @param id User Id
+     * @param input - Input containing user ID and password for validation
+     * @returns Promise<void> - Resolves when soft delete is complete
+     *
+     * @throws NotFoundError - When the user is not found or cannot be deleted
+     * @throws BadRequestError - When the provided password is invalid
+     *
+     * @remarks
+     * This method validates the user's password, marks the account as deleted
+     * with a future deletion date, and sends a confirmation email to the user.
+     * Only users with password-based accounts can be deleted (not OAuth users).
      */
     async execute(input: SoftDeleteUserUseCaseInput): Promise<void> {
         const user = await this.userRepository.findById(input.id);

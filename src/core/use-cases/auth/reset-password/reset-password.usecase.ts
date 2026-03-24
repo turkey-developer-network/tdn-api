@@ -6,9 +6,23 @@ import { TokenType } from "@core/domain/enums/token-type.enum";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { ResetPasswordInput } from "./reset-password.input";
 
+/**
+ * Use case for resetting user password.
+ *
+ * This use case handles the complete password reset process including
+ * OTP verification and password update.
+ */
 export class ResetPasswordUseCase {
     private readonly GENERIC_ERROR = "Invalid or expired reset credentials.";
 
+    /**
+     * Creates a new instance of ResetPasswordUseCase.
+     *
+     * @param userRepository - Repository for managing user data
+     * @param verificationTokenRepository - Repository for managing verification tokens
+     * @param passwordService - Service for password hashing
+     * @param cryptoService - Service for cryptographic operations
+     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
@@ -16,6 +30,18 @@ export class ResetPasswordUseCase {
         private readonly cryptoService: CryptoPort,
     ) {}
 
+    /**
+     * Executes the password reset process.
+     *
+     * @param input - Reset password input containing email, OTP, and new password
+     * @returns Promise<void> - Resolves when password reset is complete
+     *
+     * @throws BadRequestError - When reset credentials are invalid or expired
+     *
+     * @remarks
+     * This method validates the OTP, updates the user's password, and cleans up
+     * the verification token to prevent reuse.
+     */
     async execute(input: ResetPasswordInput): Promise<void> {
         const user = await this.userRepository.findByEmail(input.email);
 

@@ -10,7 +10,22 @@ import { AccountPendingDeletionError } from "@core/errors";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { IRefreshTokenRepository } from "@core/ports/repositories/refresh-token.repository";
 
+/**
+ * Use case for handling GitHub OAuth authentication.
+ *
+ * This use case manages the complete GitHub OAuth login process including
+ * user creation, token generation, and refresh token management.
+ */
 export class GithubLoginUseCase {
+    /**
+     * Creates a new instance of GithubLoginUseCase.
+     *
+     * @param githubAuthService - Service for GitHub OAuth operations
+     * @param userRepository - Repository for managing user data
+     * @param authTokenService - Service for generating authentication tokens
+     * @param cryptoService - Service for cryptographic operations
+     * @param refreshTokenRepository - Repository for managing refresh tokens
+     */
     constructor(
         private readonly githubAuthService: GithubAuthPort,
         private readonly userRepository: IUserRepository,
@@ -19,6 +34,20 @@ export class GithubLoginUseCase {
         private readonly refreshTokenRepository: IRefreshTokenRepository,
     ) {}
 
+    /**
+     * Executes the GitHub OAuth login process.
+     *
+     * @param input - GitHub login input containing OAuth code and device info
+     * @returns Promise<LoginOutput> Authentication tokens and user information
+     *
+     * @throws AccountPendingDeletionError - When account is pending deletion
+     *
+     * @remarks
+     * This method handles both new user creation and existing user login.
+     * For new users, it creates an account with a unique username and stores
+     * the OAuth provider information. For existing users, it validates their
+     * account status and generates new authentication tokens.
+     */
     async execute(input: GithubLoginInput): Promise<LoginOutput> {
         const profile = await this.githubAuthService.getUserProfileByCode(
             input.code,
