@@ -24,13 +24,15 @@ export class NotificationController {
             limit,
         });
 
+        const totalPages = Math.ceil(response.total / limit);
+
         return reply.status(200).send({
-            success: true,
             data: response.notifications,
             meta: {
                 total: response.total,
-                currentPage: response.currentPage,
-                totalPages: response.totalPages,
+                currentPage: page,
+                totalPages,
+                limit,
             },
         });
     }

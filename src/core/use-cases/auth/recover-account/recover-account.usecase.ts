@@ -6,6 +6,7 @@ import type {
 import { UnauthorizedError, BadRequestError } from "@core/errors";
 import { type LoginOutput } from "../login/login.output";
 import type { RecoverAccountInput } from "./recover-account.input";
+import { AuthMapper } from "../auth.mapper";
 
 /**
  * Use case for recovering a deleted user account.
@@ -69,14 +70,16 @@ export class RecoverAccountUseCase {
         });
 
         return {
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            expiresAt: tokens.expiresAt,
-            refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
-            user: {
+            user: AuthMapper.toUserOutput({
                 id: user.id,
                 username: user.username,
-            },
+            }),
+            tokens: AuthMapper.toTokenOutput({
+                accessToken: tokens.accessToken,
+                expiresAt: tokens.expiresAt,
+                refreshToken: tokens.refreshToken,
+                refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+            }),
         };
     }
 }

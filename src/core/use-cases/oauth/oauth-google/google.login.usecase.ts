@@ -9,6 +9,7 @@ import { AccountPendingDeletionError } from "@core/errors";
 import type { CryptoPort } from "@core/ports/services/crypto.port";
 import type { IRefreshTokenRepository } from "@core/ports/repositories/refresh-token.repository";
 import type { GoogleLoginInput } from "./google-login.input";
+import { AuthMapper } from "../../auth/auth.mapper";
 
 /**
  * Use case for handling Google OAuth authentication.
@@ -101,11 +102,13 @@ export class GoogleLoginUseCase {
         });
 
         return {
-            accessToken,
-            expiresAt,
-            refreshToken,
-            refreshTokenExpiresAt,
-            user: payload,
+            user: AuthMapper.toUserOutput(payload),
+            tokens: AuthMapper.toTokenOutput({
+                accessToken,
+                expiresAt,
+                refreshToken,
+                refreshTokenExpiresAt,
+            }),
         };
     }
 }

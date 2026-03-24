@@ -5,8 +5,7 @@ import type { GetNotificationsOutput } from "./get-notifications-usecase.output"
 /**
  * Use case for retrieving user notifications.
  *
- * This use case handles fetching notifications for a specific user with
- * pagination support.
+ * This use case handles fetching notifications for a specific user.
  */
 export class GetUserNotificatonUseCase {
     /**
@@ -22,11 +21,12 @@ export class GetUserNotificatonUseCase {
      * Executes the get user notifications process.
      *
      * @param input - Input containing user ID, page, and limit for pagination
-     * @returns Promise<GetNotificationsOutput> Notifications with pagination info
+     * @returns Promise<GetNotificationsOutput> Notifications with total count
      *
      * @remarks
      * This method fetches notifications for the specified user with pagination.
-     * It returns the notifications along with total count and pagination metadata.
+     * It returns the notifications along with total count. Pagination metadata
+     * (currentPage, totalPages) is calculated in the Controller.
      */
     async execute(
         input: GetNotificationsInput,
@@ -45,13 +45,9 @@ export class GetUserNotificatonUseCase {
             this.notificationRepository.countByUserId(userId),
         ]);
 
-        const totalPages = Math.ceil(total / limit);
-
         return {
             notifications,
             total,
-            currentPage: page,
-            totalPages,
         };
     }
 }

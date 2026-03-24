@@ -1,11 +1,10 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
 
 /**
- * Output interface for retrieving posts with pagination and metadata.
+ * Output interface for retrieving posts.
  *
  * This interface defines the structure of the data returned when fetching
- * posts with pagination support, including the posts themselves and
- * pagination metadata.
+ * posts with pagination support.
  */
 export interface GetPostsOutput {
     /**

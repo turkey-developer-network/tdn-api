@@ -1,10 +1,10 @@
 import type { Notification } from "@core/domain/entities/notification.entity";
 
 /**
- * Output interface for retrieving user notifications with pagination.
+ * Output interface for retrieving user notifications.
  *
  * This interface defines the structure of the data returned when fetching
- * notifications for a user with pagination support.
+ * notifications for a user.
  */
 export interface GetNotificationsOutput {
     /**
@@ -16,14 +16,4 @@ export interface GetNotificationsOutput {
      * Total number of notifications available for the user.
      */
     total: number;
-
-    /**
-     * Current page number (1-based).
-     */
-    currentPage: number;
-
-    /**
-     * Total number of pages available.
-     */
-    totalPages: number;
 }

@@ -11,6 +11,7 @@ import type { IRefreshTokenRepository } from "@core/ports/repositories/refresh-t
 import type { IUserRepository } from "@core/ports/repositories/user.repository";
 import type { LoginInput } from "./login.input";
 import type { LoginOutput } from "./login.output";
+import { AuthMapper } from "../auth.mapper";
 
 /**
  * Use case for handling user authentication and login.
@@ -93,11 +94,13 @@ export class LoginUseCase {
         });
 
         return {
-            accessToken,
-            expiresAt,
-            refreshToken,
-            refreshTokenExpiresAt,
-            user: payload,
+            user: AuthMapper.toUserOutput(payload),
+            tokens: AuthMapper.toTokenOutput({
+                accessToken,
+                expiresAt,
+                refreshToken,
+                refreshTokenExpiresAt,
+            }),
         };
     }
 }

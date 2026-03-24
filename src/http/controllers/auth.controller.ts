@@ -66,14 +66,14 @@ export class AuthController extends BaseAuthController {
 
         this.setRefreshTokenCookie(
             reply,
-            response.refreshToken,
-            response.refreshTokenExpiresAt,
+            response.tokens.refreshToken,
+            response.tokens.refreshTokenExpiresAt,
         );
 
         reply.status(200).send({
             data: {
-                accessToken: response.accessToken,
-                expiresAt: response.expiresAt,
+                accessToken: response.tokens.accessToken,
+                expiresAt: response.tokens.expiresAt,
                 user: response.user,
             },
             meta: { timestamp: new Date().toISOString() },
@@ -187,19 +187,16 @@ export class AuthController extends BaseAuthController {
 
         this.setRefreshTokenCookie(
             reply,
-            response.refreshToken,
+            response.tokens.refreshToken,
             this.config.REFRESH_TOKEN_EXPIRES_IN,
             "/auth/refresh",
         );
 
         reply.status(200).send({
             data: {
-                accessToken: response.accessToken,
-                expiresAt: response.expiresAt,
-                user: {
-                    id: response.user.id,
-                    username: response.user.username,
-                },
+                accessToken: response.tokens.accessToken,
+                expiresAt: response.tokens.expiresAt,
+                user: response.user,
             },
             meta: { timestamp: new Date().toISOString() },
         });

@@ -50,13 +50,13 @@ export class OAuthController extends BaseAuthController {
 
             this.setRefreshTokenCookie(
                 reply,
-                response.refreshToken,
-                response.refreshTokenExpiresAt,
+                response.tokens.refreshToken,
+                response.tokens.refreshTokenExpiresAt,
                 "/auth/refresh",
             );
 
             reply.redirect(
-                `${frontendUrl}/oauth-success?token=${response.accessToken}`,
+                `${frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {
@@ -102,13 +102,13 @@ export class OAuthController extends BaseAuthController {
 
             this.setRefreshTokenCookie(
                 reply,
-                response.refreshToken,
-                response.refreshTokenExpiresAt,
+                response.tokens.refreshToken,
+                response.tokens.refreshTokenExpiresAt,
                 "/auth/refresh",
             );
 
             reply.redirect(
-                `${frontendUrl}/oauth-success?token=${response.accessToken}`,
+                `${frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {

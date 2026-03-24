@@ -92,7 +92,7 @@ export class PostController {
         request: FastifyRequest<{ Querystring: GetPostsQuery }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { page, limit, type } = request.query;
+        const { page = 1, limit = 10, type } = request.query;
 
         const cdnUrl = request.server.config.R2_PUBLIC_URL;
 
@@ -117,13 +117,13 @@ export class PostController {
             };
         });
 
-        const totalPages = Math.ceil(result.total / (limit || 10));
+        const totalPages = Math.ceil(result.total / limit);
 
         return reply.status(200).send({
             data: formattedData,
             meta: {
                 total: result.total,
-                page,
+                currentPage: page,
                 limit,
                 totalPages,
             },
