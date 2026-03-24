@@ -4,6 +4,7 @@ import { AuthController } from "@controllers/auth.controller";
 import { OAuthController } from "@controllers/oauth.controller";
 import { NotificationController } from "@controllers/notification.controller";
 import { PostController } from "@controllers/post.controller";
+import { LikeController } from "@controllers/like.controller";
 import { ProfileController } from "@controllers/profile.controller";
 import { FollowUserController } from "@controllers/follow-user.controller";
 import { CommentController } from "@controllers/comment.controller";
@@ -44,4 +45,8 @@ export const controllersModule = {
     notificationController: asClass(NotificationController).singleton(),
     postController: asClass(PostController).singleton(),
     commentController: asClass(CommentController).singleton(),
+    likeController: asFunction(
+        (likePostUseCase, unlikePostUseCase) =>
+            new LikeController(likePostUseCase, unlikePostUseCase),
+    ).singleton(),
 };

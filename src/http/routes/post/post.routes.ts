@@ -18,10 +18,6 @@ import {
     getPostsQuerySchema,
     type GetPostsQuery,
 } from "@typings/schemas/post/get-post.schema";
-import {
-    type LikePostParams,
-    LikePostParamsSchema,
-} from "@typings/schemas/post/like-post.schema";
 import type { FastifyInstance } from "fastify";
 
 /**
@@ -104,39 +100,5 @@ export function postRoutes(fastify: FastifyInstance): void {
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
         },
         postController.deletePost.bind(postController),
-    );
-
-    /**
-     * Like a post by ID
-     * Requires authentication and applies sensitive rate limiting
-     */
-    fastify.post<{ Params: LikePostParams }>(
-        "/:id/like",
-        {
-            onRequest: [fastify.authenticate],
-            schema: {
-                params: LikePostParamsSchema,
-                tags: ["Post"],
-            },
-            config: { rateLimit: RateLimitPolicies.SENSITIVE },
-        },
-        postController.likePost.bind(postController),
-    );
-
-    /**
-     * Unlike a post by ID
-     * Requires authentication and applies sensitive rate limiting
-     */
-    fastify.delete<{ Params: LikePostParams }>(
-        "/:id/unlike",
-        {
-            onRequest: [fastify.authenticate],
-            schema: {
-                params: LikePostParamsSchema,
-                tags: ["Post"],
-            },
-            config: { rateLimit: RateLimitPolicies.SENSITIVE },
-        },
-        postController.unlikePost.bind(postController),
     );
 }

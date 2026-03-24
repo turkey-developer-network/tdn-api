@@ -1,5 +1,4 @@
-import type { IPostRepository } from "@core/ports/repositories/post.repository";
-import type { IPostLikeRepository } from "@core/ports/repositories/post-like.repository";
+import type { TransactionPort } from "@core/ports/services/transaction.port";
 import { NotFoundError } from "@core/errors";
 import type { UnlikePostUseCaseInput } from "./unlike-post-usecase.input";
 
@@ -8,18 +7,14 @@ import type { UnlikePostUseCaseInput } from "./unlike-post-usecase.input";
  *
  * Handles the business logic for removing a like relationship between a user and a post.
  * Validates that the post exists and that the user has previously liked the post before
- * removing the like relationship.
+ * removing the like relationship. Uses transactions for atomic operations.
  */
 export class UnlikePostUseCase {
     /**
      * Creates a new UnlikePostUseCase instance
-     * @param postRepository - Repository for post data operations
-     * @param postLikeRepository - Repository for post like relationships
+     * @param transactionService - Service for handling database transactions
      */
-    constructor(
-        private readonly postRepository: IPostRepository,
-        private readonly postLikeRepository: IPostLikeRepository,
-    ) {}
+    constructor(private readonly transactionService: TransactionPort) {}
 
     /**
      * Executes the unlike post use case
@@ -31,23 +26,26 @@ export class UnlikePostUseCase {
      * @remarks
      * This method first validates that the post exists, then checks if the user
      * has previously liked the post. If both conditions are met, it removes the
-     * like relationship. If the user hasn't liked the post, the operation is
-     * silently ignored (no error thrown).
+     * like relationship and decrements the like count. If the user hasn't liked the post,
+     * the operation is silently ignored (no error thrown).
      */
     async execute(input: UnlikePostUseCaseInput): Promise<void> {
-        const post = await this.postRepository.findById(input.postId);
+        await this.transactionService.runInTransaction(async (ctx) => {
+            const post = await ctx.postRepository.findById(input.postId);
 
-        if (!post) {
-            throw new NotFoundError("Post not found.");
-        }
+            if (!post) {
+                throw new NotFoundError("Post not found.");
+            }
 
-        const hasLiked = await this.postLikeRepository.isLiked(
-            input.postId,
-            input.userId,
-        );
+            const hasLiked = await ctx.postLikeRepository.isLiked(
+                input.postId,
+                input.userId,
+            );
 
-        if (hasLiked) {
-            await this.postLikeRepository.unlike(input.postId, input.userId);
-        }
+            if (hasLiked) {
+                await ctx.postLikeRepository.unlike(input.postId, input.userId);
+                await ctx.postLikeRepository.decrementLikeCount(input.postId);
+            }
+        });
     }
 }

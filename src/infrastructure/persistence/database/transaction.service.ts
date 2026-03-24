@@ -9,6 +9,7 @@ import type { FastifyInstance } from "fastify";
 import { PrismaCommentRepository } from "../repositories/prisma-comment.repository";
 import { PrismaPostRepository } from "../repositories/prisma-post.repository";
 import { PrismaNotificationRepository } from "../repositories/prisma-notification.repository";
+import { PrismaLikeRepository } from "../repositories/prisma-like.repository";
 
 /**
  * Transaction service implementation for managing database transactions
@@ -45,6 +46,7 @@ export class TransactionService implements TransactionPort {
                 }),
                 commentRepository: new PrismaCommentRepository(tx),
                 postRepository: new PrismaPostRepository(tx),
+                postLikeRepository: new PrismaLikeRepository(tx),
                 notificationRepository: new PrismaNotificationRepository(tx),
             };
 

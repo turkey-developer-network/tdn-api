@@ -29,4 +29,18 @@ export interface IPostLikeRepository {
      * @returns Promise<void>
      */
     unlike(postId: string, userId: string): Promise<void>;
+
+    /**
+     * Increments the like count for a post atomically
+     * @param postId - The ID of the post to increment like count for
+     * @returns Promise<void>
+     */
+    incrementLikeCount(postId: string): Promise<void>;
+
+    /**
+     * Decrements the like count for a post atomically
+     * @param postId - The ID of the post to decrement like count for
+     * @returns Promise<void>
+     */
+    decrementLikeCount(postId: string): Promise<void>;
 }

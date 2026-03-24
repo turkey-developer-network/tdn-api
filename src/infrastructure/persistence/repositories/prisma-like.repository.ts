@@ -1,19 +1,19 @@
-import type { PrismaClient } from "@generated/prisma/client";
 import type { IPostLikeRepository } from "@core/ports/repositories/post-like.repository";
+import type { PrismaTransactionalClient } from "../database/prisma-client.type";
 
 /**
  * Prisma implementation of the PostLike repository
  *
- * Provides database operations for post like relationships using Prisma ORM.
+ * Provides database operations for post like relationships and like count management using Prisma ORM.
  * Implements the IPostLikeRepository interface to ensure consistent
  * data access patterns across different persistence implementations.
  */
-export class PrismaPostLikeRepository implements IPostLikeRepository {
+export class PrismaLikeRepository implements IPostLikeRepository {
     /**
-     * Creates a new PrismaPostLikeRepository instance
+     * Creates a new PrismaLikeRepository instance
      * @param prisma - The Prisma client instance
      */
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(private readonly prisma: PrismaTransactionalClient) {}
 
     /**
      * Creates a like relationship between a user and a post

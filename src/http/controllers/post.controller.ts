@@ -2,13 +2,10 @@ import { MediaLimitExceededError, NoMediaProvidedError } from "@core/errors";
 import type { CreatePostUseCase } from "@core/use-cases/post/create-post";
 import type { DeletePostUseCase } from "@core/use-cases/post/delete-post";
 import type { GetPostsUseCase } from "@core/use-cases/post/get-post";
-import type { LikePostUseCase } from "@core/use-cases/post/like-post";
-import type { UnlikePostUseCase } from "@core/use-cases/post/unlike-post";
 import type { UploadPostMediaUseCase } from "@core/use-cases/post/upload-post-media";
 import type { CreatePostBody } from "@typings/schemas/post/create-post.schema";
 import type { DeletePostParams } from "@typings/schemas/post/delete-post.schema";
 import type { GetPostsQuery } from "@typings/schemas/post/get-post.schema";
-import type { LikePostParams } from "@typings/schemas/post/like-post.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 /**
@@ -25,16 +22,12 @@ export class PostController {
      * @param uploadPostMediaUseCase - Use case for uploading post media
      * @param getPostsUseCase - Use case for retrieving posts
      * @param deletePostUseCase - Use case for deleting posts
-     * @param likePostUseCase - Use case for liking posts
-     * @param unlikePostUseCase - Use case for unliking posts
      */
     constructor(
         private readonly createPostUseCase: CreatePostUseCase,
         private readonly uploadPostMediaUseCase: UploadPostMediaUseCase,
         private readonly getPostsUseCase: GetPostsUseCase,
         private readonly deletePostUseCase: DeletePostUseCase,
-        private readonly likePostUseCase: LikePostUseCase,
-        private readonly unlikePostUseCase: UnlikePostUseCase,
     ) {}
 
     /**
@@ -189,40 +182,6 @@ export class PostController {
             userId,
             cdnBaseUrl,
         });
-
-        return reply.status(204).send();
-    }
-
-    /**
-     * Likes a post by ID
-     * @param request - HTTP request containing the post ID to like
-     * @param reply - HTTP response object
-     */
-    async likePost(
-        request: FastifyRequest<{ Params: LikePostParams }>,
-        reply: FastifyReply,
-    ): Promise<void> {
-        const userId = request.user.id;
-        const postId = request.params.id;
-
-        await this.likePostUseCase.execute({ postId, userId });
-
-        return reply.status(204).send();
-    }
-
-    /**
-     * Unlikes a post by ID
-     * @param request - HTTP request containing the post ID to unlike
-     * @param reply - HTTP response object
-     */
-    async unlikePost(
-        request: FastifyRequest<{ Params: LikePostParams }>,
-        reply: FastifyReply,
-    ): Promise<void> {
-        const userId = request.user.id;
-        const postId = request.params.id;
-
-        await this.unlikePostUseCase.execute({ postId, userId });
 
         return reply.status(204).send();
     }
