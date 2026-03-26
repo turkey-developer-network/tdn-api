@@ -18,8 +18,8 @@ export class PrismaCommentRepository implements ICommentRepository {
      * @param comment - The comment entity to create
      * @returns Promise that resolves when the comment is created
      */
-    async create(comment: Comment): Promise<void> {
-        await this.prisma.comment.create({
+    async create(comment: Comment): Promise<Comment> {
+        const rawComment = await this.prisma.comment.create({
             data: {
                 content: comment.content,
                 postId: comment.postId,
@@ -27,6 +27,8 @@ export class PrismaCommentRepository implements ICommentRepository {
                 parentId: comment.parentId,
             },
         });
+
+        return Comment.with(rawComment);
     }
 
     /**
@@ -95,9 +97,16 @@ export class PrismaCommentRepository implements ICommentRepository {
      * @param id - The ID of the comment to delete
      * @returns Promise that resolves when the comment is deleted
      */
-    async delete(id: string): Promise<void> {
+    async delete(id: string, postId: string): Promise<void> {
         await this.prisma.comment.delete({
             where: { id },
+        });
+
+        await this.prisma.post.update({
+            where: { id: postId },
+            data: {
+                commentCount: { decrement: 1 },
+            },
         });
     }
 

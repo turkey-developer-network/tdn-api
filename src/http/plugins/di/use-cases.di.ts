@@ -36,10 +36,12 @@ import { GetPostsUseCase } from "@core/use-cases/post/get-post";
 import { DeletePostUseCase } from "@core/use-cases/post/delete-post";
 import { LikePostUseCase } from "@core/use-cases/post/like-post";
 import { UnlikePostUseCase } from "@core/use-cases/post/unlike-post";
-import { CreateCommentUseCase } from "@core/use-cases/comment/create-comment.usecase";
+import { CreateCommentUseCase } from "@core/use-cases/comment/create-comment/create-comment.usecase";
 import { CreateBookmarkUseCase } from "@core/use-cases/bookmark/create-bookmark/create-bookmark.usecase";
 import { RemoveBookmarkUseCase } from "@core/use-cases/bookmark/remove-bookmark/remove-bookmark.usecase";
 import { GetBookmarksUseCase } from "@core/use-cases/bookmark/get-bookmarks/get-bookmarks.usecase";
+import { DeleteCommentUseCase } from "@core/use-cases/comment/delete-comment/delete-comment.usecase";
+import { GetUserPostsUseCase } from "@core/use-cases/post/get-user-posts/get-user.posts.usecase";
 
 /**
  * Dependency injection module for use cases
@@ -274,4 +276,12 @@ export const useCasesModule = {
      *
      */
     getBookmarksUseCase: asClass(GetBookmarksUseCase).singleton(),
+    /**
+     *
+     */
+    deleteCommentUseCase: asClass(DeleteCommentUseCase).singleton(),
+    /**
+     *
+     */
+    getUserPostsUseCase: asClass(GetUserPostsUseCase).singleton(),
 };

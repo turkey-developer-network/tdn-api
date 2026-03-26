@@ -14,10 +14,10 @@ model Post {
   authorId String @map("author_id")
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  tags          Tag[]
-  likes         PostLike[]
-  bookmarks     PostBookmark[]
-  comments      Comment[]
+  tags         Tag[]
+  likes        PostLike[]
+  bookmarks    PostBookmark[]
+  comments     Comment[]
   commentCount Int            @default(0)
   likeCount    Int            @default(0)
 
@@ -70,6 +70,18 @@ model PostBookmark {
   @@map("post_bookmarks")
 }
 
+model CommentLike {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([commentId, userId])
+  @@map("comment_likes")
+}
+
 model Comment {
   id      String @id @default(uuid())
   content String @db.Text
@@ -83,6 +95,8 @@ model Comment {
   parentId String?
   parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies  Comment[] @relation("CommentReplies")
+
+  likes CommentLike[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

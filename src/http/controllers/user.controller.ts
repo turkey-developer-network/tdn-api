@@ -1,8 +1,14 @@
+import type { GetUserPostsUseCase } from "@core/use-cases/post/get-user-posts/get-user.posts.usecase";
 import type { ChangeEmailUseCase } from "@core/use-cases/user/change-email";
 import type { ChangePasswordUseCase } from "@core/use-cases/user/change-password";
 import type { ChangeUsernameUseCase } from "@core/use-cases/user/change-username";
 import type { GetMeUserUseCase } from "@core/use-cases/user/get-me";
 import type { SoftDeleteUserUseCase } from "@core/use-cases/user/soft-delete";
+import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
+import type {
+    GetUserPostsParams,
+    GetUserPostsQuery,
+} from "@typings/schemas/post/get-user-posts.schema";
 import type { ChangeEmailBody } from "@typings/schemas/user/change-email.schema";
 import type { ChangePasswordBody } from "@typings/schemas/user/change-password.schema";
 import type { ChangeUsernameBody } from "@typings/schemas/user/change-username.schema";
@@ -16,6 +22,7 @@ export class UserController {
         private readonly changePasswordUseCase: ChangePasswordUseCase,
         private readonly changeUsernameUseCase: ChangeUsernameUseCase,
         private readonly changeEmailUseCase: ChangeEmailUseCase,
+        private readonly getUserPostsUseCase: GetUserPostsUseCase,
     ) {}
 
     async softDeleteMe(
@@ -82,5 +89,43 @@ export class UserController {
         });
 
         return reply.status(204).send();
+    }
+
+    async getUserPosts(
+        request: FastifyRequest<{
+            Params: GetUserPostsParams;
+            Querystring: GetUserPostsQuery;
+        }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const { username } = request.params;
+        const { page = 1, limit = 10, type } = request.query;
+
+        const cdnUrl = request.server.config.R2_PUBLIC_URL;
+
+        const result = await this.getUserPostsUseCase.execute({
+            username,
+            page,
+            limit,
+            type,
+        });
+
+        const formattedData = PostPrismaMapper.toFeedResponse(
+            result.posts,
+            cdnUrl,
+        );
+
+        const totalPages = Math.ceil(result.total / limit);
+
+        return reply.status(200).send({
+            data: formattedData,
+            meta: {
+                total: result.total,
+                currentPage: page,
+                limit,
+                totalPages,
+                timestamp: new Date().toISOString(),
+            },
+        });
     }
 }

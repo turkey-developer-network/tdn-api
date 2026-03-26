@@ -24,7 +24,7 @@ export interface IPostRepository {
      * Creates a new post entity in the persistence layer.
      * @param post - The Post entity to be created.
      */
-    create(post: Post): Promise<void>;
+    create(post: Post): Promise<Post>;
 
     /**
      * Retrieves a paginated list of posts with optional type filtering.
@@ -57,4 +57,10 @@ export interface IPostRepository {
      * @param postId - The ID of the post to decrement comment count for
      */
     decrementCommentsCount(postId: string): Promise<void>;
+    findByAuthorUsername(
+        username: string,
+        page: number,
+        limit: number,
+        type?: string,
+    ): Promise<{ posts: Post[]; total: number }>;
 }

@@ -1,5 +1,34 @@
-import type { Post } from "@core/domain/entities/post.entity";
+import { Post } from "@core/domain/entities/post.entity";
 import type { PostType } from "@core/domain/enums/post-type.enum";
+import type { Prisma } from "@generated/prisma/client";
+
+export type PostWithRelations = Prisma.PostGetPayload<{
+    include: {
+        author: {
+            select: {
+                id: true;
+                username: true;
+                profile: { select: { avatarUrl: true } };
+            };
+        };
+        tags: true;
+    };
+}>;
+
+export interface PostResponse {
+    id: string;
+    content: string;
+    type: string;
+    mediaUrls: string[];
+    createdAt: Date;
+    likeCount: number;
+    commentCount: number;
+    author: {
+        id: string;
+        username?: string;
+        avatarUrl: string;
+    };
+}
 
 /**
  * Mapper class for converting between Post entities and Prisma data structures
@@ -9,6 +38,28 @@ import type { PostType } from "@core/domain/enums/post-type.enum";
  * the domain layer and the persistence layer.
  */
 export class PostPrismaMapper {
+    static toDomain(raw: PostWithRelations): Post {
+        return new Post({
+            id: raw.id,
+            content: raw.content,
+            type: raw.type as PostType,
+            mediaUrls: raw.mediaUrls,
+
+            author: {
+                id: raw.authorId,
+                username: raw.author?.username ?? undefined,
+                avatarUrl: raw.author?.profile?.avatarUrl ?? undefined,
+            },
+
+            tags: raw.tags?.map((t) => t.name) || [],
+
+            createdAt: raw.createdAt,
+            updatedAt: raw.updatedAt,
+            likeCount: raw.likeCount,
+            commentCount: raw.commentCount,
+        });
+    }
+
     /**
      * Maps a Post entity to a response object
      * @param post - The Post entity
@@ -66,5 +117,31 @@ export class PostPrismaMapper {
             mediaUrls: post.mediaUrls,
             authorId: post.author.id,
         };
+    }
+
+    static toResponse(post: Post, cdnUrl: string): PostResponse {
+        return {
+            id: post.id,
+            content: post.content,
+            type: post.type,
+            mediaUrls: post.mediaUrls,
+            createdAt: post.createdAt,
+            likeCount: post.likeCount,
+            commentCount: post.commentCount,
+            author: {
+                id: post.author.id,
+                username: post.author.username,
+
+                avatarUrl: post.author.avatarUrl
+                    ? post.author.avatarUrl.startsWith("http")
+                        ? post.author.avatarUrl
+                        : `${cdnUrl}/${post.author.avatarUrl}`
+                    : `${cdnUrl}/default-avatar.png`,
+            },
+        };
+    }
+
+    static toFeedResponse(posts: Post[], cdnUrl: string): PostResponse[] {
+        return posts.map((post) => this.toResponse(post, cdnUrl));
     }
 }

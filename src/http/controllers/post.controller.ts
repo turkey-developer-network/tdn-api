@@ -42,14 +42,17 @@ export class PostController {
         const authorId = request.user.id;
         const { content, type, mediaUrls } = request.body;
 
-        await this.createPostUseCase.execute({
+        const post = await this.createPostUseCase.execute({
             authorId,
             content,
             type,
             mediaUrls,
         });
-
+        console.log(post.id);
         return reply.status(201).send({
+            data: {
+                id: post.id,
+            },
             meta: {
                 timestamp: new Date().toISOString(),
             },
