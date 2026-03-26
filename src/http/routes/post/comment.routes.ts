@@ -12,6 +12,10 @@ import {
     type CreateCommentBody,
     type CreateCommentParams,
 } from "@typings/schemas/comment/create-comment.schema";
+import {
+    type DeleteCommentParams,
+    deleteCommentParamsSchema,
+} from "@typings/schemas/comment/delete-comment.schema";
 import { type FastifyInstance } from "fastify";
 
 /**
@@ -42,5 +46,18 @@ export function commentRoutes(fastify: FastifyInstance): void {
             config: { rateLimit: RateLimitPolicies.STANDARD },
         },
         commentController.create.bind(commentController),
+    );
+
+    fastify.delete<{ Params: DeleteCommentParams; Reply: { 204: void } }>(
+        "/:commentId",
+        {
+            onRequest: [fastify.authenticate],
+            schema: {
+                params: deleteCommentParamsSchema,
+                tags: ["Comment"],
+            },
+            config: { rateLimit: RateLimitPolicies.STANDARD },
+        },
+        commentController.delete.bind(commentController),
     );
 }

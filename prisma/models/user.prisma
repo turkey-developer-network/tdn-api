@@ -25,9 +25,10 @@ model User {
   postBookmarks PostBookmark[]
   comments      Comment[]
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deletedAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  commentLikes CommentLike[]
 
   @@map("users")
 }

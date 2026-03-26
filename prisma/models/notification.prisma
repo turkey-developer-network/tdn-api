@@ -3,6 +3,8 @@ enum NotificationType {
   NEW_POST
   COMMENT
   LIKE
+  COMMENT_LIKE
+  COMMENT_REPLY
 }
 
 model Notification {

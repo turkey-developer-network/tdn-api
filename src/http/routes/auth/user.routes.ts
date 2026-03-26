@@ -7,6 +7,12 @@
 
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
+    type GetUserPostsParams,
+    getUserPostsParamsSchema,
+    type GetUserPostsQuery,
+    getUserPostsQuerySchema,
+} from "@typings/schemas/post/get-user-posts.schema";
+import {
     type ChangeEmailBody,
     ChangeEmailSchema,
 } from "@typings/schemas/user/change-email.schema";
@@ -94,6 +100,19 @@ function userRoutes(fastify: FastifyInstance): void {
             config: { rateLimit: RateLimitPolicies.STRICT },
         },
         userController.changeEmailMe.bind(userController),
+    );
+
+    fastify.get<{ Params: GetUserPostsParams; Querystring: GetUserPostsQuery }>(
+        "/:username/posts",
+        {
+            schema: {
+                params: getUserPostsParamsSchema,
+                querystring: getUserPostsQuerySchema,
+                tags: ["User"],
+            },
+            config: { rateLimit: RateLimitPolicies.STANDARD },
+        },
+        userController.getUserPosts.bind(userController),
     );
 }
 

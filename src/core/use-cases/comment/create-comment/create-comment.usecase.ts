@@ -7,7 +7,7 @@ import type { RealtimePort } from "@core/ports/services/realtime.port";
 import { Comment } from "@core/domain/entities/comment.entity";
 import { Notification } from "@core/domain/entities/notification.entity";
 import { NotificationType } from "@core/domain/enums/notification-type.enum";
-import { NotFoundError, BadRequestError } from "@core/errors"; // Yeni error'u import ettik
+import { NotFoundError, BadRequestError } from "@core/errors";
 import type { CreateCommentUseCaseInput } from "./create-comment-usecase.input";
 
 export class CreateCommentUseCase {
@@ -24,12 +24,12 @@ export class CreateCommentUseCase {
     /**
      * Executes the comment creation use case
      * @param input - Input data containing comment content, post ID, author ID, and optional parent comment ID
-     * @returns Promise that resolves when the comment is created
+     * @returns Promise that resolves with the created Comment entity
      * @throws NotFoundError if the post or parent comment is not found
      * @throws BadRequestError if the parent comment belongs to a different post
      */
-    async execute(input: CreateCommentUseCaseInput): Promise<void> {
-        await this.transactionService.runInTransaction(async (ctx) => {
+    async execute(input: CreateCommentUseCaseInput): Promise<Comment> {
+        return await this.transactionService.runInTransaction(async (ctx) => {
             const post = await ctx.postRepository.findById(input.postId);
             if (!post) throw new NotFoundError("Post not found.");
 
@@ -58,14 +58,16 @@ export class CreateCommentUseCase {
                 }
             }
 
-            const comment = Comment.create(
+            const tempComment = Comment.create(
                 input.content,
                 input.postId,
                 input.authorId,
                 input.parentId,
             );
 
-            await ctx.commentRepository.create(comment);
+            const savedComment =
+                await ctx.commentRepository.create(tempComment);
+
             await ctx.postRepository.incrementCommentsCount(input.postId);
 
             if (notifyUserId) {
@@ -87,6 +89,8 @@ export class CreateCommentUseCase {
                     },
                 );
             }
+
+            return savedComment;
         });
     }
 }

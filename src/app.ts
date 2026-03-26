@@ -111,11 +111,17 @@ export class App {
      */
     private registerRoutes(): void {
         this.server.register(authRoutes, { prefix: "/api/v1/auth" });
+
         this.server.register(userRoutes, { prefix: "/api/v1/users" });
+
         this.server.register(oauthRoutes, { prefix: "/api/v1/oauth" });
+
         this.server.register(profileRoutes, { prefix: "/api/v1/profiles" });
+
         this.server.register(followRoutes, { prefix: "/api/v1/follows" });
+
         this.server.register(realtimeRoutes, { prefix: "/api/v1/realtime" });
+
         this.server.register(notificationRoutes, {
             prefix: "/api/v1/notifications",
         });

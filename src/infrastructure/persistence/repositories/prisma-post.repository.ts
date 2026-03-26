@@ -6,6 +6,7 @@ import { Post } from "@core/domain/entities/post.entity";
 import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { PrismaTransactionalClient } from "@infrastructure/persistence/database/prisma-client.type";
+import type { Prisma } from "@generated/prisma/client";
 
 /**
  * Prisma implementation of the Post repository
@@ -26,7 +27,7 @@ export class PrismaPostRepository implements IPostRepository {
      * @param post - The Post entity to create
      * @returns Promise<void>
      */
-    async create(post: Post): Promise<void> {
+    async create(post: Post): Promise<Post> {
         const hashtagRegex = /#[\p{L}\p{N}_]+/gu;
         const matches = post.content.match(hashtagRegex) || [];
         const uniqueTags = [
@@ -37,7 +38,7 @@ export class PrismaPostRepository implements IPostRepository {
 
         const prismaData = PostPrismaMapper.toPrisma(post);
 
-        await this.prisma.post.create({
+        const createdRaw = await this.prisma.post.create({
             data: {
                 ...prismaData,
                 tags: {
@@ -47,6 +48,19 @@ export class PrismaPostRepository implements IPostRepository {
                     })),
                 },
             },
+        });
+
+        return new Post({
+            id: createdRaw.id,
+            content: createdRaw.content,
+            type: createdRaw.type as PostType,
+            mediaUrls: createdRaw.mediaUrls,
+            author: { id: createdRaw.authorId },
+            tags: [],
+            createdAt: createdRaw.createdAt,
+            updatedAt: createdRaw.updatedAt,
+            commentCount: createdRaw.commentCount,
+            likeCount: 0,
         });
     }
 
@@ -203,5 +217,49 @@ export class PrismaPostRepository implements IPostRepository {
             where: { id: postId },
             data: { commentCount: { decrement: 1 } },
         });
+    }
+
+    async findByAuthorUsername(
+        username: string,
+        page: number,
+        limit: number,
+        type?: string,
+    ): Promise<{ posts: Post[]; total: number }> {
+        const skip = (page - 1) * limit;
+
+        const whereClause: Prisma.PostWhereInput = {
+            author: {
+                username: username,
+            },
+        };
+
+        if (type) {
+            whereClause.type = type as PostType;
+        }
+
+        const [rawPosts, total] = await this.prisma.$transaction([
+            this.prisma.post.findMany({
+                where: whereClause,
+                orderBy: { createdAt: "desc" },
+                skip,
+                take: limit,
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            username: true,
+                            profile: { select: { avatarUrl: true } },
+                        },
+                    },
+                    tags: true,
+                    _count: { select: { likes: true, comments: true } },
+                },
+            }),
+            this.prisma.post.count({ where: whereClause }),
+        ]);
+
+        const posts = rawPosts.map((raw) => PostPrismaMapper.toDomain(raw));
+
+        return { posts, total };
     }
 }

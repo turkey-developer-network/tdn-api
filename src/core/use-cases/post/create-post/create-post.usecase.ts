@@ -31,7 +31,7 @@ export class CreatePostUseCase {
      * This method creates a new post entity, saves it to the database,
      * and clears any cached feed data to ensure consistency.
      */
-    async execute(request: CreatePostInput): Promise<void> {
+    async execute(request: CreatePostInput): Promise<Post> {
         const post = Post.create(
             request.content,
             request.type,
@@ -39,7 +39,9 @@ export class CreatePostUseCase {
             request.mediaUrls || [],
         );
 
-        await this.postRepository.create(post);
+        const rawPost = await this.postRepository.create(post);
         await this.cacheService.deleteByPattern("posts:feed:*");
+
+        return rawPost;
     }
 }

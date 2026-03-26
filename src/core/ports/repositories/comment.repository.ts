@@ -10,7 +10,7 @@ export interface ICommentRepository {
      * @param comment - The comment entity to create
      * @returns Promise that resolves when the comment is created
      */
-    create(comment: Comment): Promise<void>;
+    create(comment: Comment): Promise<Comment>;
 
     /**
      * Finds a comment by its unique identifier
