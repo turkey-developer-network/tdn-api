@@ -24,4 +24,8 @@ export interface GetPostsInput {
      * If not provided, all post types will be returned.
      */
     type?: PostType;
+    /**
+     *
+     */
+    currentUserId?: string;
 }

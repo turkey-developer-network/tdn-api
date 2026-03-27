@@ -136,22 +136,13 @@ export class PostController {
             page,
             limit,
             type,
+            currentUserId: request.user?.id,
         });
 
-        const formattedData = result.posts.map((post) => {
-            return {
-                ...post,
-                author: {
-                    id: post.author.id,
-                    username: post.author.username,
-                    avatarUrl: post.author.avatarUrl
-                        ? post.author.avatarUrl.startsWith("http")
-                            ? post.author.avatarUrl
-                            : `${cdnUrl}/${post.author.avatarUrl}`
-                        : `${cdnUrl}/default-avatar.png`,
-                },
-            };
-        });
+        const formattedData = PostPrismaMapper.toFeedResponse(
+            result.posts,
+            cdnUrl,
+        );
 
         const totalPages = Math.ceil(result.total / limit);
 

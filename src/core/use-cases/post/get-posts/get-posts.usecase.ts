@@ -28,7 +28,7 @@ export class GetPostsUseCase {
         const limit = input.limit || 10;
         const typeStr = input.type || "ALL";
 
-        const cacheKey = `posts:feed:page:${page}:limit:${limit}:type:${typeStr}`;
+        const cacheKey = `posts:feed:page:${page}:limit:${limit}:type:${typeStr}:user:${input.currentUserId || "guest"}`;
 
         const cachedData = await this.cacheService.get(cacheKey);
 
@@ -57,6 +57,7 @@ export class GetPostsUseCase {
             page,
             limit,
             type: input.type,
+            currentUserId: input.currentUserId,
         });
 
         const response: GetPostsOutput = {
