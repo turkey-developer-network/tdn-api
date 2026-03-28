@@ -27,7 +27,7 @@ export interface TransactionContext {
 
     /** Repository for notification-related data operations within the transaction. */
     readonly notificationRepository: INotificationRepository;
-
+    /** */
     readonly bookmarkRepository: IBookmarkRepository;
 }
 
