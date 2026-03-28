@@ -17,6 +17,10 @@ export const RateLimitPolicies = {
         max: 60,
         timeWindow: "1 minute",
     },
+    PUBLIC: {
+        max: 100,
+        timeWindow: "1 minute",
+    },
 };
 
 function rateLimitPlugin(fastify: FastifyInstance): void {

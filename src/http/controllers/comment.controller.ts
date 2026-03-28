@@ -21,10 +21,6 @@ import type { CommentActionParams } from "@typings/schemas/comment/like-comment.
 import type { FastifyRequest, FastifyReply } from "fastify";
 
 export class CommentController {
-    /**
-     * Creates a new CommentController instance
-     * @param createCommentUseCase - Use case for creating comments
-     */
     constructor(
         private readonly createCommentUseCase: CreateCommentUseCase,
         private readonly deleteCommentUseCase: DeleteCommentUseCase,
@@ -33,12 +29,6 @@ export class CommentController {
         private readonly unlikeCommentUseCase: UnlikeCommentUseCase,
     ) {}
 
-    /**
-     * Creates a new comment on a post
-     * @param request - Fastify request containing comment data and post ID
-     * @param reply - Fastify reply for sending response
-     * @returns Promise that resolves when comment is created
-     */
     async create(
         request: FastifyRequest<{
             Params: CreateCommentParams;
@@ -47,7 +37,7 @@ export class CommentController {
         reply: FastifyReply,
     ): Promise<void> {
         const userId = request.user.id;
-        const postId = request.params.id;
+        const { postId } = request.params; // ŞEFİN SİHRİ: 'id' yerine 'postId'
         const { content, parentId } = request.body;
 
         const comment = await this.createCommentUseCase.execute({
@@ -71,12 +61,11 @@ export class CommentController {
         request: FastifyRequest<{ Params: DeleteCommentParams }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { id: postId, commentId } = request.params;
+        const { commentId } = request.params; // ŞEFİN SİHRİ: Sadece commentId alıyoruz
         const userId = request.user.id;
 
         await this.deleteCommentUseCase.execute({
             commentId,
-            postId,
             userId,
         });
 
@@ -90,15 +79,14 @@ export class CommentController {
         }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { id } = request.params;
+        const { postId } = request.params;
         const { page = 1, limit = 10 } = request.query;
 
         const currentUserId = request.user?.id;
-
         const cdnUrl = request.server.config.R2_PUBLIC_URL;
 
         const comments = await this.getPostCommentsUseCase.execute({
-            postId: id,
+            postId,
             page,
             limit,
             currentUserId,
@@ -122,10 +110,10 @@ export class CommentController {
         request: FastifyRequest<{ Params: CommentActionParams }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { id } = request.params;
+        const { commentId } = request.params;
         const userId = request.user!.id;
 
-        await this.likeCommentUseCase.execute({ commentId: id, userId });
+        await this.likeCommentUseCase.execute({ commentId, userId });
 
         return reply.status(200).send({
             meta: {
@@ -138,10 +126,10 @@ export class CommentController {
         request: FastifyRequest<{ Params: CommentActionParams }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { id } = request.params;
+        const { commentId } = request.params;
         const userId = request.user!.id;
 
-        await this.unlikeCommentUseCase.execute({ commentId: id, userId });
+        await this.unlikeCommentUseCase.execute({ commentId, userId });
 
         return reply.status(200).send({
             meta: {

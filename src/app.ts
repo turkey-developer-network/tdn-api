@@ -130,7 +130,7 @@ export class App {
         });
 
         this.server.register(commentRoutes, {
-            prefix: "/api/v1/posts/:id/comments",
+            prefix: "/api/v1",
         });
 
         this.server.register(likeRoutes, {

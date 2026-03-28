@@ -23,17 +23,12 @@ export class DeleteCommentUseCase {
                 throw new ForbiddenError("This comment is not yours.");
             }
 
-            if (comment.postId !== input.postId) {
-                throw new ForbiddenError(
-                    "This comment does not belong to the mentioned post.",
-                );
-            }
-
             await ctx.commentRepository.delete(input.commentId);
 
-            await ctx.postRepository.decrementCommentsCount(input.postId);
+            await ctx.postRepository.decrementCommentsCount(comment.postId);
         });
 
+        // 4. Cache temizliği
         await this.redisService.deleteByPattern("posts:feed:*");
     }
 }

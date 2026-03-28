@@ -1,6 +1,5 @@
 /**
  * @module CommentRoutes
- * Comment routes including adding comments and replies to posts.
  * @author TDN Team
  * @version 1.0.0
  */
@@ -28,24 +27,11 @@ import {
 } from "@typings/schemas/comment/like-comment.schema";
 import { type FastifyInstance } from "fastify";
 
-/**
- * Sets up comment routes on the Fastify instance
- *
- * Registers all comment-related HTTP endpoints including:
- * - POST /posts/:id/comments - Add a new comment or reply to a post
- *
- * @param fastify - The Fastify application instance
- * @returns void
- */
 export function commentRoutes(fastify: FastifyInstance): void {
     const { commentController } = fastify.diContainer.cradle;
 
-    /**
-     * Create a new comment or reply
-     * Requires authentication and applies standard rate limiting
-     */
     fastify.post<{ Params: CreateCommentParams; Body: CreateCommentBody }>(
-        "/",
+        "/posts/:postId/comments",
         {
             onRequest: [fastify.authenticate],
             schema: {
@@ -58,8 +44,25 @@ export function commentRoutes(fastify: FastifyInstance): void {
         commentController.create.bind(commentController),
     );
 
+    fastify.get<{
+        Params: GetPostCommentsParams;
+        Querystring: GetPostCommentsQuery;
+    }>(
+        "/posts/:postId/comments",
+        {
+            schema: {
+                params: getPostCommentsParamsSchema,
+                querystring: getPostCommentsQuerySchema,
+                tags: ["Post", "Comment"],
+            },
+
+            config: { rateLimit: RateLimitPolicies.PUBLIC },
+        },
+        commentController.getPostComments.bind(commentController),
+    );
+
     fastify.delete<{ Params: DeleteCommentParams; Reply: { 204: void } }>(
-        "/:commentId",
+        "/comments/:commentId",
         {
             onRequest: [fastify.authenticate],
             schema: {
@@ -70,41 +73,30 @@ export function commentRoutes(fastify: FastifyInstance): void {
         },
         commentController.delete.bind(commentController),
     );
-    fastify.get<{
-        Params: GetPostCommentsParams;
-        Querystring: GetPostCommentsQuery;
-    }>(
-        "/:id/comments",
-        {
-            schema: {
-                params: getPostCommentsParamsSchema,
-                querystring: getPostCommentsQuerySchema,
-                tags: ["Post", "Comment"],
-            },
-        },
-        commentController.getPostComments.bind(commentController),
-    );
 
     fastify.post<{ Params: CommentActionParams }>(
-        "/:id/like",
+        "/comments/:commentId/like",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
                 tags: ["Comment", "Interaction"],
             },
+
+            config: { rateLimit: RateLimitPolicies.STANDARD },
         },
         commentController.likeComment.bind(commentController),
     );
 
     fastify.delete<{ Params: CommentActionParams }>(
-        "/:id/unlike",
+        "/comments/:commentId/unlike",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
                 tags: ["Comment", "Interaction"],
             },
+            config: { rateLimit: RateLimitPolicies.STANDARD },
         },
         commentController.unlikeComment.bind(commentController),
     );

@@ -1,7 +1,7 @@
 import { Type, type Static } from "@sinclair/typebox";
 
 export const getPostCommentsParamsSchema = Type.Object({
-    id: Type.String({ format: "uuid", description: "Post ID" }),
+    postId: Type.String({ format: "uuid", description: "Post ID" }),
 });
 
 export const getPostCommentsQuerySchema = Type.Object({
