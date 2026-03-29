@@ -14,6 +14,7 @@ export default defineConfig([
             "prisma.config.ts",
             "vitest.config.ts",
             "tests/**/*",
+            "vitest.e2e.config.ts",
         ],
     },
 

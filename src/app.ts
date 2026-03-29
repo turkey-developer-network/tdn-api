@@ -42,20 +42,23 @@ export class App {
      */
     constructor() {
         const isDevelopment = process.env.NODE_ENV === "development";
+        const isTest = process.env.NODE_ENV === "test";
 
         this.server = Fastify({
             allowErrorHandlerOverride: true,
-            logger: isDevelopment
-                ? {
-                      transport: {
-                          target: "pino-pretty",
-                          options: {
-                              translateTime: "HH:MM:ss Z",
-                              ignore: "pid,hostname",
-                          },
-                      },
-                  }
-                : true,
+            logger: isTest
+                ? false
+                : isDevelopment
+                  ? {
+                        transport: {
+                            target: "pino-pretty",
+                            options: {
+                                translateTime: "HH:MM:ss Z",
+                                ignore: "pid,hostname",
+                            },
+                        },
+                    }
+                  : true,
         }).withTypeProvider<TypeBoxTypeProvider>();
     }
 
@@ -181,7 +184,9 @@ export class App {
             process.exit(1);
         }
     }
-
+    public async close(): Promise<void> {
+        await this.server.close();
+    }
     /**
      * Getter for the Fastify instance.
      * Useful for accessing the server's internal state or configuration.

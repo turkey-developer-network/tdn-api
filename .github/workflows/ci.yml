@@ -13,6 +13,41 @@ jobs:
     build-and-test:
         runs-on: ubuntu-latest
 
+        services:
+            postgres:
+                image: postgres:15-alpine
+                env:
+                    POSTGRES_USER: testuser
+                    POSTGRES_PASSWORD: testpassword
+                    POSTGRES_DB: tdn_test
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+            redis:
+                image: redis:7-alpine
+                ports:
+                    - 6379:6379
+                options: >-
+                    --health-cmd "redis-cli ping"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            NODE_ENV: test
+            DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/tdn_test
+            REDIS_URL: redis://localhost:6379
+            ACCESS_TOKEN_SECRET_KEY: test_secret_token_123
+            COOKIE_SECRET: test_cookie_secret_123
+            GITHUB_CLIENT_ID: dummy_github_id
+            GITHUB_CLIENT_SECRET: dummy_github_secret
+            GOOGLE_CLIENT_ID: dummy_google_id
+            GOOGLE_CLIENT_SECRET: dummy_google_secret
+
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v6
@@ -32,6 +67,9 @@ jobs:
             - name: Generate Prisma Client
               run: pnpm prisma generate
 
+            - name: Push Schema to Test DB
+              run: pnpm prisma db push
+
             - name: Check Formatting
               run: pnpm format:check
 
@@ -40,3 +78,6 @@ jobs:
 
             - name: Run Build
               run: pnpm build
+
+            - name: Run E2E Tests
+              run: pnpm run test:e2e
