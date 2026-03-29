@@ -15,7 +15,6 @@
 
 [![License](https://img.shields.io/badge/License-Source--Available-blue?style=flat-square)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square)](https://github.com/the-developer-network/tdn-api/pulls)
-[![Swagger Docs](https://img.shields.io/badge/API_Docs-Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black)](https://api.developernetwork.net/api/v1/docs)
 
 <br/>
 
@@ -79,62 +78,11 @@ OAuth sign-in via **GitHub** and **Google** is supported.
 
 ---
 
-## API Reference
+## 📖 API Documentation
 
-All endpoints are prefixed with `/api/v1`.  
-Full interactive documentation available at `GET /api/v1/docs`.
+Visit our interactive documentation for all endpoint details, request/response models, and the test environment:
 
-```http
-# Auth
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-POST   /api/v1/auth/refresh
-POST   /api/v1/auth/logout
-POST   /api/v1/auth/send-verification    [Auth]
-POST   /api/v1/auth/verify-email         [Auth]
-POST   /api/v1/auth/forgot-password
-POST   /api/v1/auth/reset-password
-POST   /api/v1/auth/recover-account
-
-# OAuth
-GET    /api/v1/oauth/github
-GET    /api/v1/oauth/google
-
-# Posts
-GET    /api/v1/posts                     # Feed (filterable by type)
-POST   /api/v1/posts                     [Auth]
-POST   /api/v1/posts/media               [Auth]
-DELETE /api/v1/posts/:id                 [Auth]
-
-# Users
-GET    /api/v1/users/me                  [Auth]
-DELETE /api/v1/users/me                  [Auth]
-PATCH  /api/v1/users/me/password         [Auth]
-PATCH  /api/v1/users/me/username         [Auth]
-PATCH  /api/v1/users/me/email            [Auth]
-
-# Profiles
-GET    /api/v1/profiles/search
-GET    /api/v1/profiles/:username
-GET    /api/v1/profiles/:username/followers
-GET    /api/v1/profiles/:username/following
-PATCH  /api/v1/profiles/me               [Auth]
-PATCH  /api/v1/profiles/me/avatar        [Auth]
-PATCH  /api/v1/profiles/me/banner        [Auth]
-
-# Follow
-POST   /api/v1/follow                    [Auth]
-DELETE /api/v1/follow                    [Auth]
-
-# Notifications
-GET    /api/v1/notifications             [Auth]
-PATCH  /api/v1/notifications/read-all    [Auth]
-
-# Realtime
-GET    /api/v1/realtime/ws               # WebSocket
-```
-
----
+- **[api.developernetwork.net/api/v1/docs](https://api.developernetwork.net/api/v1/docs)**
 
 ## Contributing
 
@@ -145,8 +93,6 @@ git checkout -b feature/your-feature
 git commit -m "feat: describe your change"
 git push origin feature/your-feature
 ```
-
----
 
 ## Contact
 
