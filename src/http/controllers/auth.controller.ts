@@ -70,7 +70,7 @@ export class AuthController extends BaseAuthController {
             response.tokens.refreshTokenExpiresAt,
         );
 
-        reply.status(200).send({
+        reply.status(201).send({
             data: {
                 accessToken: response.tokens.accessToken,
                 expiresAt: response.tokens.expiresAt,
