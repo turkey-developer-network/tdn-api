@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN HUSKY=0 pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
@@ -24,7 +24,7 @@ ENV NODE_ENV=production
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN HUSKY=0 pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
