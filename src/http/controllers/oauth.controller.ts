@@ -29,7 +29,10 @@ export class OAuthController extends BaseAuthController {
         reply: FastifyReply,
     ): Promise<void> {
         const { code, error } = request.query;
-        const frontendUrl = this.config.CORS_ORIGIN;
+        const frontendUrl =
+            this.config.NODE_ENV === "production"
+                ? "https://developernetwork.net"
+                : "http://localhost:5173";
 
         if (error) {
             return reply.redirect(
@@ -81,7 +84,10 @@ export class OAuthController extends BaseAuthController {
         reply: FastifyReply,
     ): Promise<void> {
         const { code, error } = request.query;
-        const frontendUrl = this.config.CORS_ORIGIN;
+        const frontendUrl =
+            this.config.NODE_ENV === "production"
+                ? "https://developernetwork.net"
+                : "http://localhost:5173";
 
         if (error) {
             return reply.redirect(
