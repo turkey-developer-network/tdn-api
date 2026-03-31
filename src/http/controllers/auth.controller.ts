@@ -191,8 +191,7 @@ export class AuthController extends BaseAuthController {
         this.setRefreshTokenCookie(
             reply,
             response.tokens.refreshToken,
-            this.config.REFRESH_TOKEN_EXPIRES_IN,
-            "/auth/refresh",
+            response.tokens.refreshTokenExpiresAt,
         );
 
         reply.status(200).send({

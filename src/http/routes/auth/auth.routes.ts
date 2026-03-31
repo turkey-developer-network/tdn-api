@@ -181,7 +181,7 @@ export function authRoutes(fastify: FastifyInstance): void {
                 tags: ["Auth"],
             },
         },
-        authController.recoverAccount,
+        authController.recoverAccount.bind(authController),
     );
 
     fastify.post<{ Body: CheckUserBody }>(
