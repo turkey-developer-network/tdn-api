@@ -54,7 +54,7 @@
         "@fastify/websocket": "^11.2.0",
         "@prisma/adapter-pg": "^7.5.0",
         "@prisma/client": "^7.6.0",
-        "@sinclair/typebox": "^0.34.48",
+        "@sinclair/typebox": "^0.34.49",
         "argon2": "^0.44.0",
         "awilix": "^13.0.3",
         "axios": "^1.14.0",

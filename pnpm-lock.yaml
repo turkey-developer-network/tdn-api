@@ -64,8 +64,8 @@ importers:
         specifier: ^7.6.0
         version: 7.6.0(prisma@7.5.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3)
       '@sinclair/typebox':
-        specifier: ^0.34.48
-        version: 0.34.48
+        specifier: ^0.34.49
+        version: 0.34.49
       argon2:
         specifier: ^0.44.0
         version: 0.44.0
@@ -870,8 +870,8 @@ packages:
   '@rolldown/pluginutils@1.0.0-rc.9':
     resolution: {integrity: sha512-w6oiRWgEBl04QkFZgmW+jnU1EC9b57Oihi2ot3HNWIQRqgHp5PnYDia5iZ5FF7rpa4EQdiqMDXjlqKGXBhsoXw==}
 
-  '@sinclair/typebox@0.34.48':
-    resolution: {integrity: sha512-kKJTNuK3AQOrgjjotVxMrCn1sUJwM76wMszfq1kdU4uYVJjvEWuFQ6HgvLt4Xz3fSmZlTOxJ/Ie13KnIcWQXFA==}
+  '@sinclair/typebox@0.34.49':
+    resolution: {integrity: sha512-brySQQs7Jtn0joV8Xh9ZV/hZb9Ozb0pmazDIASBkYKCjXrXU3mpcFahmK/z4YDhGkQvP9mWJbVyahdtU5wQA+A==}
 
   '@smithy/abort-controller@4.2.12':
     resolution: {integrity: sha512-xolrFw6b+2iYGl6EcOL7IJY71vvyZ0DJ3mcKtpykqPe2uscwtzDZJa1uVQXyP7w9Dd+kGwYnPbMsJrGISKiY/Q==}
@@ -3766,7 +3766,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.9': {}
 
-  '@sinclair/typebox@0.34.48': {}
+  '@sinclair/typebox@0.34.49': {}
 
   '@smithy/abort-controller@4.2.12':
     dependencies:
