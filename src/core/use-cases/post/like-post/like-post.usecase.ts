@@ -4,6 +4,7 @@ import { Notification } from "@core/domain/entities/notification.entity";
 import { NotificationType } from "@core/domain/enums/notification-type.enum";
 import { NotFoundError } from "@core/errors";
 import type { LikePostUseCaseInput } from "./like-post-usecase.input";
+import type { CachePort } from "@core/ports/services/cache.port";
 
 /**
  * Use case for liking a post
@@ -21,6 +22,7 @@ export class LikePostUseCase {
     constructor(
         private readonly transactionService: TransactionPort,
         private readonly realtimeService: RealtimePort,
+        private readonly cacheService: CachePort,
     ) {}
 
     /**
@@ -63,5 +65,8 @@ export class LikePostUseCase {
                 );
             }
         });
+        await this.cacheService.deleteByPattern(
+            `posts:feed:*user:${input.userId}*`,
+        );
     }
 }

@@ -1,6 +1,7 @@
 import type { TransactionPort } from "@core/ports/services/transaction.port";
 import { NotFoundError } from "@core/errors";
 import type { UnlikePostUseCaseInput } from "./unlike-post-usecase.input";
+import type { CachePort } from "@core/ports/services/cache.port";
 
 /**
  * Use case for unliking a post
@@ -14,7 +15,10 @@ export class UnlikePostUseCase {
      * Creates a new UnlikePostUseCase instance
      * @param transactionService - Service for handling database transactions
      */
-    constructor(private readonly transactionService: TransactionPort) {}
+    constructor(
+        private readonly transactionService: TransactionPort,
+        private readonly cacheService: CachePort,
+    ) {}
 
     /**
      * Executes the unlike post use case
@@ -47,5 +51,8 @@ export class UnlikePostUseCase {
                 await ctx.postLikeRepository.decrementLikeCount(input.postId);
             }
         });
+        await this.cacheService.deleteByPattern(
+            `posts:feed:*user:${input.userId}*`,
+        );
     }
 }
