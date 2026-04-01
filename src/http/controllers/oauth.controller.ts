@@ -17,6 +17,12 @@ export class OAuthController extends BaseAuthController {
         super(config);
     }
 
+    private get frontendUrl(): string {
+        return this.config.NODE_ENV === "production"
+            ? "https://developernetwork.net"
+            : "http://localhost:5173";
+    }
+
     github(_request: FastifyRequest, reply: FastifyReply): void {
         const url = this.githubAuthService.getAuthorizationUrl();
         reply.redirect(url);
@@ -29,19 +35,17 @@ export class OAuthController extends BaseAuthController {
         reply: FastifyReply,
     ): Promise<void> {
         const { code, error } = request.query;
-        const frontendUrl =
-            this.config.NODE_ENV === "production"
-                ? "https://developernetwork.net"
-                : "http://localhost:5173";
 
         if (error) {
             return reply.redirect(
-                `${frontendUrl}/login?error=github_access_denied`,
+                `${this.frontendUrl}/login?error=github_access_denied`,
             );
         }
 
         if (!code) {
-            return reply.redirect(`${frontendUrl}/login?error=missing_code`);
+            return reply.redirect(
+                `${this.frontendUrl}/login?error=missing_code`,
+            );
         }
 
         try {
@@ -59,20 +63,20 @@ export class OAuthController extends BaseAuthController {
             );
 
             reply.redirect(
-                `${frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
+                `${this.frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {
                 return reply.redirect(
-                    `${frontendUrl}/recover-account?token=${err.recoveryToken}`,
+                    `${this.frontendUrl}/oauth-success?error=account_pending_deletion&recoveryToken=${err.recoveryToken}`,
                 );
             }
 
-            reply.redirect(`${frontendUrl}/login?error=oauth_failed`);
+            reply.redirect(`${this.frontendUrl}/login?error=oauth_failed`);
         }
     }
 
-    google(request: FastifyRequest, reply: FastifyReply): void {
+    google(_request: FastifyRequest, reply: FastifyReply): void {
         const url = this.googleAuthService.getAuthorizationUrl();
         reply.redirect(url);
     }
@@ -84,19 +88,17 @@ export class OAuthController extends BaseAuthController {
         reply: FastifyReply,
     ): Promise<void> {
         const { code, error } = request.query;
-        const frontendUrl =
-            this.config.NODE_ENV === "production"
-                ? "https://developernetwork.net"
-                : "http://localhost:5173";
 
         if (error) {
             return reply.redirect(
-                `${frontendUrl}/login?error=google_access_denied`,
+                `${this.frontendUrl}/login?error=google_access_denied`,
             );
         }
 
         if (!code) {
-            return reply.redirect(`${frontendUrl}/login?error=missing_code`);
+            return reply.redirect(
+                `${this.frontendUrl}/login?error=missing_code`,
+            );
         }
 
         try {
@@ -114,16 +116,16 @@ export class OAuthController extends BaseAuthController {
             );
 
             reply.redirect(
-                `${frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
+                `${this.frontendUrl}/oauth-success?token=${response.tokens.accessToken}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {
                 return reply.redirect(
-                    `${frontendUrl}/recover-account?token=${err.recoveryToken}`,
+                    `${this.frontendUrl}/oauth-success?error=account_pending_deletion&recoveryToken=${err.recoveryToken}`,
                 );
             }
 
-            reply.redirect(`${frontendUrl}/login?error=oauth_failed`);
+            reply.redirect(`${this.frontendUrl}/login?error=oauth_failed`);
         }
     }
 }
