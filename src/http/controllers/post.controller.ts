@@ -54,9 +54,11 @@ export class PostController {
         });
 
         return reply.status(201).send({
-            data: {
-                id: post.id,
-            },
+            data: PostPrismaMapper.toResponse(
+                post,
+                request.server.config.R2_PUBLIC_URL,
+                authorId,
+            ),
             meta: {
                 timestamp: new Date().toISOString(),
             },
