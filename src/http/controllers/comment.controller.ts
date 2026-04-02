@@ -96,6 +96,7 @@ export class CommentController {
         const formattedData = CommentPrismaMapper.toListResponse(
             comments,
             cdnUrl,
+            currentUserId,
         );
 
         return reply.status(200).send({

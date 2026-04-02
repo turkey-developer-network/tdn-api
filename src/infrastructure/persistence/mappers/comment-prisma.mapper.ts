@@ -56,6 +56,7 @@ export class CommentPrismaMapper {
                 id: dbComment.authorId,
                 username: dbComment.author?.username ?? undefined,
                 avatarUrl: dbComment.author?.profile?.avatarUrl ?? undefined,
+                fullName: dbComment.author?.profile?.fullName ?? undefined,
             },
             likeCount: dbComment.likeCount,
             replyCount: dbComment.replyCount,
@@ -80,8 +81,8 @@ export class CommentPrismaMapper {
             isLiked: comment.isLiked,
             author: {
                 id: comment.authorId,
-                username: comment.author?.username || "Unknown",
-                fullName: comment.author?.fullName || "Full Name",
+                username: comment.author?.username,
+                fullName: comment.author?.fullName ?? undefined,
                 avatarUrl: comment.author?.avatarUrl
                     ? comment.author.avatarUrl.startsWith("http")
                         ? comment.author.avatarUrl
