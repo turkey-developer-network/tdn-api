@@ -198,7 +198,7 @@ export class PostController {
 
         const post = await this.getPostDetailUseCase.execute(id, userId);
 
-        const formattedData = PostPrismaMapper.toResponse(post, cdnUrl);
+        const formattedData = PostPrismaMapper.toResponse(post, cdnUrl, userId);
 
         return reply.status(200).send({
             data: formattedData,
