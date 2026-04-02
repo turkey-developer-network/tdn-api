@@ -125,6 +125,17 @@ export function postRoutes(fastify: FastifyInstance): void {
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
+            onRequest: async (request) => {
+                try {
+                    if (request.headers.authorization) {
+                        await request.jwtVerify();
+                    }
+                } catch {
+                    request.log.warn(
+                        "Invalid token on public route, proceeding as guest.",
+                    );
+                }
+            },
         },
         postController.getPost.bind(postController),
     );
