@@ -28,8 +28,6 @@ RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
-# Copy pre-built Prisma query engine — avoids re-downloading at runtime
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
 # Run as non-root for security (node user ships with node:alpine)
 USER node
