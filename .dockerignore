@@ -1,7 +1,23 @@
 node_modules
 dist
+coverage
+
 .git
 .github
-.env
+.husky
+.vscode
+
+# Environment files — never bake secrets into the image
+.env*
+
+# Test & dev config
 tests
-README.md
+vitest*.config.ts
+eslint.config.mts
+
+# Docs
+*.md
+
+# Misc
+*.log
+docker-compose*
