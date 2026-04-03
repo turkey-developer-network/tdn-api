@@ -23,7 +23,8 @@ model User {
   posts         Post[]
   postLikes     PostLike[]
   postBookmarks PostBookmark[]
-  comments      Comment[]
+  comments         Comment[]
+  commentBookmarks CommentBookmark[]
 
   deletedAt    DateTime?
   createdAt    DateTime      @default(now())

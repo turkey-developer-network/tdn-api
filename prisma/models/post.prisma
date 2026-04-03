@@ -97,7 +97,8 @@ model Comment {
   parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies  Comment[] @relation("CommentReplies")
 
-  likes CommentLike[]
+  likes     CommentLike[]
+  bookmarks CommentBookmark[]
   likeCount  Int @default(0) @map("like_count")
   replyCount Int @default(0) @map("reply_count")
 
@@ -107,4 +108,19 @@ model Comment {
   @@index([postId])
   @@index([authorId])
   @@map("comments")
+}
+
+model CommentBookmark {
+  id        String @id @default(uuid())
+  commentId String @map("comment_id")
+  userId    String @map("user_id")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([commentId, userId])
+  @@index([userId])
+  @@map("comment_bookmarks")
 }
