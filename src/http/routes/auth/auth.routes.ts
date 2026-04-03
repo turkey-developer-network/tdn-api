@@ -28,6 +28,10 @@ import {
     type LoginResponse,
 } from "@typings/schemas/auth/login.schema";
 import {
+    RefreshResponseSchema,
+    type RefreshResponse,
+} from "@typings/schemas/auth/refresh.schema";
+import {
     RecoverAccountSchema,
     type RecoverAccountBody,
 } from "@typings/schemas/auth/recover-account.schema";
@@ -90,12 +94,12 @@ export function authRoutes(fastify: FastifyInstance): void {
         authController.login.bind(authController),
     );
 
-    fastify.post<{ Reply: { 200: LoginResponse } }>(
+    fastify.post<{ Reply: { 200: RefreshResponse } }>(
         "/refresh",
         {
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
             schema: {
-                response: { 200: LoginResponseSchema },
+                response: { 200: RefreshResponseSchema },
                 tags: ["Auth"],
             },
         },
