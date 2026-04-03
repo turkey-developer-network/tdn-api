@@ -3,24 +3,25 @@ import type { FastifyReply, FastifyRequest, FastifyInstance } from "fastify";
 import type { GithubAuthPort } from "@core/ports/services/github-auth.port";
 import { AccountPendingDeletionError } from "@core/errors";
 import type { GithubLoginUseCase } from "@core/use-cases/oauth/oauth-github";
-import type { GoogleAuthService } from "@infrastructure/external/google-auth.service";
+import type { GoogleAuthPort } from "@core/ports/services/google-auth.port";
 import type { GoogleLoginUseCase } from "@core/use-cases/oauth/oauth-google";
+import type { OAuthExchangeUseCase } from "@core/use-cases/oauth/oauth-exchange";
+import type { OAuthExchangeBody } from "@typings/schemas/oauth/oauth-exchange.schema";
 
 export class OAuthController extends BaseAuthController {
     constructor(
         private readonly githubAuthService: GithubAuthPort,
         private readonly githubLoginUseCase: GithubLoginUseCase,
-        private readonly googleAuthService: GoogleAuthService,
+        private readonly googleAuthService: GoogleAuthPort,
         private readonly googleLoginUseCase: GoogleLoginUseCase,
+        private readonly oauthExchangeUseCase: OAuthExchangeUseCase,
         config: FastifyInstance["config"],
     ) {
         super(config);
     }
 
     private get frontendUrl(): string {
-        return this.config.NODE_ENV === "production"
-            ? "https://developernetwork.net"
-            : "http://localhost:5173";
+        return this.config.FRONTEND_URL;
     }
 
     github(_request: FastifyRequest, reply: FastifyReply): void {
@@ -49,14 +50,12 @@ export class OAuthController extends BaseAuthController {
         }
 
         try {
-            const response = await this.githubLoginUseCase.execute({
+            const { exchangeCode } = await this.githubLoginUseCase.execute({
                 code,
-                deviceIp: request.ip,
-                userAgent: request.headers["user-agent"] ?? "Unknown Device",
             });
 
             reply.redirect(
-                `${this.frontendUrl}/oauth-success?token=${response.tokens.accessToken}&refreshToken=${response.tokens.refreshToken}`,
+                `${this.frontendUrl}/oauth-success?code=${exchangeCode}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {
@@ -97,14 +96,12 @@ export class OAuthController extends BaseAuthController {
         }
 
         try {
-            const response = await this.googleLoginUseCase.execute({
+            const { exchangeCode } = await this.googleLoginUseCase.execute({
                 code,
-                deviceIp: request.ip,
-                userAgent: request.headers["user-agent"] ?? "Unknown Device",
             });
 
             reply.redirect(
-                `${this.frontendUrl}/oauth-success?token=${response.tokens.accessToken}&refreshToken=${response.tokens.refreshToken}`,
+                `${this.frontendUrl}/oauth-success?code=${exchangeCode}`,
             );
         } catch (err: unknown) {
             if (err instanceof AccountPendingDeletionError) {
@@ -117,5 +114,31 @@ export class OAuthController extends BaseAuthController {
                 `${this.frontendUrl}/oauth-success?error=oauth_failed`,
             );
         }
+    }
+
+    async exchange(
+        request: FastifyRequest<{ Body: OAuthExchangeBody }>,
+        reply: FastifyReply,
+    ): Promise<void> {
+        const response = await this.oauthExchangeUseCase.execute({
+            code: request.body.code,
+            deviceIp: request.ip,
+            userAgent: request.headers["user-agent"] ?? "Unknown Device",
+        });
+
+        this.setRefreshTokenCookie(
+            reply,
+            response.tokens.refreshToken,
+            response.tokens.refreshTokenExpiresAt,
+        );
+
+        reply.status(200).send({
+            data: {
+                accessToken: response.tokens.accessToken,
+                expiresAt: response.tokens.expiresAt,
+                user: response.user,
+            },
+            meta: { timestamp: new Date().toISOString() },
+        });
     }
 }

@@ -76,6 +76,17 @@ export class RedisService implements CachePort {
         }
     }
 
+    async delete(key: string): Promise<void> {
+        try {
+            await this.publisher.del(key);
+        } catch (error) {
+            this.logger.error(
+                { err: error, key },
+                "Failed to delete key from Redis cache",
+            );
+        }
+    }
+
     async deleteByPattern(pattern: string): Promise<void> {
         try {
             const keys = await this.publisher.keys(pattern);

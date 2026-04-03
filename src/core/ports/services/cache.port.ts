@@ -20,6 +20,12 @@ export interface CachePort {
     set(key: string, value: string, ttlSeconds?: number): Promise<void>;
 
     /**
+     * Deletes a single cache entry by its exact key.
+     * @param key - The exact cache key to delete.
+     */
+    delete(key: string): Promise<void>;
+
+    /**
      * Deletes cache entries matching a pattern.
      * @param pattern - The pattern to match cache keys against.
      */

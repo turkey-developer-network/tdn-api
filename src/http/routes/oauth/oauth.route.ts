@@ -7,6 +7,11 @@
 
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import type { FastifyInstance } from "fastify";
+import {
+    OAuthExchangeBodySchema,
+    OAuthExchangeResponseSchema,
+    type OAuthExchangeBody,
+} from "@typings/schemas/oauth/oauth-exchange.schema";
 
 /**
  * Sets up OAuth routes on the Fastify instance
@@ -59,6 +64,19 @@ export function oauthRoutes(fastify: FastifyInstance): void {
             },
         },
         oauthController.googleCallback.bind(oauthController),
+    );
+
+    fastify.post<{ Body: OAuthExchangeBody }>(
+        "/exchange",
+        {
+            config: { rateLimit: RateLimitPolicies.STRICT },
+            schema: {
+                body: OAuthExchangeBodySchema,
+                response: { 200: OAuthExchangeResponseSchema },
+                tags: ["OAuth"],
+            },
+        },
+        oauthController.exchange.bind(oauthController),
     );
 }
 

@@ -59,6 +59,9 @@ export const EnvSchema = Type.Object({
     NOTIFICATION_PURGE_GRACE_PERIOD_DAYS: Type.Number({ default: 30 }),
 
     RESEND_API_KEY: Type.String({ default: "resend_api_key" }),
+
+    // Frontend URL for OAuth redirects
+    FRONTEND_URL: Type.String({ default: "http://localhost:5173" }),
 });
 
 export type EnvConfig = Static<typeof EnvSchema>;

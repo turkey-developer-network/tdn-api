@@ -12,6 +12,7 @@ import { ForgotPasswordUseCase } from "@core/use-cases/auth/forgot-password";
 import { ResetPasswordUseCase } from "@core/use-cases/auth/reset-password";
 import { RecoverAccountUseCase } from "@core/use-cases/auth/recover-account";
 import { GoogleLoginUseCase } from "@core/use-cases/oauth/oauth-google";
+import { OAuthExchangeUseCase } from "@core/use-cases/oauth/oauth-exchange";
 import { PurgeExpiredUsersUseCase } from "@core/use-cases/user/purge-expired-users";
 import { PurgeExpiredTokensUseCase } from "@core/use-cases/auth/cleanup-refresh-tokens";
 import { GetMeUserUseCase } from "@core/use-cases/user/get-me";
@@ -87,6 +88,11 @@ export const useCasesModule = {
      * Use case for Google OAuth login
      */
     googleLoginUseCase: asClass(GoogleLoginUseCase).singleton(),
+
+    /**
+     * Use case for exchanging a short-lived OAuth code for auth tokens
+     */
+    oauthExchangeUseCase: asClass(OAuthExchangeUseCase).singleton(),
 
     /**
      * Use case for JWT token refresh
@@ -221,8 +227,8 @@ export const useCasesModule = {
      * Use case for creating a new post
      */
     createPostUseCase: asFunction(
-        (postRepository, redisService) =>
-            new CreatePostUseCase(postRepository, redisService),
+        (postRepository, cacheService) =>
+            new CreatePostUseCase(postRepository, cacheService),
     ).singleton(),
 
     /**
@@ -234,20 +240,20 @@ export const useCasesModule = {
      * Use case for retrieving posts
      */
     getPostsUseCase: asFunction(
-        (postRepository, redisService) =>
-            new GetPostsUseCase(postRepository, redisService),
+        (postRepository, cacheService) =>
+            new GetPostsUseCase(postRepository, cacheService),
     ).singleton(),
 
     /**
      * Use case for deleting a post
      */
     deletePostUseCase: asFunction(
-        (postRepository, storageService, logger, redisService) =>
+        (postRepository, storageService, logger, cacheService) =>
             new DeletePostUseCase(
                 postRepository,
                 storageService,
                 logger,
-                redisService,
+                cacheService,
             ),
     ).singleton(),
 
