@@ -11,6 +11,7 @@ export type CommentWithRelations = Prisma.CommentGetPayload<{
             };
         };
         likes: true;
+        bookmarks: true;
         _count: { select: { replies: true } };
     };
 }>;
@@ -32,6 +33,7 @@ export interface CommentResponse {
     likeCount: number;
     replyCount: number;
     isLiked: boolean;
+    isBookmarked: boolean;
 }
 
 /**
@@ -61,6 +63,7 @@ export class CommentPrismaMapper {
             likeCount: dbComment.likeCount,
             replyCount: dbComment.replyCount,
             isLiked: dbComment.likes && dbComment.likes.length > 0,
+            isBookmarked: dbComment.bookmarks && dbComment.bookmarks.length > 0,
         });
     }
 
@@ -79,6 +82,7 @@ export class CommentPrismaMapper {
             likeCount: comment.likeCount,
             replyCount: comment.replyCount,
             isLiked: comment.isLiked,
+            isBookmarked: comment.isBookmarked,
             author: {
                 id: comment.authorId,
                 username: comment.author?.username,

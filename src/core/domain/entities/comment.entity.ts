@@ -118,6 +118,10 @@ export class Comment {
         return this.props.isLiked || false;
     }
 
+    public get isBookmarked(): boolean {
+        return this.props.isBookmarked || false;
+    }
+
     /**
      * Factory method to create a comment from existing properties
      * @param props - Comment properties including optional ID and timestamps

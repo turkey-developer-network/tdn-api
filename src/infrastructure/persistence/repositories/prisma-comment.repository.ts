@@ -74,6 +74,9 @@ export class PrismaCommentRepository implements ICommentRepository {
                 likes: currentUserId
                     ? { where: { userId: currentUserId } }
                     : false,
+                bookmarks: currentUserId
+                    ? { where: { userId: currentUserId } }
+                    : false,
                 _count: { select: { replies: true } },
             },
         });
@@ -118,6 +121,9 @@ export class PrismaCommentRepository implements ICommentRepository {
                 likes: currentUserId
                     ? { where: { userId: currentUserId } }
                     : false,
+                bookmarks: currentUserId
+                    ? { where: { userId: currentUserId } }
+                    : false,
                 _count: { select: { replies: true } },
             },
         });
@@ -140,12 +146,31 @@ export class PrismaCommentRepository implements ICommentRepository {
         parentId: string,
         limit: number,
         offset: number,
+        currentUserId?: string,
     ): Promise<Comment[]> {
         const rawReplies = await this.prisma.comment.findMany({
             where: { parentId },
             orderBy: { createdAt: "asc" },
             take: limit,
             skip: offset,
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profile: {
+                            select: { avatarUrl: true, fullName: true },
+                        },
+                    },
+                },
+                likes: currentUserId
+                    ? { where: { userId: currentUserId } }
+                    : false,
+                bookmarks: currentUserId
+                    ? { where: { userId: currentUserId } }
+                    : false,
+                _count: { select: { replies: true } },
+            },
         });
 
         return rawReplies.map((raw) =>

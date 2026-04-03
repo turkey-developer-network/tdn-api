@@ -49,5 +49,6 @@ export interface CommentProps {
     likeCount?: number;
     replyCount?: number;
     isLiked?: boolean;
+    isBookmarked?: boolean;
     mediaUrls?: string[];
 }
