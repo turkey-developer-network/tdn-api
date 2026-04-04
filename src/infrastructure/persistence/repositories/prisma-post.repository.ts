@@ -9,6 +9,7 @@ import {
 } from "@infrastructure/persistence/mappers/post-prisma.mapper";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { PrismaTransactionalClient } from "@infrastructure/persistence/database/prisma-client.type";
+import { mapPostTypeToCategory } from "@infrastructure/persistence/repositories/prisma-tag.repository";
 import type { Prisma } from "@generated/prisma/client";
 
 /**
@@ -38,7 +39,12 @@ export class PrismaPostRepository implements IPostRepository {
                 tags: {
                     connectOrCreate: uniqueTags.map((tag: string) => ({
                         where: { name: tag },
-                        create: { name: tag },
+                        create: {
+                            name: tag,
+                            category: mapPostTypeToCategory(
+                                post.type as PostType,
+                            ),
+                        },
                     })),
                 },
             },

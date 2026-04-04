@@ -12,6 +12,7 @@ import { PrismaLikeRepository } from "@infrastructure/persistence/repositories/p
 import { PrismaBookmarkRepository } from "@infrastructure/persistence/repositories/prisma-bookmark.repository";
 import { PrismaCommentRepository } from "@infrastructure/persistence/repositories/prisma-comment.repository";
 import { PrismaCommentBookmarkRepository } from "@infrastructure/persistence/repositories/prisma-comment-bookmark.repository";
+import { PrismaTagRepository } from "@infrastructure/persistence/repositories/prisma-tag.repository";
 
 /**
  * Dependency injection module for persistence layer
@@ -101,4 +102,6 @@ export const persistenceModule = {
     commentBookmarkRepository: asClass(
         PrismaCommentBookmarkRepository,
     ).singleton(),
+
+    tagRepository: asClass(PrismaTagRepository).singleton(),
 };

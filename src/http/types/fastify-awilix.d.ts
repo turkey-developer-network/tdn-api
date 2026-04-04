@@ -13,6 +13,7 @@ import type PostController from "@services/post.controller";
 import type { CommentController } from "@controllers/comment.controller";
 import type { LikeController } from "@controllers/like.controller";
 import type { BookmarkController } from "@controllers/bookmark.controller";
+import type { TrendController } from "@controllers/trend.controller";
 import type { CachePort } from "@core/ports/services/cache.port";
 
 /**
@@ -65,6 +66,9 @@ declare module "@fastify/awilix" {
 
         /** */
         bookmarkController: BookmarkController;
+
+        /** Controller for trending tag operations */
+        trendController: TrendController;
 
         /** Redis-backed cache service */
         cacheService: CachePort;

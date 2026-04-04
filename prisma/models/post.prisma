@@ -33,6 +33,7 @@ model Post {
 model Tag {
   id        String   @id @default(uuid())
   name      String   @unique
+  category  String?  @map("category")
   posts     Post[]
   createdAt DateTime @default(now()) @map("created_at")
 
