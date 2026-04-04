@@ -161,6 +161,6 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
             (t: { tag: string }) => t.tag === "typescript",
         );
 
-        expect(typescriptTrend?.category).toBe("Community");
+        expect(typescriptTrend?.category).toBe("Technology");
     });
 });

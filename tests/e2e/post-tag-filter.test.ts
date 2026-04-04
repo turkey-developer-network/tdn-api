@@ -93,7 +93,6 @@ describe("E2E Post Tag Filter (GET /posts?tag=xxx)", () => {
         expect(ids).toContain(taggedPostId);
         expect(ids).toContain(secondPostId);
 
-        // Her post'un tags array'inde etiket adı bulunmalı
         for (const post of body.data as { tags: { name: string }[] }[]) {
             const hasTag = post.tags.some((t) => t.name === TAG_NAME);
             expect(hasTag).toBe(true);
@@ -101,7 +100,6 @@ describe("E2E Post Tag Filter (GET /posts?tag=xxx)", () => {
     });
 
     it("4. Should return posts ordered by popularity (likeCount desc) when tag is given", async () => {
-        // İkinci postu beğen → likeCount artar → sıralamada önce gelmeli
         await server.inject({
             method: "POST",
             url: `${API_PREFIX}/posts/${secondPostId}/like`,
