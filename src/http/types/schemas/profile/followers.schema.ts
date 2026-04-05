@@ -1,4 +1,27 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { Type } from "@sinclair/typebox";
+
+export const FollowListItemSchema = FBType.Object({
+    userId: FBType.String({ format: "uuid" }),
+    username: FBType.String(),
+    fullName: FBType.String(),
+    avatarUrl: FBType.String(),
+    bio: FBType.Union([FBType.String(), FBType.Null()]),
+    isFollowing: FBType.Boolean(),
+    isMe: FBType.Boolean(),
+});
+
+export type FollowListItem = Static<typeof FollowListItemSchema>;
+
+export const FollowsListResponseSchema = FBType.Object({
+    data: FBType.Array(FollowListItemSchema),
+    meta: FBType.Object({
+        limit: FBType.Number(),
+        offset: FBType.Number(),
+        count: FBType.Number(),
+    }),
+});
+export type FollowsListResponse = Static<typeof FollowsListResponseSchema>;
 
 export const FollowersParamsSchema = Type.Object({
     username: Type.String(),

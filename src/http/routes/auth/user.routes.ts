@@ -11,6 +11,8 @@ import {
     getUserPostsParamsSchema,
     type GetUserPostsQuery,
     getUserPostsQuerySchema,
+    GetUserPostsResponseSchema,
+    type GetUserPostsResponse,
 } from "@typings/schemas/post/get-user-posts.schema";
 import {
     type ChangeEmailBody,
@@ -29,6 +31,19 @@ import {
     SoftDeleteUserSchema,
 } from "@typings/schemas/user/solft-delete.schema";
 import type { FastifyInstance } from "fastify";
+import { Type } from "@sinclair/typebox";
+import { ResponseSchema } from "@typings/schemas/create-response-schema";
+
+const GetMeResponseSchema = ResponseSchema(
+    Type.Object({
+        username: Type.String(),
+        email: Type.String({ format: "email" }),
+        isEmailVerified: Type.Boolean(),
+        createdAt: Type.String(),
+        updatedAt: Type.String(),
+        providers: Type.Array(Type.String()),
+    }),
+);
 
 /**
  * Sets up user routes on the Fastify instance
@@ -58,6 +73,7 @@ function userRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
             config: { rateLimit: RateLimitPolicies.STANDARD },
             schema: {
+                response: { 200: GetMeResponseSchema },
                 tags: ["User"],
             },
         },
@@ -102,12 +118,17 @@ function userRoutes(fastify: FastifyInstance): void {
         userController.changeEmailMe.bind(userController),
     );
 
-    fastify.get<{ Params: GetUserPostsParams; Querystring: GetUserPostsQuery }>(
+    fastify.get<{
+        Params: GetUserPostsParams;
+        Querystring: GetUserPostsQuery;
+        Reply: { 200: GetUserPostsResponse };
+    }>(
         "/:username/posts",
         {
             schema: {
                 params: getUserPostsParamsSchema,
                 querystring: getUserPostsQuerySchema,
+                response: { 200: GetUserPostsResponseSchema },
                 tags: ["User"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },

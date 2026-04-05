@@ -1,4 +1,6 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { CommentItemSchema } from "./get-comment.schema";
 
 export const getCommentRepliesParamsSchema = Type.Object({
     commentId: Type.String({ format: "uuid", description: "Comment ID" }),
@@ -14,4 +16,15 @@ export type GetCommentRepliesParams = Static<
 >;
 export type GetCommentRepliesQuery = Static<
     typeof getCommentRepliesQuerySchema
+>;
+
+export const GetCommentRepliesResponseSchema = FBType.Object({
+    data: FBType.Array(CommentItemSchema),
+    meta: FBType.Object({
+        currentPage: FBType.Number(),
+        limit: FBType.Number(),
+    }),
+});
+export type GetCommentRepliesResponse = Static<
+    typeof GetCommentRepliesResponseSchema
 >;

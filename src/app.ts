@@ -28,7 +28,7 @@ import { postRoutes } from "@routes/post/post.routes";
 import { commentRoutes } from "@routes/post/comment.routes";
 import { likeRoutes } from "@routes/post/like.routes";
 import { bookmarkRoutes } from "@routes/post/bookmark.routes";
-import { trendRoutes } from "@routes/trends.routes";
+import { tagRoutes } from "@routes/tags.routes";
 
 /**
  * Main Application class responsible for orchestrating the Fastify server lifecycle.
@@ -150,8 +150,8 @@ export class App {
             prefix: "/api/v1/posts",
         });
 
-        this.server.register(trendRoutes, {
-            prefix: "/api/v1",
+        this.server.register(tagRoutes, {
+            prefix: "/api/v1/tags",
         });
     }
 

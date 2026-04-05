@@ -53,6 +53,7 @@ import { CheckUserUseCase } from "@core/use-cases/auth/check-user";
 import { SaveCommentBookmarkUseCase } from "@core/use-cases/bookmark/save-comment-bookmark/save-comment-bookmark.usecase";
 import { RemoveCommentBookmarkUseCase } from "@core/use-cases/bookmark/remove-comment-bookmark/remove-comment-bookmark.usecase";
 import { GetTrendsUseCase } from "@core/use-cases/post/get-trends";
+import { SearchTagsUseCase } from "@core/use-cases/tag/search-tag";
 
 /**
  * Dependency injection module for use cases
@@ -334,4 +335,5 @@ export const useCasesModule = {
     ).singleton(),
 
     getTrendsUseCase: asClass(GetTrendsUseCase).singleton(),
+    searchTagsUseCase: asClass(SearchTagsUseCase).singleton(),
 };

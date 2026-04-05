@@ -16,6 +16,8 @@ import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
     type CheckUserBody,
     checkUserBodySchema,
+    CheckUserResponseSchema,
+    type CheckUserResponse,
 } from "@typings/schemas/auth/check-user.schema";
 import {
     ForgotPasswordBodySchema,
@@ -33,7 +35,9 @@ import {
 } from "@typings/schemas/auth/refresh.schema";
 import {
     RecoverAccountSchema,
+    RecoverAccountResponseSchema,
     type RecoverAccountBody,
+    type RecoverAccountResponse,
 } from "@typings/schemas/auth/recover-account.schema";
 import {
     RegisterBodySchema,
@@ -176,23 +180,28 @@ export function authRoutes(fastify: FastifyInstance): void {
         authController.resetPassword.bind(authController),
     );
 
-    fastify.post<{ Body: RecoverAccountBody; Reply: LoginResponse }>(
+    fastify.post<{
+        Body: RecoverAccountBody;
+        Reply: { 200: RecoverAccountResponse };
+    }>(
         "/recover-account",
         {
             config: { rateLimit: RateLimitPolicies.STRICT },
             schema: {
                 body: RecoverAccountSchema,
+                response: { 200: RecoverAccountResponseSchema },
                 tags: ["Auth"],
             },
         },
         authController.recoverAccount.bind(authController),
     );
 
-    fastify.post<{ Body: CheckUserBody }>(
+    fastify.post<{ Body: CheckUserBody; Reply: { 200: CheckUserResponse } }>(
         "/check",
         {
             schema: {
                 body: checkUserBodySchema,
+                response: { 200: CheckUserResponseSchema },
                 tags: ["Auth"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },

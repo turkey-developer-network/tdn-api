@@ -1,7 +1,9 @@
 /**
  * Schema for bookmark deletion parameters
  */
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { type Static } from "@fastify/type-provider-typebox";
+import { MetaOnlyResponseSchema } from "../create-response-schema";
 
 /**
  * Schema for deleting a bookmark
@@ -21,3 +23,8 @@ export const deleteBookmarkParamsSchema = Type.Object(
  * Type for bookmark deletion parameters
  */
 export type DeleteBookmarkParams = Static<typeof deleteBookmarkParamsSchema>;
+
+export const UnsaveBookmarkResponseSchema = MetaOnlyResponseSchema;
+export type UnsaveBookmarkResponse = Static<
+    typeof UnsaveBookmarkResponseSchema
+>;

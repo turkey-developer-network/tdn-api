@@ -5,16 +5,20 @@
 import {
     type SaveBookmarkParams,
     saveBookmarkParamsSchema,
+    SaveBookmarkResponseSchema,
 } from "@typings/schemas/bookmark/save-bookmark-params.schema";
 import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import type { FastifyInstance } from "fastify";
 import {
     type DeleteBookmarkParams,
     deleteBookmarkParamsSchema,
+    UnsaveBookmarkResponseSchema,
 } from "@typings/schemas/bookmark/delete-bookmark.params.schema";
 import {
     type GetBookmarksQuery,
     getBookmarksQuerySchema,
+    GetBookmarksResponseSchema,
+    type GetBookmarksResponse,
 } from "@typings/schemas/bookmark/get-bookmarks-query.schema";
 
 export function bookmarkRoutes(fastify: FastifyInstance): void {
@@ -32,6 +36,7 @@ export function bookmarkRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
             schema: {
                 params: saveBookmarkParamsSchema,
+                response: { 201: SaveBookmarkResponseSchema },
                 tags: ["Bookmark"],
             },
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
@@ -51,6 +56,7 @@ export function bookmarkRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
             schema: {
                 params: deleteBookmarkParamsSchema,
+                response: { 200: UnsaveBookmarkResponseSchema },
                 tags: ["Bookmark"],
             },
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
@@ -63,12 +69,16 @@ export function bookmarkRoutes(fastify: FastifyInstance): void {
      * @route GET /bookmarks
      * @authentication Required
      */
-    fastify.get<{ Querystring: GetBookmarksQuery }>(
+    fastify.get<{
+        Querystring: GetBookmarksQuery;
+        Reply: { 200: GetBookmarksResponse };
+    }>(
         "/bookmarks",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 querystring: getBookmarksQuerySchema,
+                response: { 200: GetBookmarksResponseSchema },
                 tags: ["Bookmark"],
             },
         },

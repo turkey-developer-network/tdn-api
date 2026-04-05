@@ -1,23 +1,11 @@
 import type {
     ITagRepository,
+    TagSearchItem,
     TrendItem,
     TrendingParams,
 } from "@core/ports/repositories/tag.repository";
 import type { PrismaTransactionalClient } from "@infrastructure/persistence/database/prisma-client.type";
-import type { PostType } from "@core/domain/enums/post-type.enum";
-
-const POST_TYPE_CATEGORY_MAP: Record<string, string> = {
-    TECH_NEWS: "Technology",
-    COMMUNITY: "Community",
-    JOB_POSTING: "Jobs",
-    SYSTEM_UPDATE: "System",
-};
-
-export function mapPostTypeToCategory(type: PostType | string): string {
-    if (!type) return "Community";
-    const key = String(type).toUpperCase();
-    return POST_TYPE_CATEGORY_MAP[key] ?? "Community";
-}
+import { TagPrismaMapper } from "@infrastructure/persistence/mappers/tag-prisma.mapper";
 
 export class PrismaTagRepository implements ITagRepository {
     constructor(private readonly prisma: PrismaTransactionalClient) {}
@@ -66,6 +54,29 @@ export class PrismaTagRepository implements ITagRepository {
             freq[t] = (freq[t] ?? 0) + 1;
         }
         const dominant = Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
-        return mapPostTypeToCategory(dominant);
+        return TagPrismaMapper.mapPostTypeToCategory(dominant);
+    }
+
+    async search(query: string, limit = 10): Promise<TagSearchItem[]> {
+        const rawTags = await this.prisma.tag.findMany({
+            where: {
+                name: { contains: query, mode: "insensitive" },
+            },
+            include: {
+                _count: { select: { posts: true } },
+            },
+            orderBy: {
+                posts: { _count: "desc" },
+            },
+            take: limit,
+        });
+
+        return rawTags.map(
+            (tag): TagSearchItem => ({
+                name: tag.name,
+                postCount: tag._count.posts,
+                category: tag.category,
+            }),
+        );
     }
 }

@@ -27,7 +27,7 @@ export const EnvSchema = Type.Object({
     GITHUB_CLIENT_ID: Type.String(),
     GITHUB_CLIENT_SECRET: Type.String(),
     GITHUB_CALLBACK_URL: Type.String({
-        default: "http://localhost:8080/api/v1/oauth/google/callback",
+        default: "http://localhost:8080/api/v1/oauth/github/callback",
     }),
 
     //Google Configration
@@ -62,6 +62,7 @@ export const EnvSchema = Type.Object({
 
     // Frontend URL for OAuth redirects
     FRONTEND_URL: Type.String({ default: "http://localhost:5173" }),
+    API_URL: Type.String({ default: "http://localhost:8080" }),
 });
 
 export type EnvConfig = Static<typeof EnvSchema>;

@@ -12,6 +12,7 @@ import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
     type FollowUserBody,
     FollowUserBodySchema,
+    FollowActionResponseSchema,
 } from "@typings/schemas/follow-user/follow-user.schema";
 import type { FastifyInstance } from "fastify";
 
@@ -29,6 +30,7 @@ export default function followRoutes(fastify: FastifyInstance): void {
         {
             schema: {
                 body: FollowUserBodySchema,
+                response: { 200: FollowActionResponseSchema },
                 tags: ["Follow"],
             },
             onRequest: [fastify.authenticate],
@@ -42,6 +44,7 @@ export default function followRoutes(fastify: FastifyInstance): void {
         {
             schema: {
                 body: FollowUserBodySchema,
+                response: { 200: FollowActionResponseSchema },
                 tags: ["Follow"],
             },
             onRequest: [fastify.authenticate],

@@ -10,6 +10,8 @@ import {
     createCommentParamsSchema,
     type CreateCommentBody,
     type CreateCommentParams,
+    CreateCommentResponseSchema,
+    type CreateCommentResponse,
 } from "@typings/schemas/comment/create-comment.schema";
 import {
     type DeleteCommentParams,
@@ -20,33 +22,46 @@ import {
     getPostCommentsParamsSchema,
     type GetPostCommentsQuery,
     getPostCommentsQuerySchema,
+    GetPostCommentsResponseSchema,
+    type GetPostCommentsResponse,
 } from "@typings/schemas/comment/get-post-comments.schema";
 import {
     type CommentActionParams,
     commentActionParamsSchema,
+    CommentActionResponseSchema,
+    type CommentActionResponse,
 } from "@typings/schemas/comment/like-comment.schema";
 import {
     type GetCommentParams,
     getCommentParamsSchema,
+    GetCommentResponseSchema,
+    type GetCommentResponse,
 } from "@typings/schemas/comment/get-comment.schema";
 import {
     type GetCommentRepliesParams,
     type GetCommentRepliesQuery,
     getCommentRepliesParamsSchema,
     getCommentRepliesQuerySchema,
+    GetCommentRepliesResponseSchema,
+    type GetCommentRepliesResponse,
 } from "@typings/schemas/comment/get-comment-replies.schema";
 import { type FastifyInstance } from "fastify";
 
 export function commentRoutes(fastify: FastifyInstance): void {
     const { commentController } = fastify.diContainer.cradle;
 
-    fastify.post<{ Params: CreateCommentParams; Body: CreateCommentBody }>(
+    fastify.post<{
+        Params: CreateCommentParams;
+        Body: CreateCommentBody;
+        Reply: { 201: CreateCommentResponse };
+    }>(
         "/posts/:postId/comments",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: createCommentParamsSchema,
                 body: createCommentBodySchema,
+                response: { 201: CreateCommentResponseSchema },
                 tags: ["Comment"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
@@ -57,6 +72,7 @@ export function commentRoutes(fastify: FastifyInstance): void {
     fastify.get<{
         Params: GetPostCommentsParams;
         Querystring: GetPostCommentsQuery;
+        Reply: { 200: GetPostCommentsResponse };
     }>(
         "/posts/:postId/comments",
         {
@@ -64,6 +80,7 @@ export function commentRoutes(fastify: FastifyInstance): void {
             schema: {
                 params: getPostCommentsParamsSchema,
                 querystring: getPostCommentsQuerySchema,
+                response: { 200: GetPostCommentsResponseSchema },
                 tags: ["Post", "Comment"],
             },
 
@@ -85,12 +102,16 @@ export function commentRoutes(fastify: FastifyInstance): void {
         commentController.delete.bind(commentController),
     );
 
-    fastify.post<{ Params: CommentActionParams }>(
+    fastify.post<{
+        Params: CommentActionParams;
+        Reply: { 200: CommentActionResponse };
+    }>(
         "/comments/:commentId/like",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
+                response: { 200: CommentActionResponseSchema },
                 tags: ["Comment", "Interaction"],
             },
 
@@ -99,12 +120,16 @@ export function commentRoutes(fastify: FastifyInstance): void {
         commentController.likeComment.bind(commentController),
     );
 
-    fastify.delete<{ Params: CommentActionParams }>(
+    fastify.delete<{
+        Params: CommentActionParams;
+        Reply: { 200: CommentActionResponse };
+    }>(
         "/comments/:commentId/unlike",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
+                response: { 200: CommentActionResponseSchema },
                 tags: ["Comment", "Interaction"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
@@ -112,12 +137,16 @@ export function commentRoutes(fastify: FastifyInstance): void {
         commentController.unlikeComment.bind(commentController),
     );
 
-    fastify.post<{ Params: CommentActionParams }>(
+    fastify.post<{
+        Params: CommentActionParams;
+        Reply: { 201: CommentActionResponse };
+    }>(
         "/comments/:commentId/save",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
+                response: { 201: CommentActionResponseSchema },
                 tags: ["Comment", "Bookmark"],
             },
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
@@ -127,12 +156,16 @@ export function commentRoutes(fastify: FastifyInstance): void {
         ),
     );
 
-    fastify.delete<{ Params: CommentActionParams }>(
+    fastify.delete<{
+        Params: CommentActionParams;
+        Reply: { 200: CommentActionResponse };
+    }>(
         "/comments/:commentId/unsave",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 params: commentActionParamsSchema,
+                response: { 200: CommentActionResponseSchema },
                 tags: ["Comment", "Bookmark"],
             },
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
@@ -142,12 +175,16 @@ export function commentRoutes(fastify: FastifyInstance): void {
         ),
     );
 
-    fastify.get<{ Params: GetCommentParams }>(
+    fastify.get<{
+        Params: GetCommentParams;
+        Reply: { 200: GetCommentResponse };
+    }>(
         "/comments/:commentId",
         {
             onRequest: [fastify.optionalAuthenticate],
             schema: {
                 params: getCommentParamsSchema,
+                response: { 200: GetCommentResponseSchema },
                 tags: ["Comment"],
             },
             config: { rateLimit: RateLimitPolicies.PUBLIC },
@@ -158,6 +195,7 @@ export function commentRoutes(fastify: FastifyInstance): void {
     fastify.get<{
         Params: GetCommentRepliesParams;
         Querystring: GetCommentRepliesQuery;
+        Reply: { 200: GetCommentRepliesResponse };
     }>(
         "/comments/:commentId/replies",
         {
@@ -165,6 +203,7 @@ export function commentRoutes(fastify: FastifyInstance): void {
             schema: {
                 params: getCommentRepliesParamsSchema,
                 querystring: getCommentRepliesQuerySchema,
+                response: { 200: GetCommentRepliesResponseSchema },
                 tags: ["Comment"],
             },
             config: { rateLimit: RateLimitPolicies.PUBLIC },

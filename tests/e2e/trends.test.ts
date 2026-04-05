@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { server, API_PREFIX } from "./setup";
 
-describe("E2E Trends Flow (GET /api/v1/trends)", () => {
+describe("E2E Trends Flow (GET /api/v1/tags/trends)", () => {
     let accessToken: string = "";
 
     const testUser = {
@@ -32,7 +32,6 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
 
         accessToken = JSON.parse(loginRes.payload).data?.accessToken;
 
-        // Tag'lerin oluşması için hashtag içeren postlar at
         const posts = [
             {
                 content: "Exploring #typescript with a #backend architecture",
@@ -67,7 +66,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("1. Should return 200 with a trends array without auth", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends`,
+            url: `${API_PREFIX}/tags/trends`,
         });
 
         expect(response.statusCode).toBe(200);
@@ -83,7 +82,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("2. Each trend item should have tag, postCount, category fields", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends`,
+            url: `${API_PREFIX}/tags/trends`,
         });
 
         const { trends } = JSON.parse(response.payload).data;
@@ -92,7 +91,6 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
             expect(typeof trend.tag).toBe("string");
             expect(typeof trend.postCount).toBe("number");
             expect(trend.postCount).toBeGreaterThan(0);
-            // category null veya string olabilir
             expect(
                 trend.category === null || typeof trend.category === "string",
             ).toBe(true);
@@ -102,7 +100,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("3. Most-used tag should appear in results (typescript used 3 times)", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends`,
+            url: `${API_PREFIX}/tags/trends`,
         });
 
         const { trends } = JSON.parse(response.payload).data;
@@ -117,7 +115,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("4. Results should be ordered by postCount descending", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends`,
+            url: `${API_PREFIX}/tags/trends`,
         });
 
         const { trends } = JSON.parse(response.payload).data;
@@ -132,7 +130,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("5. Should respect limit query param", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends?limit=2`,
+            url: `${API_PREFIX}/tags/trends?limit=2`,
         });
 
         expect(response.statusCode).toBe(200);
@@ -144,7 +142,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("6. Should reject limit > 50 with 400", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends?limit=99`,
+            url: `${API_PREFIX}/tags/trends?limit=99`,
         });
 
         expect(response.statusCode).toBe(400);
@@ -153,7 +151,7 @@ describe("E2E Trends Flow (GET /api/v1/trends)", () => {
     it("7. Category for TECH_NEWS posts should be Technology", async () => {
         const response = await server.inject({
             method: "GET",
-            url: `${API_PREFIX}/trends`,
+            url: `${API_PREFIX}/tags/trends`,
         });
 
         const { trends } = JSON.parse(response.payload).data;

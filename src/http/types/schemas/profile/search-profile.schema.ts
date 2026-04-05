@@ -1,4 +1,6 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { ProfileItemSchema } from "./get-profile.schema";
 
 export const SearchProfilesQuerySchema = Type.Object({
     q: Type.String({
@@ -10,3 +12,14 @@ export const SearchProfilesQuerySchema = Type.Object({
 });
 
 export type SearchProfilesQuery = Static<typeof SearchProfilesQuerySchema>;
+
+export const SearchProfilesResponseSchema = FBType.Object({
+    data: FBType.Array(ProfileItemSchema),
+    meta: FBType.Object({
+        timestamp: FBType.String({ format: "date-time" }),
+        count: FBType.Number(),
+    }),
+});
+export type SearchProfilesResponse = Static<
+    typeof SearchProfilesResponseSchema
+>;

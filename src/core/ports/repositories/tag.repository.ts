@@ -8,6 +8,15 @@ export interface TrendItem {
 }
 
 /**
+ * Represents a single tag search result.
+ */
+export interface TagSearchItem {
+    name: string;
+    postCount: number;
+    category: string | null;
+}
+
+/**
  * Parameters for querying trending tags.
  */
 export interface TrendingParams {
@@ -26,4 +35,11 @@ export interface ITagRepository {
      * @param params - Limit and window size in days.
      */
     findTrending(params: TrendingParams): Promise<TrendItem[]>;
+
+    /**
+     * Searches tags by name prefix/substring, ordered by post count descending.
+     * @param query - The search string to match against tag names.
+     * @param limit - Maximum number of results to return. Defaults to 10.
+     */
+    search(query: string, limit?: number): Promise<TagSearchItem[]>;
 }

@@ -1,4 +1,34 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { Type } from "@sinclair/typebox";
+
+export const PostAuthorSchema = FBType.Object({
+    id: FBType.String({ format: "uuid" }),
+    username: FBType.Optional(FBType.String()),
+    avatarUrl: FBType.String(),
+    fullName: FBType.Optional(FBType.String()),
+    isMe: FBType.Optional(FBType.Boolean()),
+});
+
+export const PostItemSchema = FBType.Object({
+    id: FBType.String({ format: "uuid" }),
+    content: FBType.String(),
+    type: FBType.String(),
+    mediaUrls: FBType.Array(FBType.String()),
+    createdAt: FBType.String(),
+    likeCount: FBType.Number(),
+    commentCount: FBType.Number(),
+    isLiked: FBType.Boolean(),
+    isBookmarked: FBType.Boolean(),
+    author: PostAuthorSchema,
+    tags: FBType.Array(FBType.Object({ name: FBType.String() })),
+});
+
+export type PostItem = Static<typeof PostItemSchema>;
+
+export const GetPostResponseSchema = FBType.Object({
+    data: PostItemSchema,
+});
+export type GetPostResponse = Static<typeof GetPostResponseSchema>;
 
 export const getPostParamsSchema = Type.Object({
     id: Type.String({

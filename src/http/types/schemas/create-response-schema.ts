@@ -1,6 +1,6 @@
 import { type TSchema, Type } from "@fastify/type-provider-typebox";
 
-const MetaSchema = Type.Object({
+export const MetaSchema = Type.Object({
     timestamp: Type.String({ format: "date-time" }),
 });
 
@@ -17,3 +17,11 @@ export function ResponseSchema<T extends TSchema>(
         meta: MetaSchema,
     });
 }
+
+/**
+ * Schema for action responses that return only meta (no data payload).
+ * Used by: follow, unfollow, like, unlike, save, unsave, markAllRead
+ */
+export const MetaOnlyResponseSchema = Type.Object({
+    meta: MetaSchema,
+});

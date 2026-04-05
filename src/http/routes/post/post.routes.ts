@@ -9,6 +9,8 @@ import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
     type CreatePostBody,
     createPostBodySchema,
+    CreatePostResponseSchema,
+    type CreatePostResponse,
 } from "@typings/schemas/post/create-post.schema";
 import {
     type DeletePostParams,
@@ -17,12 +19,22 @@ import {
 import {
     type GetPostParams,
     getPostParamsSchema,
+    GetPostResponseSchema,
+    type GetPostResponse,
 } from "@typings/schemas/post/get-post.schema";
 import {
     getPostsQuerySchema,
     type GetPostsQuery,
+    GetFeedResponseSchema,
+    type GetFeedResponse,
 } from "@typings/schemas/post/get-posts.schema";
-import type { FastifyInstance } from "fastify";
+import { Type as FBType } from "@fastify/type-provider-typebox";
+import { ResponseSchema } from "@typings/schemas/create-response-schema";
+import type { FastifyInstance, FastifyRequest } from "fastify";
+
+const UploadMediaResponseSchema = ResponseSchema(
+    FBType.Object({ mediaUrls: FBType.Array(FBType.String()) }),
+);
 
 /**
  * Sets up post routes on the Fastify instance
@@ -44,12 +56,13 @@ export function postRoutes(fastify: FastifyInstance): void {
      * Create a new post
      * Requires authentication and applies sensitive rate limiting
      */
-    fastify.post<{ Body: CreatePostBody }>(
+    fastify.post<{ Body: CreatePostBody; Reply: { 201: CreatePostResponse } }>(
         "/posts",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 body: createPostBodySchema,
+                response: { 201: CreatePostResponseSchema },
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
@@ -67,6 +80,7 @@ export function postRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
             config: { rateLimit: RateLimitPolicies.SENSITIVE },
             schema: {
+                response: { 200: UploadMediaResponseSchema },
                 tags: ["Post"],
             },
         },
@@ -77,15 +91,19 @@ export function postRoutes(fastify: FastifyInstance): void {
      * Retrieve paginated post feed
      * Applies standard rate limiting
      */
-    fastify.get<{ Querystring: GetPostsQuery }>(
+    fastify.get<{
+        Querystring: GetPostsQuery;
+        Reply: { 200: GetFeedResponse };
+    }>(
         "/posts",
         {
             schema: {
                 querystring: getPostsQuerySchema,
+                response: { 200: GetFeedResponseSchema },
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
-            onRequest: async (request) => {
+            onRequest: async (request: FastifyRequest) => {
                 try {
                     if (request.headers.authorization) {
                         await request.jwtVerify();
@@ -117,15 +135,16 @@ export function postRoutes(fastify: FastifyInstance): void {
         postController.deletePost.bind(postController),
     );
 
-    fastify.get<{ Params: GetPostParams }>(
+    fastify.get<{ Params: GetPostParams; Reply: { 200: GetPostResponse } }>(
         "/posts/:id",
         {
             schema: {
                 params: getPostParamsSchema,
+                response: { 200: GetPostResponseSchema },
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
-            onRequest: async (request) => {
+            onRequest: async (request: FastifyRequest) => {
                 try {
                     if (request.headers.authorization) {
                         await request.jwtVerify();

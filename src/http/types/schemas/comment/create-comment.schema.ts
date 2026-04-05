@@ -1,4 +1,7 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { type Static } from "@fastify/type-provider-typebox";
+import { ResponseSchema } from "../create-response-schema";
+import { CommentItemSchema } from "./get-comment.schema";
 
 export const createCommentParamsSchema = Type.Object({
     postId: Type.String({ format: "uuid", description: "The ID of the Post" }),
@@ -23,3 +26,6 @@ export const createCommentBodySchema = Type.Object({
 });
 
 export type CreateCommentBody = Static<typeof createCommentBodySchema>;
+
+export const CreateCommentResponseSchema = ResponseSchema(CommentItemSchema);
+export type CreateCommentResponse = Static<typeof CreateCommentResponseSchema>;

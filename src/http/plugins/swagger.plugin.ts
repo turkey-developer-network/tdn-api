@@ -13,8 +13,8 @@ async function swaggerPlugin(fastify: FastifyInstance): Promise<void> {
             },
             servers: [
                 {
-                    url: "http://localhost:8080",
-                    description: "Development server",
+                    url: fastify.config.API_URL,
+                    description: "API server",
                 },
             ],
             components: {

@@ -1,5 +1,8 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { type Static } from "@fastify/type-provider-typebox";
 import { PostType } from "@core/domain/enums/post-type.enum";
+import { ResponseSchema } from "../create-response-schema";
+import { PostItemSchema } from "./get-post.schema";
 
 export const createPostBodySchema = Type.Object({
     content: Type.String({
@@ -22,3 +25,6 @@ export const createPostBodySchema = Type.Object({
 });
 
 export type CreatePostBody = Static<typeof createPostBodySchema>;
+
+export const CreatePostResponseSchema = ResponseSchema(PostItemSchema);
+export type CreatePostResponse = Static<typeof CreatePostResponseSchema>;

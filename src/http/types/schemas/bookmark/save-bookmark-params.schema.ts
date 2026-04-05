@@ -1,7 +1,9 @@
 /**
  * Schema for bookmark creation parameters
  */
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { type Static } from "@fastify/type-provider-typebox";
+import { MetaOnlyResponseSchema } from "../create-response-schema";
 
 /**
  * Schema for saving a bookmark
@@ -21,3 +23,6 @@ export const saveBookmarkParamsSchema = Type.Object(
  * Type for bookmark creation parameters
  */
 export type SaveBookmarkParams = Static<typeof saveBookmarkParamsSchema>;
+
+export const SaveBookmarkResponseSchema = MetaOnlyResponseSchema;
+export type SaveBookmarkResponse = Static<typeof SaveBookmarkResponseSchema>;

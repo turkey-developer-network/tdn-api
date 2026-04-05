@@ -9,20 +9,35 @@ import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
     FollowersParamsSchema,
     PaginationQuerySchema,
+    FollowsListResponseSchema,
+    type FollowsListResponse,
 } from "@typings/schemas/profile/followers.schema";
 import {
     type GetProfileParams,
     GetProfileParamsSchema,
+    GetProfileResponseSchema,
+    type GetProfileResponse,
 } from "@typings/schemas/profile/get-profile.schema";
 import {
     type SearchProfilesQuery,
     SearchProfilesQuerySchema,
+    SearchProfilesResponseSchema,
+    type SearchProfilesResponse,
 } from "@typings/schemas/profile/search-profile.schema";
 import {
     type UpdateProfileBody,
     UpdateProfileBodySchema,
 } from "@typings/schemas/profile/update-profile.schema";
+import { Type } from "@sinclair/typebox";
+import { ResponseSchema } from "@typings/schemas/create-response-schema";
 import type { FastifyInstance, FastifyRequest } from "fastify";
+
+const UploadAvatarResponseSchema = ResponseSchema(
+    Type.Object({ avatarUrl: Type.String() }),
+);
+const UploadBannerResponseSchema = ResponseSchema(
+    Type.Object({ bannerUrl: Type.String() }),
+);
 
 /**
  * Sets up profile routes on the Fastify instance
@@ -41,6 +56,7 @@ function profileRoutes(fastify: FastifyInstance): void {
                 rateLimit: RateLimitPolicies.STRICT,
             },
             schema: {
+                response: { 200: UploadAvatarResponseSchema },
                 tags: ["Profile"],
             },
         },
@@ -55,6 +71,7 @@ function profileRoutes(fastify: FastifyInstance): void {
                 rateLimit: RateLimitPolicies.STRICT,
             },
             schema: {
+                response: { 200: UploadBannerResponseSchema },
                 tags: ["Profile"],
             },
         },
@@ -73,11 +90,15 @@ function profileRoutes(fastify: FastifyInstance): void {
         profileController.updateProfileMe.bind(profileController),
     );
 
-    fastify.get<{ Querystring: SearchProfilesQuery }>(
+    fastify.get<{
+        Querystring: SearchProfilesQuery;
+        Reply: { 200: SearchProfilesResponse };
+    }>(
         "/search",
         {
             schema: {
                 querystring: SearchProfilesQuerySchema,
+                response: { 200: SearchProfilesResponseSchema },
                 tags: ["Profile"],
             },
             onRequest: async (request) => {
@@ -89,11 +110,15 @@ function profileRoutes(fastify: FastifyInstance): void {
         profileController.searchProfiles.bind(profileController),
     );
 
-    fastify.get<{ Params: GetProfileParams }>(
+    fastify.get<{
+        Params: GetProfileParams;
+        Reply: { 200: GetProfileResponse };
+    }>(
         "/:username",
         {
             schema: {
                 params: GetProfileParamsSchema,
+                response: { 200: GetProfileResponseSchema },
                 tags: ["Profile"],
             },
             onRequest: async (request: FastifyRequest) => {
@@ -105,24 +130,26 @@ function profileRoutes(fastify: FastifyInstance): void {
         profileController.getProfile.bind(profileController),
     );
 
-    fastify.get(
+    fastify.get<{ Reply: { 200: FollowsListResponse } }>(
         "/:username/followers",
         {
             schema: {
                 params: FollowersParamsSchema,
                 querystring: PaginationQuerySchema,
+                response: { 200: FollowsListResponseSchema },
                 tags: ["Profile"],
             },
         },
         profileController.getFollowers.bind(profileController),
     );
 
-    fastify.get(
+    fastify.get<{ Reply: { 200: FollowsListResponse } }>(
         "/:username/following",
         {
             schema: {
                 params: FollowersParamsSchema,
                 querystring: PaginationQuerySchema,
+                response: { 200: FollowsListResponseSchema },
                 tags: ["Profile"],
             },
         },

@@ -1,4 +1,29 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { Type } from "@sinclair/typebox";
+
+export const ProfileItemSchema = FBType.Object({
+    username: FBType.String(),
+    fullName: FBType.String(),
+    bio: FBType.Union([FBType.String(), FBType.Null()]),
+    location: FBType.Union([FBType.String(), FBType.Null()]),
+    avatarUrl: FBType.String(),
+    bannerUrl: FBType.String(),
+    socials: FBType.Record(FBType.String(), FBType.String()),
+    createdAt: FBType.String(),
+    updatedAt: FBType.String(),
+    followersCount: FBType.Number(),
+    followingCount: FBType.Number(),
+    isMe: FBType.Boolean(),
+    isFollowing: FBType.Boolean(),
+});
+
+export type ProfileItem = Static<typeof ProfileItemSchema>;
+
+export const GetProfileResponseSchema = FBType.Object({
+    data: ProfileItemSchema,
+    meta: FBType.Object({ timestamp: FBType.String({ format: "date-time" }) }),
+});
+export type GetProfileResponse = Static<typeof GetProfileResponseSchema>;
 
 export const GetProfileParamsSchema = Type.Object({
     username: Type.String({

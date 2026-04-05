@@ -1,4 +1,6 @@
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
+import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
+import { PostItemSchema } from "./get-post.schema";
 
 export const getUserPostsParamsSchema = Type.Object({
     username: Type.String({
@@ -14,3 +16,14 @@ export const getUserPostsQuerySchema = Type.Object({
 
 export type GetUserPostsParams = Static<typeof getUserPostsParamsSchema>;
 export type GetUserPostsQuery = Static<typeof getUserPostsQuerySchema>;
+
+export const GetUserPostsResponseSchema = FBType.Object({
+    data: FBType.Array(PostItemSchema),
+    meta: FBType.Object({
+        total: FBType.Number(),
+        currentPage: FBType.Number(),
+        limit: FBType.Number(),
+        totalPages: FBType.Number(),
+    }),
+});
+export type GetUserPostsResponse = Static<typeof GetUserPostsResponseSchema>;

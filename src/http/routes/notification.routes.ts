@@ -13,6 +13,9 @@ import { RateLimitPolicies } from "@plugins/rate-limit.plugin";
 import {
     GetNotificationsQuerySchema,
     type GetNotificationsQuery,
+    GetNotificationsResponseSchema,
+    type GetNotificationsResponse,
+    MarkAllReadResponseSchema,
 } from "@typings/schemas/notification/get-notification.schema";
 import type { FastifyInstance } from "fastify";
 
@@ -26,12 +29,16 @@ export default function notificationRoutes(fastify: FastifyInstance): void {
     const notificationController =
         fastify.diContainer.cradle.notificationController;
 
-    fastify.get<{ Querystring: GetNotificationsQuery }>(
+    fastify.get<{
+        Querystring: GetNotificationsQuery;
+        Reply: { 200: GetNotificationsResponse };
+    }>(
         "/notifications",
         {
             onRequest: [fastify.authenticate],
             schema: {
                 querystring: GetNotificationsQuerySchema,
+                response: { 200: GetNotificationsResponseSchema },
                 tags: ["Notification"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
@@ -45,6 +52,7 @@ export default function notificationRoutes(fastify: FastifyInstance): void {
             onRequest: [fastify.authenticate],
             config: { rateLimit: RateLimitPolicies.STANDARD },
             schema: {
+                response: { 200: MarkAllReadResponseSchema },
                 tags: ["Notification"],
             },
         },
