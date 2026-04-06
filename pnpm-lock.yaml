@@ -93,8 +93,8 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1
       resend:
-        specifier: ^6.9.4
-        version: 6.9.4
+        specifier: ^6.10.0
+        version: 6.10.0
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -2365,8 +2365,8 @@ packages:
     resolution: {integrity: sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA==}
     engines: {node: '>=12'}
 
-  postal-mime@2.7.3:
-    resolution: {integrity: sha512-MjhXadAJaWgYzevi46+3kLak8y6gbg0ku14O1gO/LNOuay8dO+1PtcSGvAdgDR0DoIsSaiIA8y/Ddw6MnrO0Tw==}
+  postal-mime@2.7.4:
+    resolution: {integrity: sha512-0WdnFQYUrPGGTFu1uOqD2s7omwua8xaeYGdO6rb88oD5yJ/4pPHDA4sdWqfD8wQVfCny563n/HQS7zTFft+f/g==}
 
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
@@ -2509,8 +2509,8 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  resend@6.9.4:
-    resolution: {integrity: sha512-/M3dsJzu5OgozqVsA4Psd/1L7EdePgOIIxClas453GOQYFG3VHc2ZyCHZFlvqsc9aZCCd2BJRRqZgWC8D9c7/g==}
+  resend@6.10.0:
+    resolution: {integrity: sha512-i7CwZpYj4Oho1RxsTpLcCUkO08+HiL4NXrm6jLJ2WzJ89UGI8eROSieLONJA3hnUrf1OYnCyfq5F6POnHUMv1Q==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -2685,8 +2685,8 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  svix@1.86.0:
-    resolution: {integrity: sha512-/HTvXwjLJe1l/MsLXAO1ddCYxElJk4eNR4DzOjDOEmGrPN/3BtBE8perGwMAaJ2sT5T172VkBYzmHcjUfM1JRQ==}
+  svix@1.88.0:
+    resolution: {integrity: sha512-vm/JrrUd3bVyBE+3L33TIyVSs8gS5fYx7lrISvKlDJXTYX1ACH4REX8P1tHxsSKoZi/rvifM1t0XRc5Vc45THw==}
 
   thread-stream@4.0.0:
     resolution: {integrity: sha512-4iMVL6HAINXWf1ZKZjIPcz5wYaOdPhtO8ATvZ+Xqp3BTdaqtAwQkNmKORqcIo5YkQqGXq5cwfswDwMqqQNrpJA==}
@@ -5515,7 +5515,7 @@ snapshots:
     dependencies:
       queue-lit: 1.5.2
 
-  postal-mime@2.7.3: {}
+  postal-mime@2.7.4: {}
 
   postcss@8.5.8:
     dependencies:
@@ -5631,10 +5631,10 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  resend@6.9.4:
+  resend@6.10.0:
     dependencies:
-      postal-mime: 2.7.3
-      svix: 1.86.0
+      postal-mime: 2.7.4
+      svix: 1.88.0
 
   resolve-pkg-maps@1.0.0: {}
 
@@ -5791,7 +5791,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  svix@1.86.0:
+  svix@1.88.0:
     dependencies:
       standardwebhooks: 1.0.0
       uuid: 10.0.0
