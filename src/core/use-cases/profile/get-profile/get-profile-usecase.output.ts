@@ -4,4 +4,5 @@ export interface GetProfileOutput {
     profile: Profile;
     isMe: boolean;
     isFollowing: boolean;
+    postCount: number;
 }

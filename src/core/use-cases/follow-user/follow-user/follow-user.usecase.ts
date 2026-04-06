@@ -39,7 +39,10 @@ export class FollowUserUseCase {
      * Otherwise, it creates the follow relationship, sends a notification,
      * and emits a real-time event to the target user.
      */
-    async execute(currentUserId: string, targetId: string): Promise<void> {
+    async execute(
+        currentUserId: string,
+        targetId: string,
+    ): Promise<{ followersCount: number }> {
         if (currentUserId === targetId)
             throw new BadRequestError("You cannot follow yourself.");
 
@@ -48,21 +51,25 @@ export class FollowUserUseCase {
             targetId,
         );
 
-        if (isFollowing) return;
+        if (!isFollowing) {
+            await this.followUserRepository.followUser(currentUserId, targetId);
 
-        await this.followUserRepository.followUser(currentUserId, targetId);
+            const notification = Notification.create(
+                targetId,
+                currentUserId,
+                NotificationType.FOLLOW,
+            );
 
-        const notification = Notification.create(
-            targetId,
-            currentUserId,
-            NotificationType.FOLLOW,
-        );
+            await this.notificationRepository.create(notification);
 
-        await this.notificationRepository.create(notification);
+            this.realtimeService.emitToUser(targetId, "new-notification", {
+                type: NotificationType.FOLLOW,
+                issuerId: currentUserId,
+            });
+        }
 
-        this.realtimeService.emitToUser(targetId, "new-notification", {
-            type: NotificationType.FOLLOW,
-            issuerId: currentUserId,
-        });
+        const followersCount =
+            await this.followUserRepository.getFollowersCount(targetId);
+        return { followersCount };
     }
 }

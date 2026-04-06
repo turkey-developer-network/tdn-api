@@ -29,7 +29,7 @@ export interface PostResponse {
         username?: string;
         avatarUrl: string;
         isMe?: boolean;
-        fullName?: string;
+        fullName: string | null;
     };
     isLiked: boolean;
     isBookmarked: boolean;
@@ -58,7 +58,7 @@ export class PostPrismaMapper {
                 id: dbPost.authorId,
                 username: dbPost.author?.username ?? undefined,
                 avatarUrl: dbPost.author?.profile?.avatarUrl ?? undefined,
-                fullName: dbPost.author?.profile?.fullName ?? undefined,
+                fullName: dbPost.author?.profile?.fullName ?? null,
             },
 
             tags: dbPost.tags?.map((t) => t.name) || [],

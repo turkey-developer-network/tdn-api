@@ -64,4 +64,11 @@ export interface IPostRepository {
         limit: number,
         type?: string,
     ): Promise<{ posts: Post[]; total: number }>;
+
+    /**
+     * Counts total posts by a specific user.
+     * @param userId - The ID of the user whose posts are being counted.
+     * @returns The total number of posts by the user.
+     */
+    countByUserId(userId: string): Promise<number>;
 }

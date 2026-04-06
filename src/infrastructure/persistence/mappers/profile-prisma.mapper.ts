@@ -66,6 +66,7 @@ export class ProfilePrismaMapper {
      * @returns A sanitized profile object safe for external API responses.
      */
     static toResponse(profile: Profile): {
+        id: string;
         username: string;
         fullName: string;
         bio: string | null;
@@ -79,6 +80,7 @@ export class ProfilePrismaMapper {
         followingCount: number;
     } {
         return {
+            id: profile.userId,
             username: profile.username,
             fullName: profile.fullName,
             bio: profile.bio,

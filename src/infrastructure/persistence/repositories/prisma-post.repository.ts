@@ -223,4 +223,8 @@ export class PrismaPostRepository implements IPostRepository {
 
         return { posts, total };
     }
+
+    async countByUserId(userId: string): Promise<number> {
+        return this.prisma.post.count({ where: { authorId: userId } });
+    }
 }

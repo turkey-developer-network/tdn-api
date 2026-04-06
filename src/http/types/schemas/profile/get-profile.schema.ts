@@ -2,6 +2,7 @@ import { Type as FBType, type Static } from "@fastify/type-provider-typebox";
 import { Type } from "@sinclair/typebox";
 
 export const ProfileItemSchema = FBType.Object({
+    id: FBType.String({ format: "uuid" }),
     username: FBType.String(),
     fullName: FBType.String(),
     bio: FBType.Union([FBType.String(), FBType.Null()]),
@@ -13,6 +14,7 @@ export const ProfileItemSchema = FBType.Object({
     updatedAt: FBType.String(),
     followersCount: FBType.Number(),
     followingCount: FBType.Number(),
+    postCount: FBType.Number(),
     isMe: FBType.Boolean(),
     isFollowing: FBType.Boolean(),
 });

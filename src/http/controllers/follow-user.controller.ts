@@ -16,12 +16,14 @@ export class FollowUserController {
         const { targetId } = request.body;
         const currentUserId = request.user!.id;
 
-        await this.followUserUseCase.execute(currentUserId, targetId);
+        const { followersCount } = await this.followUserUseCase.execute(
+            currentUserId,
+            targetId,
+        );
 
         reply.status(200).send({
-            meta: {
-                timestamp: new Date().toISOString(),
-            },
+            data: { followersCount },
+            meta: { timestamp: new Date().toISOString() },
         });
     }
 
@@ -32,12 +34,14 @@ export class FollowUserController {
         const { targetId } = request.body;
         const currentUserId = request.user!.id;
 
-        await this.unfollowUserUseCase.execute(currentUserId, targetId);
+        const { followersCount } = await this.unfollowUserUseCase.execute(
+            currentUserId,
+            targetId,
+        );
 
         reply.status(200).send({
-            meta: {
-                timestamp: new Date().toISOString(),
-            },
+            data: { followersCount },
+            meta: { timestamp: new Date().toISOString() },
         });
     }
 }

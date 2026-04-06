@@ -143,4 +143,8 @@ export class PrismaFollowUserRepository implements IFollowRepository {
 
         return follows.map((f) => f.followingId);
     }
+
+    async getFollowersCount(userId: string): Promise<number> {
+        return this.prisma.follow.count({ where: { followingId: userId } });
+    }
 }

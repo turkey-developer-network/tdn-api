@@ -34,7 +34,10 @@ export class UnfollowUserUseCase {
      * If the user is not following the target, the method returns silently.
      * Otherwise, it removes the follow relationship from the database.
      */
-    async execute(currentUserId: string, targetId: string): Promise<void> {
+    async execute(
+        currentUserId: string,
+        targetId: string,
+    ): Promise<{ followersCount: number }> {
         const targetProfile =
             await this.profileRepository.findByUserId(targetId);
         if (!targetProfile) throw new NotFoundError("User not found.");
@@ -47,11 +50,17 @@ export class UnfollowUserUseCase {
             targetProfile.userId,
         );
 
-        if (!isFollowing) return;
+        if (isFollowing) {
+            await this.followUserRepository.unfollowUser(
+                currentUserId,
+                targetProfile.userId,
+            );
+        }
 
-        await this.followUserRepository.unfollowUser(
-            currentUserId,
-            targetProfile.userId,
-        );
+        const followersCount =
+            await this.followUserRepository.getFollowersCount(
+                targetProfile.userId,
+            );
+        return { followersCount };
     }
 }

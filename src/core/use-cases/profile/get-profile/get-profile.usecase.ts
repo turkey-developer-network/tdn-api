@@ -1,6 +1,7 @@
 import { NotFoundError } from "@core/errors/common/not-found.error";
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
+import type { IPostRepository } from "@core/ports/repositories/post.repository";
 import type { GetProfileOutput } from "./get-profile-usecase.output";
 
 /**
@@ -19,6 +20,7 @@ export class GetProfileUseCase {
     constructor(
         private readonly profileRepository: IProfileRepository,
         private readonly followUserRepository: IFollowRepository,
+        private readonly postRepository: IPostRepository,
     ) {}
 
     /**
@@ -45,18 +47,21 @@ export class GetProfileUseCase {
 
         const isMe = currentUserId ? profile.userId === currentUserId : false;
 
-        let isFollowing = false;
-        if (currentUserId && !isMe) {
-            isFollowing = await this.followUserRepository.checkIsFollowing(
-                currentUserId,
-                profile.userId,
-            );
-        }
+        const [isFollowing, postCount] = await Promise.all([
+            currentUserId && !isMe
+                ? this.followUserRepository.checkIsFollowing(
+                      currentUserId,
+                      profile.userId,
+                  )
+                : Promise.resolve(false),
+            this.postRepository.countByUserId(profile.userId),
+        ]);
 
         return {
             profile,
             isMe,
             isFollowing,
+            postCount,
         };
     }
 }
