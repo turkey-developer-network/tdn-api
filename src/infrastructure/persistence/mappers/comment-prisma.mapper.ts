@@ -89,7 +89,9 @@ export class CommentPrismaMapper {
                 avatarUrl: comment.author?.avatarUrl
                     ? comment.author.avatarUrl.startsWith("http")
                         ? comment.author.avatarUrl
-                        : `${cdnUrl}/${comment.author.avatarUrl}`
+                        : comment.author.avatarUrl.includes("default_profile")
+                          ? `${cdnUrl}/${comment.author.avatarUrl}?v=1`
+                          : `${cdnUrl}/${comment.author.avatarUrl}`
                     : `${cdnUrl}/default-avatar.png`,
                 isMe: currentUserId
                     ? comment.authorId === currentUserId

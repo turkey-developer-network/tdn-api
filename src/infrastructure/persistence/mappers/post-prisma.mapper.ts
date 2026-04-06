@@ -120,7 +120,9 @@ export class PostPrismaMapper {
                 avatarUrl: post.author.avatarUrl
                     ? post.author.avatarUrl.startsWith("http")
                         ? post.author.avatarUrl
-                        : `${cdnUrl}/${post.author.avatarUrl}`
+                        : post.author.avatarUrl.includes("default_profile")
+                          ? `${cdnUrl}/${post.author.avatarUrl}?v=1`
+                          : `${cdnUrl}/${post.author.avatarUrl}`
                     : `${cdnUrl}/default-avatar.png`,
                 fullName: post.author.fullName ?? null,
                 isMe: currentUserId ? post.author.id === currentUserId : false,
