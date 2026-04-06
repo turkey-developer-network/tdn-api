@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type { GetUserNotificatonUseCase } from "@core/use-cases/notification/get-user";
 import type { GetNotificationsQuery } from "@typings/schemas/notification/get-notification.schema";
 import type { MarkAllNotificationsAsReadUseCase } from "@core/use-cases/notification/mark-all";
+import { NotificationPrismaMapper } from "@infrastructure/persistence/mappers/notification-prisma.mapper";
 
 export class NotificationController {
     constructor(
@@ -26,8 +27,12 @@ export class NotificationController {
 
         const totalPages = Math.ceil(response.total / limit);
 
+        const cdnUrl = request.server.config.R2_PUBLIC_URL;
+
         return reply.status(200).send({
-            data: response.notifications,
+            data: response.notifications.map((n) =>
+                NotificationPrismaMapper.toGetNotificationOutput(n, cdnUrl),
+            ),
             meta: {
                 total: response.total,
                 currentPage: page,

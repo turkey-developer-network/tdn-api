@@ -47,7 +47,10 @@ export class NotificationPrismaMapper {
      * @param notification - The Notification entity
      * @returns A response object with notification data
      */
-    public static toGetNotificationOutput(notification: Notification): {
+    public static toGetNotificationOutput(
+        notification: Notification,
+        cdnUrl: string,
+    ): {
         avatarUrl: string;
         createdAt: Date;
         type: CoreNotificationType;
@@ -56,7 +59,13 @@ export class NotificationPrismaMapper {
         isRead: boolean;
     } {
         return {
-            avatarUrl: notification.avatarUrl || "",
+            avatarUrl: notification.avatarUrl
+                ? notification.avatarUrl.startsWith("http")
+                    ? notification.avatarUrl
+                    : notification.avatarUrl.includes("default_profile")
+                      ? `${cdnUrl}/${notification.avatarUrl}?v=1`
+                      : `${cdnUrl}/${notification.avatarUrl}`
+                : `${cdnUrl}/default-avatar.png`,
             createdAt: notification.createdAt,
             type: notification.type as CoreNotificationType,
             recipientId: notification.recipientId,
