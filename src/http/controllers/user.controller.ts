@@ -45,7 +45,10 @@ export class UserController {
             id: request.user.id,
         });
 
-        reply.status(200).send(result);
+        reply.status(200).send({
+            data: result,
+            meta: { timestamp: new Date().toISOString() },
+        });
     }
 
     async changePasswordMe(
