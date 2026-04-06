@@ -58,7 +58,7 @@ export class PostPrismaMapper {
                 id: dbPost.authorId,
                 username: dbPost.author?.username ?? undefined,
                 avatarUrl: dbPost.author?.profile?.avatarUrl ?? undefined,
-                fullName: dbPost.author?.profile?.fullName ?? null,
+                fullName: dbPost.author?.profile?.fullName ?? undefined,
             },
 
             tags: dbPost.tags?.map((t) => t.name) || [],
@@ -122,7 +122,7 @@ export class PostPrismaMapper {
                         ? post.author.avatarUrl
                         : `${cdnUrl}/${post.author.avatarUrl}`
                     : `${cdnUrl}/default-avatar.png`,
-                fullName: post.author.fullName,
+                fullName: post.author.fullName ?? null,
                 isMe: currentUserId ? post.author.id === currentUserId : false,
             },
             tags: post.tags?.map((t) => ({ name: t })) || [],
