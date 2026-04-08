@@ -15,7 +15,7 @@ import type { LikeController } from "@controllers/like.controller";
 import type { BookmarkController } from "@controllers/bookmark.controller";
 import type { TrendController } from "@controllers/trend.controller";
 import type { CachePort } from "@core/ports/services/cache.port";
-
+import type { TranslationController } from "@controllers/translation.controller";
 /**
  * Fastify Awilix cradle interface for dependency injection
  * Defines all injectable services and components available in the application
@@ -61,10 +61,10 @@ declare module "@fastify/awilix" {
         /** Controller for comment operations */
         commentController: CommentController;
 
-        /** */
+        /** Controller for like operations */
         likeController: LikeController;
 
-        /** */
+        /** Controller for bookmark operations */
         bookmarkController: BookmarkController;
 
         /** Controller for trending tag operations */
@@ -72,6 +72,9 @@ declare module "@fastify/awilix" {
 
         /** Redis-backed cache service */
         cacheService: CachePort;
+
+        /** Controller for translation operations */
+        translationController: TranslationController;
     }
 }
 

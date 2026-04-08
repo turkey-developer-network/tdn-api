@@ -3,6 +3,7 @@ import { EmailService } from "@infrastructure/external/email.service";
 import { GithubAuthService } from "@infrastructure/external/github-auth.service";
 import { GoogleAuthService } from "@infrastructure/external/google-auth.service";
 import { S3StorageService } from "@infrastructure/external/s3-storage.service";
+import { DeepLTranslationService } from "@infrastructure/external/deepl-translation.service";
 
 export const externalModule = {
     // --- Services ---
@@ -31,5 +32,9 @@ export const externalModule = {
             clientSecret: config.GOOGLE_CLIENT_SECRET,
             callbackUrl: config.GOOGLE_CALLBACK_URL,
         });
+    }).singleton(),
+
+    translationService: asFunction((config) => {
+        return new DeepLTranslationService({ apiKey: config.DEEPL_API_KEY });
     }).singleton(),
 };

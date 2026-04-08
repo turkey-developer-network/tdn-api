@@ -55,6 +55,7 @@ import { RemoveCommentBookmarkUseCase } from "@core/use-cases/bookmark/remove-co
 import { GetTrendsUseCase } from "@core/use-cases/post/get-trends";
 import { SearchTagsUseCase } from "@core/use-cases/tag/search-tag";
 import { GetSuggestedUsersUseCase } from "@core/use-cases/profile/get-suggested-users";
+import { TranslateUseCase } from "@core/use-cases/translate";
 
 /**
  * Dependency injection module for use cases
@@ -338,4 +339,5 @@ export const useCasesModule = {
     getTrendsUseCase: asClass(GetTrendsUseCase).singleton(),
     searchTagsUseCase: asClass(SearchTagsUseCase).singleton(),
     getSuggestedUsersUseCase: asClass(GetSuggestedUsersUseCase).singleton(),
+    translateUseCase: asClass(TranslateUseCase).singleton(),
 };

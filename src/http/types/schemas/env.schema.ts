@@ -60,6 +60,9 @@ export const EnvSchema = Type.Object({
 
     RESEND_API_KEY: Type.String({ default: "resend_api_key" }),
 
+    // DeepL Translation
+    DEEPL_API_KEY: Type.String({ default: "deepl_api_key" }),
+
     // Frontend URL for OAuth redirects
     FRONTEND_URL: Type.String({ default: "http://localhost:5173" }),
     API_URL: Type.String({ default: "http://localhost:8080" }),
