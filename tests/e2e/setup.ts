@@ -1,5 +1,5 @@
 import { beforeAll, afterAll } from "vitest";
-import { App } from "src/app";
+import { App } from "../../src/app";
 import type { FastifyInstance } from "fastify";
 
 export let server: FastifyInstance;
