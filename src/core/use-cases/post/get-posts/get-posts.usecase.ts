@@ -32,6 +32,10 @@ export class GetPostsUseCase {
         const typeStr = input.type || "ALL";
         const tagStr = input.tag ?? "ALL";
         const followedOnly = input.followedOnly ?? false;
+        const categoriesStr =
+            input.categories && input.categories.length > 0
+                ? input.categories.join(",")
+                : "ALL";
 
         if (followedOnly && !input.currentUserId) {
             throw new UnauthorizedError(
@@ -39,7 +43,7 @@ export class GetPostsUseCase {
             );
         }
 
-        const cacheKey = `posts:feed:page:${page}:limit:${limit}:type:${typeStr}:tag:${tagStr}:followedOnly:${followedOnly}:user:${input.currentUserId || "guest"}`;
+        const cacheKey = `posts:feed:page:${page}:limit:${limit}:type:${typeStr}:tag:${tagStr}:categories:${categoriesStr}:followedOnly:${followedOnly}:user:${input.currentUserId || "guest"}`;
 
         const cachedData = await this.cacheService.get(cacheKey);
 
@@ -70,6 +74,7 @@ export class GetPostsUseCase {
             type: input.type,
             currentUserId: input.currentUserId,
             tag: input.tag,
+            categories: input.categories,
             ...(followedOnly && input.currentUserId
                 ? {
                       followingIds: await this.followRepository.getFollowingIds(

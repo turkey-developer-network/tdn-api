@@ -1,4 +1,5 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
+import type { PostCategory } from "@core/domain/enums/post-category";
 
 /**
  * Input interface for retrieving posts with pagination and filtering.
@@ -30,4 +31,6 @@ export interface GetPostsInput {
     currentUserId?: string;
     tag?: string;
     followedOnly?: boolean;
+    /** Optional array of categories to filter the feed */
+    categories?: PostCategory[];
 }

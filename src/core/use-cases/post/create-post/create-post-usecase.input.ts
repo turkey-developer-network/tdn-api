@@ -1,3 +1,4 @@
+import type { PostCategory } from "@core/domain/enums/post-category";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 
 /**
@@ -28,4 +29,8 @@ export interface CreatePostInput {
      * These URLs should point to uploaded media files.
      */
     mediaUrls?: string[];
+    /**
+     * Array of categories associated with the post for classification and discovery.
+     */
+    categories?: PostCategory[];
 }

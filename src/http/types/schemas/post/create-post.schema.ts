@@ -3,6 +3,7 @@ import { type Static } from "@fastify/type-provider-typebox";
 import { PostType } from "@core/domain/enums/post-type.enum";
 import { ResponseSchema } from "../create-response-schema";
 import { PostItemSchema } from "./get-post.schema";
+import { PostCategory } from "@core/domain/enums/post-category";
 
 export const createPostBodySchema = Type.Object({
     content: Type.String({
@@ -21,6 +22,12 @@ export const createPostBodySchema = Type.Object({
                 maxItems: 4,
             },
         ),
+    ),
+    categories: Type.Optional(
+        Type.Array(Type.Enum(PostCategory), {
+            maxItems: 5,
+            uniqueItems: true,
+        }),
     ),
 });
 

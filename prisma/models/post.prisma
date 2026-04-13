@@ -5,10 +5,19 @@ enum PostType {
   JOB_POSTING
 }
 
+enum Category {
+  AI
+  GAME
+  MOBILE
+  BACKEND
+  FRONTEND
+}
+
 model Post {
   id        String   @id @default(uuid())
   content   String   @db.Text
   type      PostType @default(COMMUNITY)
+  category  Category[] @map("category")
   mediaUrls String[] @map("media_urls")
 
   authorId String @map("author_id")
@@ -27,13 +36,13 @@ model Post {
   @@index([authorId])
   @@index([createdAt])
   @@index([type])
+  @@index([category])
   @@map("posts")
 }
 
 model Tag {
   id        String   @id @default(uuid())
   name      String   @unique
-  category  String?  @map("category")
   posts     Post[]
   createdAt DateTime @default(now()) @map("created_at")
 

@@ -9,7 +9,6 @@ import {
 } from "@infrastructure/persistence/mappers/post-prisma.mapper";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { PrismaTransactionalClient } from "@infrastructure/persistence/database/prisma-client.type";
-import { TagPrismaMapper } from "@infrastructure/persistence/mappers/tag-prisma.mapper";
 import type { Prisma } from "@generated/prisma/client";
 
 /**
@@ -41,9 +40,6 @@ export class PrismaPostRepository implements IPostRepository {
                         where: { name: tag },
                         create: {
                             name: tag,
-                            category: TagPrismaMapper.mapPostTypeToCategory(
-                                post.type as PostType,
-                            ),
                         },
                     })),
                 },
@@ -93,6 +89,9 @@ export class PrismaPostRepository implements IPostRepository {
                 ? { bookmarks: { some: { userId: savedByUserId } } }
                 : {}),
             ...(tag ? { tags: { some: { name: tag.toLowerCase() } } } : {}),
+            ...(params.categories && params.categories.length > 0
+                ? { category: { hasSome: params.categories } }
+                : {}),
         };
 
         const orderBy = tag

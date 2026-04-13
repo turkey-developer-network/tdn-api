@@ -21,6 +21,7 @@ export const PostItemSchema = FBType.Object({
     isBookmarked: FBType.Boolean(),
     author: PostAuthorSchema,
     tags: FBType.Array(FBType.Object({ name: FBType.String() })),
+    categories: FBType.Array(FBType.Object({ name: FBType.String() })),
 });
 
 export type PostItem = Static<typeof PostItemSchema>;

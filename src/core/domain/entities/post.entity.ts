@@ -1,5 +1,6 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { PostProps } from "@core/domain/interfaces/post-props.interface";
+import type { PostCategory } from "../enums/post-category";
 
 /**
  * Rich domain model for Post entity
@@ -19,22 +20,21 @@ export class Post {
     constructor(private readonly props: PostProps) {}
 
     /**
-     * Creates a new Post entity with minimal required data.
+     * Creates a new instance of the Post entity.
      *
-     * Factory method that ensures all required properties are provided
-     * while setting sensible defaults for optional properties.
-     *
-     * @param content - The content of the post
-     * @param type - The type of the post
-     * @param authorId - The ID of the post author
-     * @param mediaUrls - Optional array of media URLs
-     * @returns A new Post entity
+     * @param content - The textual content of the post.
+     * @param type - The type of the post (e.g., article, image, etc.).
+     * @param authorId - The unique identifier of the post's author.
+     * @param mediaUrls - Optional. An array of media URLs associated with the post. Defaults to an empty array.
+     * @param categories - Optional. An array of categories assigned to the post. Defaults to an empty array.
+     * @returns A new Post instance with the specified properties.
      */
     public static create(
         content: string,
         type: PostType,
         authorId: string,
         mediaUrls: string[] = [],
+        categories: PostCategory[] = [],
     ): Post {
         return new Post({
             content,
@@ -42,6 +42,7 @@ export class Post {
             mediaUrls,
             author: { id: authorId },
             tags: [],
+            categories,
         });
     }
 
@@ -65,7 +66,7 @@ export class Post {
      * Get the type of the post
      * @returns The post type enum value
      */
-    get type(): string {
+    get type(): PostType {
         return this.props.type;
     }
 
@@ -137,6 +138,15 @@ export class Post {
     get isLiked(): boolean {
         return this.props.isLiked ?? false;
     }
+
+    /**
+     * Get the categories associated with the post
+     * @returns Array of categories
+     */
+    get categories(): PostCategory[] {
+        return this.props.categories ?? [];
+    }
+
     /**
      * Check if the post has any media attached
      * @returns True if the post has one or more media items
