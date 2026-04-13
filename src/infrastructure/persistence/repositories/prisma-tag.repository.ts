@@ -5,11 +5,29 @@ import type {
     TrendingParams,
 } from "@core/ports/repositories/tag.repository";
 import type { PrismaTransactionalClient } from "@infrastructure/persistence/database/prisma-client.type";
-import { TagPrismaMapper } from "@infrastructure/persistence/mappers/tag-prisma.mapper";
 
+/**
+ * Prisma implementation of the Tag repository.
+ *
+ * Provides database operations for Tag entities using Prisma ORM.
+ * Implements the ITagRepository interface to ensure consistent
+ * data access patterns across different persistence implementations.
+ */
 export class PrismaTagRepository implements ITagRepository {
+    /**
+     * Initializes the PrismaTagRepository.
+     *
+     * @param prisma - The Prisma transactional client instance used for database operations.
+     */
     constructor(private readonly prisma: PrismaTransactionalClient) {}
 
+    /**
+     * Retrieves the most frequently used tags (trending) within a specified time window.
+     * Uses a "Twitter-style" trend algorithm where the tag itself represents the category.
+     *
+     * @param params - The parameters containing the limit of tags to retrieve and the time window in days.
+     * @returns A promise that resolves to an array of trending tags (TrendItem).
+     */
     async findTrending(params: TrendingParams): Promise<TrendItem[]> {
         const { limit, windowDays } = params;
         const windowStart = new Date(
@@ -25,7 +43,7 @@ export class PrismaTagRepository implements ITagRepository {
             include: {
                 posts: {
                     where: { createdAt: { gte: windowStart } },
-                    select: { type: true },
+                    select: { id: true },
                 },
             },
             orderBy: {
@@ -35,28 +53,22 @@ export class PrismaTagRepository implements ITagRepository {
         });
 
         return rawTags.map((tag): TrendItem => {
-            const postCount = tag.posts.length;
-            const topCategory = this.computeTopCategory(
-                tag.posts.map((p) => p.type),
-            );
             return {
                 tag: tag.name,
-                postCount,
-                category: topCategory ?? tag.category,
+                postCount: tag.posts.length,
+                category: null,
             };
         });
     }
 
-    private computeTopCategory(types: string[]): string | null {
-        if (types.length === 0) return null;
-        const freq: Record<string, number> = {};
-        for (const t of types) {
-            freq[t] = (freq[t] ?? 0) + 1;
-        }
-        const dominant = Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
-        return TagPrismaMapper.mapPostTypeToCategory(dominant);
-    }
-
+    /**
+     * Searches for tags by name using a case-insensitive substring match.
+     * Results are ordered by the total number of posts associated with the tag, descending.
+     *
+     * @param query - The search string to match against tag names.
+     * @param limit - The maximum number of results to return (defaults to 10).
+     * @returns A promise that resolves to an array of matching tags (TagSearchItem).
+     */
     async search(query: string, limit = 10): Promise<TagSearchItem[]> {
         const rawTags = await this.prisma.tag.findMany({
             where: {
@@ -75,7 +87,7 @@ export class PrismaTagRepository implements ITagRepository {
             (tag): TagSearchItem => ({
                 name: tag.name,
                 postCount: tag._count.posts,
-                category: tag.category,
+                category: null,
             }),
         );
     }

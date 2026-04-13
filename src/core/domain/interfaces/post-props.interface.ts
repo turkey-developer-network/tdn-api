@@ -1,4 +1,5 @@
 import type { PostType } from "@core/domain/enums";
+import type { PostCategory } from "../enums/post-category";
 
 /**
  * Props interface for Post entity
@@ -55,5 +56,9 @@ export interface PostProps {
     /** Indicates if the current authenticated user has bookmarked this post */
     isBookmarked?: boolean;
 
+    /** Indicates if the current authenticated user has liked this post */
     isLiked?: boolean;
+
+    /** Array of categories associated with the post */
+    categories: PostCategory[];
 }

@@ -4,6 +4,7 @@ import {
     type Static as FBStatic,
 } from "@fastify/type-provider-typebox";
 import { PostType } from "@core/domain/enums/post-type.enum";
+import { PostCategory } from "@core/domain/enums/post-category";
 import { PostItemSchema } from "./get-post.schema";
 
 export const getPostsQuerySchema = Type.Object({
@@ -18,6 +19,13 @@ export const getPostsQuerySchema = Type.Object({
     type: Type.Optional(Type.Enum(PostType, {})),
     tag: Type.Optional(Type.String({ minLength: 1, maxLength: 50 })),
     followedOnly: Type.Optional(Type.Boolean()),
+    categories: Type.Optional(
+        Type.Union([
+            Type.Array(Type.Enum(PostCategory)),
+            Type.Enum(PostCategory),
+            Type.String(),
+        ]),
+    ),
 });
 
 export type GetPostsQuery = Static<typeof getPostsQuerySchema>;
