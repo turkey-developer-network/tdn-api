@@ -1,4 +1,5 @@
 import { Post } from "@core/domain/entities/post.entity";
+import type { PostCategory } from "@core/domain/enums/post-category";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { Prisma } from "@generated/prisma/client";
 
@@ -34,6 +35,7 @@ export interface PostResponse {
     isLiked: boolean;
     isBookmarked: boolean;
     tags?: { name: string }[];
+    categories?: string[];
 }
 
 /**
@@ -68,6 +70,7 @@ export class PostPrismaMapper {
             commentCount: dbPost.commentCount,
             isLiked: dbPost.likes && dbPost.likes.length > 0,
             isBookmarked: dbPost.bookmarks && dbPost.bookmarks.length > 0,
+            categories: (dbPost.category as PostCategory[]) || [],
         });
     }
 
@@ -82,12 +85,14 @@ export class PostPrismaMapper {
         type: PostType;
         mediaUrls: string[];
         authorId: string;
+        category: PostCategory[];
     } {
         return {
             content: post.content,
             type: post.type as PostType,
             mediaUrls: post.mediaUrls,
             authorId: post.author.id,
+            category: post.categories || [],
         };
     }
 
@@ -128,6 +133,7 @@ export class PostPrismaMapper {
                 isMe: currentUserId ? post.author.id === currentUserId : false,
             },
             tags: post.tags?.map((t) => ({ name: t })) || [],
+            categories: post.categories || [],
         };
     }
 

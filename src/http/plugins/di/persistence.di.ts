@@ -102,6 +102,6 @@ export const persistenceModule = {
     commentBookmarkRepository: asClass(
         PrismaCommentBookmarkRepository,
     ).singleton(),
-
+    /* Tags act as their own trends/categories in the modern architecture, so we can omit a separate category repository. --- IGNORE --- */
     tagRepository: asClass(PrismaTagRepository).singleton(),
 };

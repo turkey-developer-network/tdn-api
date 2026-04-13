@@ -5,6 +5,7 @@ import type { GetPostDetailUseCase } from "@core/use-cases/post/get-post-detail/
 import type { GetPostsUseCase } from "@core/use-cases/post/get-posts";
 import type { UploadPostMediaUseCase } from "@core/use-cases/post/upload-post-media";
 import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
+import { PostCategory } from "@core/domain/enums/post-category";
 import type { CreatePostBody } from "@typings/schemas/post/create-post.schema";
 import type { DeletePostParams } from "@typings/schemas/post/delete-post.schema";
 import type { GetPostParams } from "@typings/schemas/post/get-post.schema";
@@ -12,19 +13,21 @@ import type { GetPostsQuery } from "@typings/schemas/post/get-posts.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 /**
- * Controller for handling post-related HTTP requests
+ * Controller for handling Post-related HTTP requests.
  *
- * Manages the HTTP layer for post operations including creation, media upload,
- * feed retrieval, deletion, and liking posts. This controller acts as the
- * interface between HTTP requests and the underlying use cases.
+ * This class acts as the HTTP interface for the Post domain. It orchestrates
+ * incoming requests, extracts necessary payload/parameters, delegates business
+ * logic to the respective Use Cases, and formats the outgoing HTTP responses.
  */
 export class PostController {
     /**
-     * Creates a new PostController instance
-     * @param createPostUseCase - Use case for creating posts
-     * @param uploadPostMediaUseCase - Use case for uploading post media
-     * @param getPostsUseCase - Use case for retrieving posts
-     * @param deletePostUseCase - Use case for deleting posts
+     * Initializes a new instance of the PostController.
+     *
+     * @param createPostUseCase - Use case for creating a new post.
+     * @param uploadPostMediaUseCase - Use case for handling media uploads.
+     * @param getPostsUseCase - Use case for retrieving a paginated feed of posts.
+     * @param deletePostUseCase - Use case for soft/hard deleting a post.
+     * @param getPostDetailUseCase - Use case for fetching details of a specific post.
      */
     constructor(
         private readonly createPostUseCase: CreatePostUseCase,
@@ -35,30 +38,33 @@ export class PostController {
     ) {}
 
     /**
-     * Creates a new post
-     * @param request - HTTP request containing post creation data
-     * @param reply - HTTP response object
+     * Handles the creation of a new post.
+     *
+     * @param request - The Fastify request containing the CreatePostBody.
+     * @param reply - The Fastify reply object.
+     * @returns A 201 Created response containing the newly created post.
      */
     async create(
         request: FastifyRequest<{ Body: CreatePostBody }>,
         reply: FastifyReply,
     ): Promise<void> {
         const authorId = request.user.id;
-        const { content, type, mediaUrls } = request.body;
+        const { content, type, mediaUrls, categories } = request.body;
 
         const post = await this.createPostUseCase.execute({
             authorId,
             content,
             type,
             mediaUrls,
+            categories,
         });
 
+        const cdnUrl = this.normalizeCdnUrl(
+            request.server.config.R2_PUBLIC_URL,
+        );
+
         return reply.status(201).send({
-            data: PostPrismaMapper.toResponse(
-                post,
-                request.server.config.R2_PUBLIC_URL,
-                authorId,
-            ),
+            data: PostPrismaMapper.toResponse(post, cdnUrl, authorId),
             meta: {
                 timestamp: new Date().toISOString(),
             },
@@ -66,9 +72,14 @@ export class PostController {
     }
 
     /**
-     * Uploads media files for a post
-     * @param request - HTTP request containing multipart form data with media files
-     * @param reply - HTTP response object
+     * Handles the uploading of multipart media files for a post.
+     * Maximum allowed files per upload is 4.
+     *
+     * @param request - The Fastify request containing multipart/form-data.
+     * @param reply - The Fastify reply object.
+     * @returns A 200 OK response containing an array of the uploaded media CDN URLs.
+     * @throws {NoMediaProvidedError} If the request is not multipart or contains no files.
+     * @throws {MediaLimitExceededError} If more than 4 files are uploaded.
      */
     async uploadMedia(
         request: FastifyRequest,
@@ -81,7 +92,9 @@ export class PostController {
         }
 
         const userId = request.user.id;
-        const r2PublicUrl = request.server.config.R2_PUBLIC_URL;
+        const r2PublicUrl = this.normalizeCdnUrl(
+            request.server.config.R2_PUBLIC_URL,
+        );
 
         const files = request.files();
         const uploadedUrls: string[] = [];
@@ -95,7 +108,6 @@ export class PostController {
             }
 
             const fileBuffer = await part.toBuffer();
-
             const uploadedPath = await this.uploadPostMediaUseCase.execute({
                 userId,
                 fileBuffer,
@@ -103,8 +115,7 @@ export class PostController {
                 originalFileName: part.filename,
             });
 
-            const fullUrl = `${r2PublicUrl}/${uploadedPath}`;
-            uploadedUrls.push(fullUrl);
+            uploadedUrls.push(`${r2PublicUrl}/${uploadedPath}`);
         }
 
         if (uploadedUrls.length === 0) {
@@ -122,16 +133,28 @@ export class PostController {
     }
 
     /**
-     * Retrieves a paginated feed of posts
-     * @param request - HTTP request containing pagination and filtering parameters
-     * @param reply - HTTP response object
+     * Retrieves a paginated feed of posts based on various filters.
+     * Includes normalization of comma-separated or array-based category queries.
+     *
+     * @param request - The Fastify request containing the GetPostsQuery.
+     * @param reply - The Fastify reply object.
+     * @returns A 200 OK response with the list of posts and pagination metadata.
      */
     async getFeed(
         request: FastifyRequest<{ Querystring: GetPostsQuery }>,
         reply: FastifyReply,
     ): Promise<void> {
-        const { page = 1, limit = 10, type, tag, followedOnly } = request.query;
+        const {
+            page = 1,
+            limit = 10,
+            type,
+            tag,
+            followedOnly,
+            categories: rawCategories,
+        } = request.query;
 
+        const categories = this.parseCategories(rawCategories);
+        const currentUserId = request.user?.id;
         const cdnUrl = request.server.config.R2_PUBLIC_URL;
 
         const result = await this.getPostsUseCase.execute({
@@ -140,16 +163,15 @@ export class PostController {
             type,
             tag,
             followedOnly,
-            currentUserId: request.user?.id,
+            categories,
+            currentUserId,
         });
 
         const formattedData = PostPrismaMapper.toFeedResponse(
             result.posts,
             cdnUrl,
-            request.user?.id,
+            currentUserId,
         );
-
-        const totalPages = Math.ceil(result.total / limit);
 
         return reply.status(200).send({
             data: formattedData,
@@ -157,15 +179,17 @@ export class PostController {
                 total: result.total,
                 currentPage: page,
                 limit,
-                totalPages,
+                totalPages: Math.ceil(result.total / limit),
             },
         });
     }
 
     /**
-     * Deletes a post by ID
-     * @param request - HTTP request containing the post ID to delete
-     * @param reply - HTTP response object
+     * Handles the deletion of a specific post.
+     *
+     * @param request - The Fastify request containing the Post ID in params.
+     * @param reply - The Fastify reply object.
+     * @returns A 204 No Content response upon successful deletion.
      */
     async deletePost(
         request: FastifyRequest<{ Params: DeletePostParams }>,
@@ -174,11 +198,10 @@ export class PostController {
         const userId = request.user.id;
         const postId = request.params.id;
 
-        let cdnBaseUrl = request.server.config.R2_PUBLIC_URL;
-
-        if (cdnBaseUrl.endsWith("/")) {
-            cdnBaseUrl = cdnBaseUrl.slice(0, -1);
-        }
+        const rawCdnUrl = request.server.config.R2_PUBLIC_URL;
+        const cdnBaseUrl = rawCdnUrl.endsWith("/")
+            ? rawCdnUrl.slice(0, -1)
+            : rawCdnUrl;
 
         await this.deletePostUseCase.execute({
             postId,
@@ -189,21 +212,57 @@ export class PostController {
         return reply.status(204).send();
     }
 
+    /**
+     * Retrieves the detailed view of a single post.
+     *
+     * @param request - The Fastify request containing the Post ID in params.
+     * @param reply - The Fastify reply object.
+     * @returns A 200 OK response with the mapped Post object.
+     */
     async getPost(
         request: FastifyRequest<{ Params: GetPostParams }>,
         reply: FastifyReply,
     ): Promise<void> {
         const { id } = request.params;
         const userId = request.user?.id;
-
-        const cdnUrl = request.server.config.R2_PUBLIC_URL;
+        const cdnUrl = this.normalizeCdnUrl(
+            request.server.config.R2_PUBLIC_URL,
+        );
 
         const post = await this.getPostDetailUseCase.execute(id, userId);
-
         const formattedData = PostPrismaMapper.toResponse(post, cdnUrl, userId);
 
         return reply.status(200).send({
             data: formattedData,
         });
+    }
+
+    /**
+     * Helper method to normalize and validate incoming raw categories from query parameters.
+     * * @param raw - The raw category string or string array from the query string.
+     * @returns An array of validated PostCategory enums, or undefined if none are valid.
+     * @private
+     */
+    private parseCategories(
+        raw?: string | string[],
+    ): PostCategory[] | undefined {
+        if (!raw) return undefined;
+        const rawArray = Array.isArray(raw) ? raw : raw.split(",");
+        const validCategories = new Set<string>(Object.values(PostCategory));
+
+        const parsed = rawArray
+            .map((c) => c.trim().toUpperCase())
+            .filter((c) => validCategories.has(c))
+            .map((c) => c as PostCategory);
+
+        return parsed.length > 0 ? parsed : undefined;
+    }
+
+    /**
+     * Normalize CDN base URL by removing trailing slash if present.
+     */
+    private normalizeCdnUrl(url?: string): string {
+        if (!url) return "";
+        return url.endsWith("/") ? url.slice(0, -1) : url;
     }
 }

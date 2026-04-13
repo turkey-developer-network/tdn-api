@@ -51,6 +51,7 @@ export class CreatePostUseCase {
             input.type,
             input.authorId,
             input.mediaUrls || [],
+            input.categories || [],
         );
 
         const rawPost = await this.postRepository.create(post);
