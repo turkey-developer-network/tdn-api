@@ -5,7 +5,7 @@ import type { GetPostDetailUseCase } from "@core/use-cases/post/get-post-detail/
 import type { GetPostsUseCase } from "@core/use-cases/post/get-posts";
 import type { UploadPostMediaUseCase } from "@core/use-cases/post/upload-post-media";
 import { PostPrismaMapper } from "@infrastructure/persistence/mappers/post-prisma.mapper";
-import { PostCategory } from "@core/domain/enums/post-category";
+import { PostCategory } from "@core/domain/enums/post-category-enum";
 import type { CreatePostBody } from "@typings/schemas/post/create-post.schema";
 import type { DeletePostParams } from "@typings/schemas/post/delete-post.schema";
 import type { GetPostParams } from "@typings/schemas/post/get-post.schema";

@@ -39,16 +39,42 @@ export interface CommentProps {
      */
     updatedAt?: Date;
 
+    /**
+     * Author details of the comment (optional, populated on retrieval)
+     */
     author?: {
+        /** Unique identifier of the author */
         id: string;
+        /** Display username of the author */
         username?: string;
+        /** URL of the author's avatar image */
         avatarUrl?: string;
+        /** Full name of the author */
         fullName?: string;
     };
 
+    /**
+     * Total number of likes the comment has received
+     */
     likeCount?: number;
+
+    /**
+     * Total number of replies to the comment
+     */
     replyCount?: number;
+
+    /**
+     * Whether the current user has liked the comment
+     */
     isLiked?: boolean;
+
+    /**
+     * Whether the current user has bookmarked the comment
+     */
     isBookmarked?: boolean;
+
+    /**
+     * Array of media URLs attached to the comment
+     */
     mediaUrls?: string[];
 }

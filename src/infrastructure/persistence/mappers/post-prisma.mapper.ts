@@ -1,5 +1,5 @@
 import { Post } from "@core/domain/entities/post.entity";
-import type { PostCategory } from "@core/domain/enums/post-category";
+import type { PostCategory } from "@core/domain/enums/post-category-enum";
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { Prisma } from "@generated/prisma/client";
 

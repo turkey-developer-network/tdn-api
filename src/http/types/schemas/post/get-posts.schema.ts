@@ -4,7 +4,7 @@ import {
     type Static as FBStatic,
 } from "@fastify/type-provider-typebox";
 import { PostType } from "@core/domain/enums/post-type.enum";
-import { PostCategory } from "@core/domain/enums/post-category";
+import { PostCategory } from "@core/domain/enums/post-category-enum";
 import { PostItemSchema } from "./get-post.schema";
 
 export const getPostsQuerySchema = Type.Object({

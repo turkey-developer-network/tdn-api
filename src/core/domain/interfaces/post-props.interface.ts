@@ -1,5 +1,5 @@
 import type { PostType } from "@core/domain/enums";
-import type { PostCategory } from "../enums/post-category";
+import type { PostCategory } from "../enums/post-category-enum";
 
 /**
  * Props interface for Post entity

@@ -189,12 +189,12 @@ export class ProfileController {
 
         const { profile } = await this.getProfileUseCase.execute(username);
 
-        const followers = await this.getFollowersUseCase.execute(
-            profile.userId,
+        const followers = await this.getFollowersUseCase.execute({
+            targetId: profile.userId,
             currentUserId,
             limit,
             offset,
-        );
+        });
 
         const response = followers.map((f) => ({
             ...f,
@@ -220,12 +220,12 @@ export class ProfileController {
 
         const { profile } = await this.getProfileUseCase.execute(username);
 
-        const following = await this.getFollowingUseCase.execute(
-            profile.userId,
+        const following = await this.getFollowingUseCase.execute({
+            targetId: profile.userId,
             currentUserId,
             limit,
             offset,
-        );
+        });
 
         const response = following.map((f) => ({
             ...f,

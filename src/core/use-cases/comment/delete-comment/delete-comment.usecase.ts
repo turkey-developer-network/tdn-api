@@ -1,15 +1,28 @@
 import type { TransactionPort } from "@core/ports/services/transaction.port";
 import type { CachePort } from "@core/ports/services/cache.port";
 import { NotFoundError, ForbiddenError } from "@core/errors";
-import type { DeleteCommentInput } from "./delete-comment-usecase.input";
+import type { DeleteCommentUseCaseInput } from "./delete-comment-usecase.input";
 
+/**
+ * Use case for deleting an existing comment. This use case ensures that the comment exists and that the user requesting the deletion is the author of the comment. If the comment has a parent comment, it also decrements the replies count of the parent comment. Finally, it deletes the comment and decrements the comments count of the associated post, while also clearing relevant cache entries to maintain data consistency.
+ */
 export class DeleteCommentUseCase {
+    /**
+     * @param transactionService - Service for managing database transactions, used to ensure that all operations related to deleting a comment are executed atomically
+     * @param cacheService - Service for managing cache, used to clear relevant cache entries after a comment is deleted to maintain data consistency
+     */
     constructor(
         private readonly transactionService: TransactionPort,
         private readonly cacheService: CachePort,
     ) {}
-
-    async execute(input: DeleteCommentInput): Promise<void> {
+    /**
+     * Executes the use case to delete a comment based on the provided input
+     * @param input - The input containing the comment ID and user ID to identify which comment to delete and to verify permissions
+     * @throws NotFoundError if the comment does not exist
+     * @throws ForbiddenError if the user requesting the deletion is not the author of the comment
+     * @returns void if the comment is successfully deleted
+     */
+    async execute(input: DeleteCommentUseCaseInput): Promise<void> {
         await this.transactionService.runInTransaction(async (ctx) => {
             const comment = await ctx.commentRepository.findById(
                 input.commentId,

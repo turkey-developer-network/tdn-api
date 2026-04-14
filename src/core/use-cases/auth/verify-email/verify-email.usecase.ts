@@ -4,13 +4,30 @@ import type { IVerificationTokenRepository } from "@core/ports/repositories/veri
 import { TokenType } from "@core/domain/enums/token-type.enum";
 import { type CryptoPort } from "@core/ports/services/crypto.port";
 import type { VerifyEmailInput } from "./verify-email.input";
+/**
+ * Use case for verifying a user's email address using a one-time password (OTP)
+ * This is typically part of the email verification flow after a user registers or requests email verification
+ * The use case checks the provided OTP against the stored verification token for the user, verifies the email if valid, and handles error cases such as invalid or expired tokens.
+ */
 export class VerifyEmailUseCase {
+    /**
+     * @param userRepository - Repository for accessing user data
+     * @param verificationTokenRepository - Repository for accessing verification tokens
+     * @param cryptoService - Service for hashing and comparing OTPs
+     * @remarks The constructor injects the necessary dependencies for the use case, including repositories for users and verification tokens, as well as a crypto service for handling OTP hashing. This allows the use case to perform its operations without being tightly coupled to specific implementations of these dependencies, facilitating easier testing and maintenance.
+     */
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly verificationTokenRepository: IVerificationTokenRepository,
         private readonly cryptoService: CryptoPort,
     ) {}
-
+    /**
+     * Executes the email verification process for a user based on the provided input
+     * @param input - The input containing the user ID and the OTP to verify
+     * @throws UnauthorizedError if the user is not found or is deleted
+     * @throws BadRequestError if the verification token is invalid, expired, or if the OTP does not match
+     * @returns void if the email is successfully verified or if it was already verified
+     */
     async execute(input: VerifyEmailInput): Promise<void> {
         const user = await this.userRepository.findById(input.userId);
 

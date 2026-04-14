@@ -27,6 +27,10 @@ export class Comment {
         return this.props.content;
     }
 
+    /**
+     * Gets the media URLs attached to the comment
+     * @returns Array of media URL strings, or an empty array if none exist
+     */
     public get mediaUrls(): string[] {
         return this.props.mediaUrls || [];
     }
@@ -77,6 +81,7 @@ export class Comment {
      * @param postId - The ID of the post this comment belongs to
      * @param authorId - The ID of the user who authored this comment
      * @param parentId - Optional parent comment ID for nested comments
+     * @param mediaUrls - Optional array of media URLs attached to the comment
      * @returns A new Comment instance
      */
     public static create(
@@ -95,6 +100,11 @@ export class Comment {
         });
     }
 
+    /**
+     * Gets the author details of the comment
+     * @returns An object containing the author's id and optional profile fields,
+     *          or undefined if author data is not populated
+     */
     public get author():
         | {
               id: string;
@@ -106,18 +116,34 @@ export class Comment {
         return this.props.author;
     }
 
+    /**
+     * Gets the total number of likes on the comment
+     * @returns The like count, or 0 if not set
+     */
     public get likeCount(): number {
         return this.props.likeCount || 0;
     }
 
+    /**
+     * Gets the total number of replies to the comment
+     * @returns The reply count, or 0 if not set
+     */
     public get replyCount(): number {
         return this.props.replyCount || 0;
     }
 
+    /**
+     * Indicates whether the current user has liked the comment
+     * @returns True if the comment is liked by the current user, false otherwise
+     */
     public get isLiked(): boolean {
         return this.props.isLiked || false;
     }
 
+    /**
+     * Indicates whether the current user has bookmarked the comment
+     * @returns True if the comment is bookmarked by the current user, false otherwise
+     */
     public get isBookmarked(): boolean {
         return this.props.isBookmarked || false;
     }

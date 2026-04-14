@@ -1,6 +1,6 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { Post } from "@core/domain/entities/post.entity";
-import type { PostCategory } from "@core/domain/enums/post-category";
+import type { PostCategory } from "@core/domain/enums/post-category-enum";
 
 /**
  * Parameters for paginated post retrieval with optional filtering.
