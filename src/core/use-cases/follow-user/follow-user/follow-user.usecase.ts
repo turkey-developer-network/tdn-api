@@ -4,6 +4,8 @@ import type { INotificationRepository } from "@core/ports/repositories/notificat
 import { Notification } from "@core/domain/entities/notification.entity";
 import { NotificationType } from "@core/domain/enums/notification-type.enum";
 import type { RealtimePort } from "@core/ports/services/realtime.port";
+import type { FollowUserUseCaseInput } from "./follow-user-usecase.input";
+import type { FollowUserUseCaseOutput } from "./follow-user-usecase.output";
 
 /**
  * Use case for following another user.
@@ -26,23 +28,17 @@ export class FollowUserUseCase {
     ) {}
 
     /**
-     * Executes the follow user process.
-     *
-     * @param currentUserId - The ID of the user initiating the follow
-     * @param targetId - The ID of the user to be followed
-     * @returns Promise<void> - Resolves when follow operation is complete
-     *
-     * @throws BadRequestError - When user tries to follow themselves
-     *
-     * @remarks
-     * If the user is already following the target, the method returns silently.
-     * Otherwise, it creates the follow relationship, sends a notification,
-     * and emits a real-time event to the target user.
+     * Executes the follow user use case.
+     * @param input - The input data for the use case, including the current user's ID and the target user's ID.
+     * @returns A promise that resolves to the output of the use case, which includes the updated followers count for the target user.
+     * @throws {BadRequestError} If the current user tries to follow themselves.
+     * @throws {Error} If any other error occurs during the follow operation.
      */
     async execute(
-        currentUserId: string,
-        targetId: string,
-    ): Promise<{ followersCount: number }> {
+        input: FollowUserUseCaseInput,
+    ): Promise<FollowUserUseCaseOutput> {
+        const { currentUserId, targetId } = input;
+
         if (currentUserId === targetId)
             throw new BadRequestError("You cannot follow yourself.");
 

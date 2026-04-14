@@ -8,11 +8,19 @@ import type { Post } from "@core/domain/entities/post.entity";
 import type { Comment } from "@core/domain/entities/comment.entity";
 
 export class GetBookmarksUseCase {
+    /**
+     * @param postRepository - Repository for accessing posts, used to retrieve bookmarked posts
+     * @param commentBookmarkRepository - Repository for accessing comment bookmarks, used to retrieve bookmarked comments
+     */
     constructor(
         private readonly postRepository: IPostRepository,
         private readonly commentBookmarkRepository: ICommentBookmarkRepository,
     ) {}
-
+    /**
+     * Executes the use case to retrieve a user's bookmarked posts and comments based on the provided input
+     * @param input - The input containing the user ID and optional pagination parameters
+     * @returns An object containing arrays of bookmarked posts and comments, along with their respective total counts for pagination purposes
+     */
     async execute(input: GetBookmarksUseCaseInput): Promise<{
         posts: Post[];
         postTotal: number;

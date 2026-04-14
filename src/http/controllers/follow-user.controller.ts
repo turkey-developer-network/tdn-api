@@ -16,10 +16,10 @@ export class FollowUserController {
         const { targetId } = request.body;
         const currentUserId = request.user!.id;
 
-        const { followersCount } = await this.followUserUseCase.execute(
+        const { followersCount } = await this.followUserUseCase.execute({
             currentUserId,
             targetId,
-        );
+        });
 
         reply.status(200).send({
             data: { followersCount },
@@ -34,10 +34,10 @@ export class FollowUserController {
         const { targetId } = request.body;
         const currentUserId = request.user!.id;
 
-        const { followersCount } = await this.unfollowUserUseCase.execute(
+        const { followersCount } = await this.unfollowUserUseCase.execute({
             currentUserId,
             targetId,
-        );
+        });
 
         reply.status(200).send({
             data: { followersCount },

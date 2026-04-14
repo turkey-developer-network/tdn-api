@@ -1,5 +1,5 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
-import type { PostCategory } from "@core/domain/enums/post-category";
+import type { PostCategory } from "@core/domain/enums/post-category-enum";
 
 /**
  * Input interface for retrieving posts with pagination and filtering.

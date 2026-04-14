@@ -1,18 +1,6 @@
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
-
-/**
- * Interface representing a follow list item with user information.
- */
-export interface FollowListItem {
-    userId: string;
-    username: string;
-    fullName: string;
-    avatarUrl: string;
-    bio: string | null;
-    isFollowing: boolean;
-    isMe: boolean;
-}
-
+import type { GetFollowersUseCaseOutput } from "./get-followers-usecase.output";
+import type { GetFollowersUseCaseInput } from "./get-followers-usecase.input";
 /**
  * Use case for retrieving followers of a user.
  *
@@ -28,25 +16,15 @@ export class GetFollowersUseCase {
     constructor(private readonly followUserRepository: IFollowRepository) {}
 
     /**
-     * Executes the get followers process.
-     *
-     * @param targetId - The ID of the user whose followers to retrieve
-     * @param currentUserId - The ID of the current user (optional, for follow status)
-     * @param limit - Maximum number of followers to return
-     * @param offset - Number of followers to skip (for pagination)
-     * @returns Promise<FollowListItem[]> - List of followers with follow status
-     *
-     * @remarks
-     * If no followers are found, returns an empty array.
-     * If currentUserId is provided, the isFollowing field indicates whether
-     * the current user follows each listed user.
+     * Executes the get followers use case.
+     * @param input - The input data for the use case, including the target user's ID, the current user's ID, and pagination parameters.
+     * @returns A promise that resolves to an array of followers, each containing user information and follow status.
      */
     async execute(
-        targetId: string,
-        currentUserId: string | undefined,
-        limit: number,
-        offset: number,
-    ): Promise<FollowListItem[]> {
+        input: GetFollowersUseCaseInput,
+    ): Promise<GetFollowersUseCaseOutput[]> {
+        const { targetId, currentUserId, limit, offset } = input;
+
         const followers = await this.followUserRepository.getFollowers(
             targetId,
             limit,

@@ -1,6 +1,6 @@
 import type { PostType } from "@core/domain/enums/post-type.enum";
 import type { PostProps } from "@core/domain/interfaces/post-props.interface";
-import type { PostCategory } from "../enums/post-category";
+import type { PostCategory } from "../enums/post-category-enum";
 
 /**
  * Rich domain model for Post entity
@@ -131,10 +131,18 @@ export class Post {
         return this.props.commentCount!;
     }
 
+    /**
+     * Indicates whether the current user has bookmarked the post
+     * @returns True if the post is bookmarked by the current user, false otherwise
+     */
     get isBookmarked(): boolean {
         return this.props.isBookmarked ?? false;
     }
 
+    /**
+     * Indicates whether the current user has liked the post
+     * @returns True if the post is liked by the current user, false otherwise
+     */
     get isLiked(): boolean {
         return this.props.isLiked ?? false;
     }

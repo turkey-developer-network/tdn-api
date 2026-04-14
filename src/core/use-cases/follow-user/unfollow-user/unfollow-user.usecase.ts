@@ -1,6 +1,7 @@
 import { BadRequestError, NotFoundError } from "@core/errors";
 import type { IFollowRepository } from "@core/ports/repositories/follow.repository";
 import type { IProfileRepository } from "@core/ports/repositories/profile.repository";
+import type { UnFollowUserUseCaseInput, UnFollowUserUseCaseOutput } from "./";
 
 /**
  * Use case for unfollowing another user.
@@ -21,23 +22,17 @@ export class UnfollowUserUseCase {
     ) {}
 
     /**
-     * Executes the unfollow user process.
-     *
-     * @param currentUserId - The ID of the user initiating the unfollow
-     * @param targetId - The ID of the user to be unfollowed
-     * @returns Promise<void> - Resolves when unfollow operation is complete
-     *
-     * @throws NotFoundError - When the target user is not found
-     * @throws BadRequestError - When user tries to unfollow themselves
-     *
-     * @remarks
-     * If the user is not following the target, the method returns silently.
-     * Otherwise, it removes the follow relationship from the database.
+     * Executes the unfollow user use case.
+     * @param input - The input data required to perform the unfollow action, including the current user's ID and the target user's ID.
+     * @returns A promise that resolves to the output of the unfollow action, which includes the updated followers count for the target user.
+     * @throws NotFoundError if the target user does not exist.
+     * @throws BadRequestError if the current user attempts to unfollow themselves.
      */
     async execute(
-        currentUserId: string,
-        targetId: string,
-    ): Promise<{ followersCount: number }> {
+        input: UnFollowUserUseCaseInput,
+    ): Promise<UnFollowUserUseCaseOutput> {
+        const { currentUserId, targetId } = input;
+
         const targetProfile =
             await this.profileRepository.findByUserId(targetId);
         if (!targetProfile) throw new NotFoundError("User not found.");
