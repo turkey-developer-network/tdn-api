@@ -30,7 +30,7 @@ import {
 } from "@typings/schemas/post/get-posts.schema";
 import { Type as FBType } from "@fastify/type-provider-typebox";
 import { ResponseSchema } from "@typings/schemas/create-response-schema";
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 
 const UploadMediaResponseSchema = ResponseSchema(
     FBType.Object({ mediaUrls: FBType.Array(FBType.String()) }),
@@ -103,17 +103,7 @@ export function postRoutes(fastify: FastifyInstance): void {
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
-            onRequest: async (request: FastifyRequest) => {
-                try {
-                    if (request.headers.authorization) {
-                        await request.jwtVerify();
-                    }
-                } catch {
-                    request.log.warn(
-                        "Invalid token on public route, proceeding as guest.",
-                    );
-                }
-            },
+            onRequest: [fastify.optionalAuthenticate],
         },
         postController.getFeed.bind(postController),
     );
@@ -144,17 +134,7 @@ export function postRoutes(fastify: FastifyInstance): void {
                 tags: ["Post"],
             },
             config: { rateLimit: RateLimitPolicies.STANDARD },
-            onRequest: async (request: FastifyRequest) => {
-                try {
-                    if (request.headers.authorization) {
-                        await request.jwtVerify();
-                    }
-                } catch {
-                    request.log.warn(
-                        "Invalid token on public route, proceeding as guest.",
-                    );
-                }
-            },
+            onRequest: [fastify.optionalAuthenticate],
         },
         postController.getPost.bind(postController),
     );

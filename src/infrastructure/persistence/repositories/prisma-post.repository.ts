@@ -111,12 +111,7 @@ export class PrismaPostRepository implements IPostRepository {
                 : {}),
         };
 
-        const orderBy = tag
-            ? [
-                  { likeCount: "desc" as const },
-                  { commentCount: "desc" as const },
-              ]
-            : { createdAt: "desc" as const };
+        const orderBy = { createdAt: "desc" as const };
 
         const [total, rawPosts] = await Promise.all([
             this.prisma.post.count({ where: whereCondition }),
@@ -125,7 +120,6 @@ export class PrismaPostRepository implements IPostRepository {
                 skip,
                 take: limit,
                 orderBy,
-
                 include: {
                     author: {
                         select: {
