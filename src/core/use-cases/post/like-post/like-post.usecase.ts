@@ -61,6 +61,7 @@ export class LikePostUseCase {
                     {
                         type: NotificationType.LIKE,
                         issuerId: input.userId,
+                        postId: input.postId,
                     },
                 );
             }

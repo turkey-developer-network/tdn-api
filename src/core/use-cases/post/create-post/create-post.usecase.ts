@@ -19,6 +19,7 @@ export class CreatePostUseCase {
      *
      * @param postRepository - Repository for managing post data
      * @param cacheService - Service for cache operations
+     * @param userRepository - Repository for managing user data
      */
     constructor(
         private readonly postRepository: IPostRepository,

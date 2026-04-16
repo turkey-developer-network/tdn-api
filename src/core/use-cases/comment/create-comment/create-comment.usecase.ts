@@ -93,6 +93,7 @@ export class CreateCommentUseCase {
                         type: NotificationType.COMMENT,
                         issuerId: input.authorId,
                         postId: input.postId,
+                        commentId: savedComment.id,
                     },
                 );
             }
