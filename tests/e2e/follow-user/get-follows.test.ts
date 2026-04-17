@@ -1,8 +1,6 @@
 import { authRequest, parseBody, request } from "../setup";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const FAKE_USERNAME = "nonexistent_user_xyz";
-
 /**
  * E2E tests for the Get Followers and Get Following endpoints.
  * Validates listing a user's followers/following with correct shape,
