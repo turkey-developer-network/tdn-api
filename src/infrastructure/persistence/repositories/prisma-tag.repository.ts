@@ -30,6 +30,7 @@ export class PrismaTagRepository implements ITagRepository {
      */
     async findTrending(params: TrendingParams): Promise<TrendItem[]> {
         const { limit, windowDays } = params;
+
         const windowStart = new Date(
             Date.now() - windowDays * 24 * 60 * 60 * 1000,
         );
@@ -46,19 +47,18 @@ export class PrismaTagRepository implements ITagRepository {
                     select: { id: true },
                 },
             },
-            orderBy: {
-                posts: { _count: "desc" },
-            },
-            take: limit,
         });
 
-        return rawTags.map((tag): TrendItem => {
-            return {
-                tag: tag.name,
-                postCount: tag.posts.length,
-                category: null,
-            };
-        });
+        return rawTags
+            .map(
+                (tag): TrendItem => ({
+                    tag: tag.name,
+                    postCount: tag.posts.length,
+                    category: null,
+                }),
+            )
+            .sort((a, b) => b.postCount - a.postCount)
+            .slice(0, limit);
     }
 
     /**
