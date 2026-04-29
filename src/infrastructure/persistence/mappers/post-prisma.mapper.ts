@@ -35,7 +35,7 @@ export interface PostResponse {
     isLiked: boolean;
     isBookmarked: boolean;
     tags?: { name: string }[];
-    categories?: string[];
+    categories?: { name: string }[];
 }
 
 /**
@@ -133,7 +133,7 @@ export class PostPrismaMapper {
                 isMe: currentUserId ? post.author.id === currentUserId : false,
             },
             tags: post.tags?.map((t) => ({ name: t })) || [],
-            categories: post.categories || [],
+            categories: post.categories?.map((c) => ({ name: c })) || [],
         };
     }
 
