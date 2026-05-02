@@ -2,19 +2,19 @@
 
 ## Comprehensive Testing Strategy & Prioritized Roadmap
 
-**TL;DR:** The project currently has very low test coverage with only a few E2E test files. Unit and integration tests are completely missing. This plan proposes a 4-phase test implementation roadmap aligned with Clean Architecture layers (domain → use-case → infrastructure → HTTP) targeting the highest ROI first.
+**TL;DR:** E2E tests are **complete** — all 46 files, 219 tests passing across every domain. Unit and integration tests are the next priority. This plan defines a 4-phase test implementation roadmap aligned with Clean Architecture layers (domain → use-case → infrastructure → HTTP) targeting the highest ROI first.
 
 ---
 
 ## Current State Analysis
 
-| Category          | Status         | Details                                     |
-| ----------------- | -------------- | ------------------------------------------- |
-| Unit Tests        | ❌ None        | `tests/unit/` is empty                      |
-| Integration Tests | ❌ None        | `tests/integration/` is empty               |
-| E2E Tests         | ✅ In Progress | Fresh start with domain-organized structure |
-| Test Infra        | ✅ Ready       | Vitest config, setup, scripts available     |
-| Coverage          | ⚠️ ~0%         | Building from scratch                       |
+| Category          | Status          | Details                                                                 |
+| ----------------- | --------------- | ----------------------------------------------------------------------- |
+| Unit Tests        | ❌ None         | `tests/unit/` is empty — **Sprint 1 next**                              |
+| Integration Tests | ❌ None         | `tests/integration/` is empty                                           |
+| E2E Tests         | ✅ **Complete** | 219 tests, 46 files — all domains covered (auth, user, post, follow, …) |
+| Test Infra        | ✅ Ready        | Vitest config, setup, scripts, bot seed in global-setup available       |
+| Coverage          | ⚠️ ~5-10%       | E2E layer covers HTTP surface; domain/use-case layers untested          |
 
 ---
 
@@ -28,7 +28,7 @@
 
 ---
 
-## Phase 1: Domain Entity Unit Tests (HIGHEST ROI — START HERE)
+## Phase 1: Domain Entity Unit Tests (HIGHEST ROI — START NEXT)
 
 **Why first?** Zero external dependencies, fastest execution, most stable, guarantees domain invariants.
 
@@ -268,14 +268,11 @@
 
 ### 4.3 E2E Test Additions
 
-| Area         | Missing Scenarios                                                                                      | Priority |
-| ------------ | ------------------------------------------------------------------------------------------------------ | -------- |
-| Auth         | Email verification flow (send → verify); Forgot → Reset password flow; Soft-delete → Recovery flow     | P1       |
-| Post         | CreatePost as bot (SYSTEM_UPDATE); Media upload (multipart); Category filtering; Following-only filter | P1       |
-| Profile      | Avatar/banner upload; Profile update; Search; Suggested users                                          | P2       |
-| Notification | Get notifications; Mark all read; WebSocket realtime delivery                                          | P2       |
-| Translation  | Translate endpoint                                                                                     | P2       |
-| Bookmark     | Combined post+comment bookmarks                                                                        | P2       |
+| Area        | Missing Scenarios                            | Priority |
+| ----------- | -------------------------------------------- | -------- |
+| All domains | ✅ All covered — no open E2E gaps            | —        |
+| WebSocket   | Realtime notification delivery (optional)    | P3       |
+| Rate Limit  | Per-policy 429 responses (test env bypasses) | P3       |
 
 **Estimated Case Count:** ~30-40
 
@@ -347,20 +344,32 @@
 
 ### E2E Test Structure
 
-E2E tests are organized by domain with a shared setup file:
+E2E tests are organized by domain. All domains are fully covered.
 
 ```
 tests/e2e/
-├── setup.ts                    ← Shared Fastify app lifecycle + test helpers
-├── auth/
-│   ├── login.test.ts           ← Login flow, invalid credentials, soft-deleted user recovery
-│   └── register.test.ts        ← Registration flow, duplicate checks, validation
-└── user/
-    └── get-me.test.ts          ← Authenticated user profile retrieval
+├── global-setup.ts             ← DB reset + bot user seed (argon2i + SHA256 botToken)
+├── setup.ts                    ← Fastify app lifecycle + request/authRequest helpers
+├── test-constants.ts           ← Shared test data (BOT_USER credentials)
+├── auth/                       ← 8 files: login, register, check-user, email-verification,
+│                                           password-reset, recover-account, logout, refresh
+├── user/                       ← 6 files: get-me, change-password, change-username,
+│                                           change-email, soft-delete, get-user-posts
+├── post/                       ← 5 files: create (incl. bot restriction), delete,
+│                                           get-feed (incl. category + followedOnly), get-post, upload-media
+├── comment/                    ← 4 files: create, delete, get-comments, interact
+├── follow-user/                ← 3 files: follow, unfollow, get-follows
+├── like/                       ← 2 files: like, unlike
+├── bookmark/                   ← 5 files: save-post, remove-post, save-comment, remove-comment, get-bookmarks
+├── notification/               ← 2 files: get-notifications, mark-all-read
+├── oauth/                      ← 2 files: exchange, redirect
+├── profile/                    ← 6 files: get-profile, update-profile, search, suggestions,
+│                                           upload-avatar, upload-banner
+├── translate/                  ← 1 file: translate
+└── trend/                      ← 2 files: get-trends, search-tags
 ```
 
-> **Note:** E2E tests are being rebuilt from scratch with a clean domain-organized structure.
-> New test files will be added incrementally as each domain is covered.
+> **Status:** ✅ E2E layer complete — 219 tests, 46 files, all passing.
 
 ### Full Directory Structure
 

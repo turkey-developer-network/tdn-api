@@ -1,4 +1,5 @@
 import { authRequest, parseBody, request } from "../setup";
+import { BOT_USER } from "../test-constants";
 import { beforeAll, describe, expect, it } from "vitest";
 
 /**
@@ -119,5 +120,58 @@ describe("POST /posts - Create Post", () => {
 
         expect(response.statusCode).toBe(401);
         expect(body.title).toBe("UnauthorizedError");
+    });
+
+    describe("Bot user post type restrictions", () => {
+        let botAccessToken = "";
+
+        beforeAll(async () => {
+            const loginRes = await request({
+                method: "POST",
+                url: "/auth/login",
+                payload: {
+                    identifier: BOT_USER.email,
+                    password: BOT_USER.password,
+                },
+            });
+            botAccessToken = parseBody<{ data: { accessToken: string } }>(
+                loginRes,
+            ).data.accessToken;
+        });
+
+        it("should return 403 when a normal user tries to create a SYSTEM_UPDATE post", async () => {
+            const response = await authRequest(accessToken, {
+                method: "POST",
+                url: "/posts",
+                payload: { content: "Restricted post", type: "SYSTEM_UPDATE" },
+            });
+            const body = parseBody<{ title: string }>(response);
+
+            expect(response.statusCode).toBe(403);
+            expect(body.title).toBe("ForbiddenError");
+        });
+
+        it("should return 201 when a bot user creates a SYSTEM_UPDATE post", async () => {
+            const response = await authRequest(botAccessToken, {
+                method: "POST",
+                url: "/posts",
+                payload: {
+                    content: "Bot system update post",
+                    type: "SYSTEM_UPDATE",
+                },
+            });
+
+            expect(response.statusCode).toBe(201);
+        });
+
+        it("should return 201 when a bot user creates a TECH_NEWS post", async () => {
+            const response = await authRequest(botAccessToken, {
+                method: "POST",
+                url: "/posts",
+                payload: { content: "Bot tech news post", type: "TECH_NEWS" },
+            });
+
+            expect(response.statusCode).toBe(201);
+        });
     });
 });
