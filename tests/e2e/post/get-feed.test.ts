@@ -13,19 +13,27 @@ describe("GET /posts - Get Post Feed", () => {
         password: "password123",
         username: `pgf${ts}`,
     };
+    const userB = {
+        email: `pgf-b-${ts}@test.com`,
+        password: "password123",
+        username: `pgfb${ts}`,
+    };
 
     let accessToken = "";
+    let userAId = "";
+    let tokenB = "";
 
     /**
      * Registers a test user, logs in, and creates a post
      * so the feed has at least one item.
      */
     beforeAll(async () => {
-        await request({
+        const registerRes = await request({
             method: "POST",
             url: "/auth/register",
             payload: user,
         });
+        userAId = parseBody<{ data: { id: string } }>(registerRes).data.id;
 
         const loginRes = await request({
             method: "POST",
@@ -40,6 +48,34 @@ describe("GET /posts - Get Post Feed", () => {
             method: "POST",
             url: "/posts",
             payload: { content: "E2E feed seed post" },
+        });
+
+        // Create a BACKEND-categorized post for category filter test
+        await authRequest(accessToken, {
+            method: "POST",
+            url: "/posts",
+            payload: { content: "E2E backend post", categories: ["BACKEND"] },
+        });
+
+        // Register userB and follow userA for followedOnly test
+        await request({
+            method: "POST",
+            url: "/auth/register",
+            payload: userB,
+        });
+
+        const loginB = await request({
+            method: "POST",
+            url: "/auth/login",
+            payload: { identifier: userB.email, password: userB.password },
+        });
+        tokenB = parseBody<{ data: { accessToken: string } }>(loginB).data
+            .accessToken;
+
+        await authRequest(tokenB, {
+            method: "POST",
+            url: "/follows",
+            payload: { targetId: userAId },
         });
     });
 
@@ -115,5 +151,34 @@ describe("GET /posts - Get Post Feed", () => {
 
         expect(response.statusCode).toBe(401);
         expect(body.title).toBe("UnauthorizedError");
+    });
+
+    it("should return 200 with only BACKEND posts when categories=BACKEND", async () => {
+        const response = await authRequest(accessToken, {
+            method: "GET",
+            url: "/posts?categories=BACKEND",
+        });
+        const body = parseBody<{
+            data: { categories: { name: string }[] }[];
+        }>(response);
+
+        expect(response.statusCode).toBe(200);
+        expect(body.data.length).toBeGreaterThan(0);
+        body.data.forEach((post) => {
+            expect(post.categories.some((c) => c.name === "BACKEND")).toBe(
+                true,
+            );
+        });
+    });
+
+    it("should return 200 with posts from followed users when followedOnly=true", async () => {
+        const response = await authRequest(tokenB, {
+            method: "GET",
+            url: "/posts?followedOnly=true",
+        });
+        const body = parseBody<{ data: unknown[] }>(response);
+
+        expect(response.statusCode).toBe(200);
+        expect(body.data.length).toBeGreaterThanOrEqual(1);
     });
 });
