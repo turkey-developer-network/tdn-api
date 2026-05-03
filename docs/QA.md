@@ -209,17 +209,25 @@
 
 **Estimated Case Count:** ~25-30
 
-### 3.2 Security Service Unit Tests
+### 3.2 Security & Realtime Service Unit Tests
 
-**File Location:** `tests/unit/infrastructure/security/`
+**File Location:** `tests/unit/infrastructure/security/` and `tests/unit/infrastructure/realtime/`
 
 | Service                     | Test Scenarios                                                                                                                           | Priority |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | `PasswordService` (Argon2i) | hash → verify = true; hash → wrong password = false; Different hashes are unique                                                         | P0       |
 | `CryptoService`             | generateRandomHex → correct length; generateOtp → 8 digits; hashOtp → deterministic SHA256                                               | P1       |
 | `AuthTokenService`          | generate → valid JWT; verify → correct payload; hashRefreshSecret → deterministic; generateRecoveryToken + verifyRecoveryToken roundtrip | P1       |
+| `WebSocketManager`          | registerClient → stored in Map; getClient → returns socket; removeClient → removed from Map; overwrite existing client                   | P1       |
+| `FastifyRealtimeService`    | emitToUser → Redis publish called with correct channel/payload; Redis subscriber routes to WebSocketManager; socket not found → no-op    | P1       |
 
-**Estimated Case Count:** ~12-15
+> **Note on WebSocket testing strategy:**
+>
+> - **Use-case level (Phase 2):** `FollowUserUseCase`, `LikePostUseCase`, `CreateCommentUseCase`, `LikeCommentUseCase` unit tests will mock `RealtimePort` and assert `emitToUser()` is called — this validates the _trigger_ logic.
+> - **Infrastructure level (here):** `WebSocketManager` and `FastifyRealtimeService` unit tests validate the _delivery_ mechanism using mocked Redis and WebSocket instances.
+> - **E2E end-to-end delivery** (real WS client ↔ server): Kept as optional (Phase 4) — requires real HTTP port + `ws` package since `server.inject()` does not support WebSocket upgrades.
+
+**Estimated Case Count:** ~18-22
 
 ### 3.3 Repository Integration Tests (Real DB Required)
 
@@ -303,8 +311,9 @@
 10. Bookmark domain P1s — ~6 cases
 11. OAuth domain P1s — ~10 cases
 12. Mapper unit tests (Phase 3.1 P1s) — ~15 cases
+13. WebSocketManager + FastifyRealtimeService unit tests (Phase 3.2) — ~8 cases
 
-**Total: ~95 cases → Expected coverage increase: 40-55%**
+**Total: ~102 cases → Expected coverage increase: 40-55%**
 
 ### Sprint 3: Integration & Deepening (Phase 3 remaining + Phase 2 P2s)
 
@@ -415,28 +424,28 @@ tests/
 
 ### Layer × Test Type Matrix
 
-| Layer                    | Unit             | Integration     | E2E                     |
-| ------------------------ | ---------------- | --------------- | ----------------------- |
-| Domain Entities          | ✅ Phase 1       | —               | —                       |
-| Domain Enums             | ✅ Phase 1       | —               | —                       |
-| Use-Cases (Auth)         | ✅ Phase 2 P0    | —               | ✅ auth/login, register |
-| Use-Cases (User)         | ✅ Phase 2 P0-P1 | —               | ✅ user/get-me          |
-| Use-Cases (Post)         | ✅ Phase 2 P0-P1 | —               | Phase 4                 |
-| Use-Cases (Comment)      | ✅ Phase 2 P1    | —               | Phase 4                 |
-| Use-Cases (Follow)       | ✅ Phase 2 P1    | —               | Phase 4                 |
-| Use-Cases (Bookmark)     | ✅ Phase 2 P1-P2 | —               | Phase 4                 |
-| Use-Cases (OAuth)        | ✅ Phase 2 P1    | —               | Phase 4                 |
-| Use-Cases (Profile)      | ✅ Phase 2 P2    | —               | Phase 4                 |
-| Use-Cases (Notification) | ✅ Phase 2 P2    | —               | Phase 4                 |
-| Mappers                  | ✅ Phase 3.1     | —               | —                       |
-| Security Services        | ✅ Phase 3.2     | —               | —                       |
-| Repositories             | —                | ✅ Phase 3.3    | —                       |
-| Error Handler            | ✅ Phase 4.1     | —               | ✅ via E2E flows        |
-| Rate Limiting            | —                | —               | ✅ Phase 4.2            |
-| Plugins (JWT, Cookie)    | —                | —               | ✅ via auth E2E         |
-| WebSocket/Realtime       | —                | —               | Phase 4 (optional)      |
-| Scheduled Jobs           | —                | ✅ Phase 3      | —                       |
-| External Services        | —                | Mock ✅ Phase 2 | —                       |
+| Layer                    | Unit                                            | Integration     | E2E                                         |
+| ------------------------ | ----------------------------------------------- | --------------- | ------------------------------------------- |
+| Domain Entities          | ✅ Phase 1                                      | —               | —                                           |
+| Domain Enums             | ✅ Phase 1                                      | —               | —                                           |
+| Use-Cases (Auth)         | ✅ Phase 2 P0                                   | —               | ✅ auth/login, register                     |
+| Use-Cases (User)         | ✅ Phase 2 P0-P1                                | —               | ✅ user/get-me                              |
+| Use-Cases (Post)         | ✅ Phase 2 P0-P1                                | —               | Phase 4                                     |
+| Use-Cases (Comment)      | ✅ Phase 2 P1                                   | —               | Phase 4                                     |
+| Use-Cases (Follow)       | ✅ Phase 2 P1                                   | —               | Phase 4                                     |
+| Use-Cases (Bookmark)     | ✅ Phase 2 P1-P2                                | —               | Phase 4                                     |
+| Use-Cases (OAuth)        | ✅ Phase 2 P1                                   | —               | Phase 4                                     |
+| Use-Cases (Profile)      | ✅ Phase 2 P2                                   | —               | Phase 4                                     |
+| Use-Cases (Notification) | ✅ Phase 2 P2                                   | —               | Phase 4                                     |
+| Mappers                  | ✅ Phase 3.1                                    | —               | —                                           |
+| Security Services        | ✅ Phase 3.2                                    | —               | —                                           |
+| Repositories             | —                                               | ✅ Phase 3.3    | —                                           |
+| Error Handler            | ✅ Phase 4.1                                    | —               | ✅ via E2E flows                            |
+| Rate Limiting            | —                                               | —               | ✅ Phase 4.2                                |
+| Plugins (JWT, Cookie)    | —                                               | —               | ✅ via auth E2E                             |
+| WebSocket/Realtime       | ✅ Phase 3.2 (WsManager + RealtimeService unit) | —               | Phase 4 (optional: real WS client delivery) |
+| Scheduled Jobs           | —                                               | ✅ Phase 3      | —                                           |
+| External Services        | —                                               | Mock ✅ Phase 2 | —                                           |
 
 ### Risk × Coverage Matrix
 
